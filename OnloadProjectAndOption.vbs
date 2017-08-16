@@ -34,30 +34,30 @@ End Sub
 
 Sub getAllProject(pPrjRoot)
 	Set vaProject = searchFolder(pPrjRoot, "joyasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-	If vaProject.Length = -1 Then Exit Sub
+	If vaProject.Bound = -1 Then Exit Sub
 
 	Call vaProject.SortArray()
 
 	Dim i
-	For i = 0 To vaProject.Length
-		Call addAfterLi(vaProject.Value(i), ID_INPUT_PROJECT, ID_LIST_PROJECT, ID_UL_PROJECT)
+	For i = 0 To vaProject.Bound
+		Call addAfterLi(vaProject.V(i), ID_INPUT_PROJECT, ID_LIST_PROJECT, ID_UL_PROJECT)
 	Next
 	'MsgBox(vaProject.ToString())
 
-	Call setElementValue(ID_INPUT_PROJECT, vaProject.Value(0))
+	Call setElementValue(ID_INPUT_PROJECT, vaProject.V(0))
 End Sub
 
 Sub getAllOption(pOptRoot)
 	Set vaOption = searchFolder(pOptRoot, "", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-	If vaOption.Length = -1 Then Exit Sub
+	If vaOption.Bound = -1 Then Exit Sub
 
 	Call vaOption.SortArray()
 
 	Dim i
-	For i = 0 To vaOption.Length
-		Call addAfterLi(vaOption.Value(i), ID_INPUT_OPTION, ID_LIST_OPTION, ID_UL_OPTION)
+	For i = 0 To vaOption.Bound
+		Call addAfterLi(vaOption.V(i), ID_INPUT_OPTION, ID_LIST_OPTION, ID_UL_OPTION)
 	Next
 	'MsgBox(vaOption.ToString())
 
-	Call setElementValue(ID_INPUT_OPTION, vaOption.Value(0))
+	Call setElementValue(ID_INPUT_OPTION, vaOption.V(0))
 End Sub

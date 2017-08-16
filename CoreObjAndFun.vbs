@@ -14,120 +14,201 @@ Const FOR_READING = 1
 Const FOR_APPENDING = 8
 
 Class VariableArray
-    Private mLength, mArray()
+    Private mBound, mArray()
 
     Private Sub Class_Initialize
-        mLength = -1
+        mBound = -1
     End Sub
 
-    Public Property Get Length
-        Length = mLength
+    Public Property Get Bound
+        Bound = mBound
     End Property
 
-    Public Property Get Value(seq)
+    Public Property Get V(seq)
         If Not isNumeric(seq) Then
-            MsgBox("Error: Get Value(seq) seq is not a number")
+            MsgBox("Error: Get V(seq) seq is not a number")
             Exit Property
         ELse
             seq = Cint(seq)
         End If
 
-        'MsgBox("seq="&seq&" mLength="&mLength)
-        If seq < 0 Or seq > mLength Then
-            MsgBox("Error: Get Value(seq) seq out of bound")
+        'MsgBox("seq="&seq&" mBound="&mBound)
+        If seq < 0 Or seq > mBound Then
+            MsgBox("Error: Get V(seq) seq out of bound! seq="&seq&" mBound="&mBound)
             Exit Property
         End If
 
         If isObject(mArray(seq)) Then
-            Set Value = mArray(seq)
+            Set V = mArray(seq)
         Else
-            Value = mArray(seq)
+            V = mArray(seq)
         End If
     End Property
 
-    Public Property Let Value(seq, sValue)
+    Public Property Let V(seq, sValue)
         If Not isNumeric(seq) Then
-            MsgBox("Error: Let Value(seq) seq is not a number")
+            MsgBox("Error: Let V(seq) seq is not a number")
             Exit Property
         ELse
             seq = Cint(seq)
         End If
 
-        If seq < 0 Or seq > mLength Then
-            MsgBox("Error: Let Value(seq) seq out of bound")
+        If seq < 0 Or seq > mBound Then
+            MsgBox("Error: Let V(seq) seq out of bound")
             Exit Property
         End If
 
-        mArray(seq) = sValue
+        If isObject(sValue) Then
+            Set mArray(seq) = sValue
+        Else
+            mArray(seq) = sValue
+        End If
     End Property
 
-    Public Function Append(value)
-        mLength = mLength + 1
-        ReDim Preserve mArray(mLength)
+    Public Sub Append(value)
+        mBound = mBound + 1
+        ReDim Preserve mArray(mBound)
 
         If isObject(value) Then
-            Set mArray(mLength) = value
+            Set mArray(mBound) = value
         ELse
-            mArray(mLength) = value
+            mArray(mBound) = value
         End If
-    End Function
+    End Sub
 
-    Public Function ResetArray()
-        mLength = -1
-    End Function
+    Public Sub ResetArray()
+        mBound = -1
+    End Sub
+
+    Public Property Get InnerArray
+        InnerArray = mArray
+    End Property
 
     Public Property Let InnerArray(newArray)
         If Not isArray(newArray) Then
             MsgBox("Error: Set InnerArray(newArray) newArray is not array")
             Exit Property
         End If
-
+        Call ResetArray()
         Dim i
         For i = 0 To UBound(newArray)
-            mLength = mLength + 1
-            ReDim Preserve mArray(mLength)
-            mArray(mLength) = newArray(i)
+            mBound = mBound + 1
+            ReDim Preserve mArray(mBound)
+            mArray(mBound) = newArray(i)
         Next
     End Property
 
-    Public Function PopBySeq(seq)
+    Public Sub SwapTwoValues(seq1, seq2)
+        If Not isNumeric(seq1) Or Not isNumeric(seq2) Then
+            MsgBox("Error: SwapTwoValues(seq1, seq2) seq1 or seq2 is not a number")
+            Exit Sub
+        ELse
+            seq1 = Cint(seq1)
+            seq2 = Cint(seq2)
+        End If
+
+        If (seq1 < 0 Or seq1 > mBound) Or (seq2 < 0 Or seq2 > mBound) Then
+            MsgBox("Error: SwapTwoValues(seq1, seq2) seq1 or seq2 out of bound")
+            Exit Sub
+        End If
+
+        If isObject(mArray(seq1)) And isObject(mArray(seq2)) Then
+            Dim oTmp1, oTmp2
+            Set oTmp1 = mArray(seq1)
+            Set oTmp2 = mArray(seq2)
+
+            Set mArray(seq1) = Nothing
+            Set mArray(seq2) = Nothing
+
+            Set mArray(seq1) = oTmp2
+            Set mArray(seq2) = oTmp1
+        Else
+            Dim sTmp
+            sTmp = mArray(seq1)
+            mArray(seq1) = mArray(seq2)
+            mArray(seq2) = sTmp
+        End If
+    End Sub
+
+    Public Sub InsertBySeq(seq, value)
+        If Not isNumeric(seq) Then
+            MsgBox("Error: insertBySeq(seq) seq is not a number")
+            Exit Sub
+        ELse
+            seq = Cint(seq)
+        End If
+
+        If seq < 0 Or seq > mBound Then
+            MsgBox("Error: insertBySeq(seq) seq out of bound")
+            Exit Sub
+        End If
+
+        mBound = mBound + 1
+        ReDim Preserve mArray(mBound + 1)
+
+        Dim i
+        If isObject(value) Then
+            If seq <> mBound - 1 Then
+                For i = mBound To seq + 2 Step -1
+                    Set mArray(i) = mArray(i - 1)
+                Next
+            End If
+
+            Set mArray(seq + 1) = value
+        Else
+            If seq <> mBound - 1 Then
+                For i = mBound To seq + 2 Step -1
+                    mArray(i) = mArray(i - 1)
+                Next
+            End If
+
+            mArray(seq + 1) = value
+        End If
+    End Sub
+    Public Sub PopBySeq(seq)
         If Not isNumeric(seq) Then
             MsgBox("Error: PopBySeq(seq) seq is not a number")
-            Exit Function
+            Exit Sub
         ELse
             seq = Cint(seq)
         End If
 
-        If seq < 0 Or seq > mLength Then
+        If seq < 0 Or seq > mBound Then
             MsgBox("Error: PopBySeq(seq) seq out of bound")
-            Exit Function
+            Exit Sub
         End If
 
-        If seq <> mLength Then
+        If seq <> mBound Then
             Dim i
-            For i = seq To mLength - 1
-                mArray(i) = mArray(i + 1)
-            Next
+            If isObject(mArray(seq)) Then
+                For i = seq To mBound - 1
+                    Set mArray(i) = mArray(i + 1)
+                Next
+            Else
+                For i = seq To mBound - 1
+                    mArray(i) = mArray(i + 1)
+                Next
+            End If
         End If
 
-        mLength = mLength - 1
-        ReDim Preserve mArray(mLength)
-    End Function
+        mBound = mBound - 1
+        ReDim Preserve mArray(mBound)
+    End Sub
 
-    Public Function MoveToTop(seq)
+    Public Sub MoveToTop(seq)
         If Not isNumeric(seq) Then
             MsgBox("Error: MoveToTop(seq) seq is not a number")
-            Exit Function
+            Exit Sub
         ELse
             seq = Cint(seq)
         End If
 
-        If seq < 0 Or seq > mLength Then
+        If seq < 0 Or seq > mBound Then
             MsgBox("Error: MoveToTop(seq) seq out of bound")
-            Exit Function
+            Exit Sub
         End If
 
-        If seq = 0 Then Exit Function
+        If seq = 0 Then Exit Sub
 
         Dim i, sValueToBeMove
         If isObject(mArray(seq)) Then
@@ -143,77 +224,93 @@ Class VariableArray
                 mArray(0) = sValueToBeMove
             Next
         End If
-    End Function
+    End Sub
 
-    Public Function MoveToEnd(seq)
+    Public Sub MoveToEnd(seq)
         If Not isNumeric(seq) Then
             MsgBox("Error: MoveToEnd(seq) seq is not a number")
-            Exit Function
+            Exit Sub
         ELse
             seq = Cint(seq)
         End If
 
-        If seq < 0 Or seq > mLength Then
+        If seq < 0 Or seq > mBound Then
             MsgBox("Error: MoveToEnd(seq) seq out of bound")
-            Exit Function
+            Exit Sub
         End If
 
-        If seq = 0 Then Exit Function
+        If seq = 0 Then Exit Sub
 
         Dim i, sValueToBeMove
         If isObject(mArray(seq)) Then
             Set sValueToBeMove = mArray(seq)
-            For i = seq To mLength - 1
+            For i = seq To mBound - 1
                 Set mArray(i) = mArray(i + 1)
             Next
-            Set mArray(mLength) = sValueToBeMove
+            Set mArray(mBound) = sValueToBeMove
         Else
             sValueToBeMove = mArray(seq)
-            For i = seq To mLength - 1
+            For i = seq To mBound - 1
                 mArray(i) = mArray(i + 1)
             Next
-            mArray(mLength) = sValueToBeMove
+            mArray(mBound) = sValueToBeMove
         End If
-    End Function
+    End Sub
 
-    Public Function IsExistInArray(value)
-        If mLength = -1 Then
-            IsExistInArray = -1
+    Public Function GetIndexIfExist(value)
+        If mBound = -1 Then
+            GetIndexIfExist = -1
             Exit Function
         End If
 
         Dim i
-        For i = 0 To mLength
+        For i = 0 To mBound
             If StrComp(mArray(i), value) = 0 Then
-                IsExistInArray = i
+                GetIndexIfExist = i
                 Exit Function
             End If
         Next
-        IsExistInArray = -1
+        GetIndexIfExist = -1
     End Function
 
-    Public Function SortArray()
-        If mLength = -1 Then
-            'MsgBox("Error: SortArray() mLength <= 0, no need to sort")
+    Public Function IsExistInObject(value, seq)
+        If mBound = -1 Then
+            IsExistInObject = False
             Exit Function
         End If
 
+        Dim i
+        For i = 0 To mBound
+            If StrComp(mArray(i).V(seq), value) = 0 Then
+                IsExistInObject = True
+                Exit Function
+            End If
+        Next
+        IsExistInObject = False
+    End Function
+
+    Public Sub SortArray()
+        If mBound <= 0 Then
+            'MsgBox("Error: SortArray() mBound <= 0, no need to sort")
+            Exit Sub
+        End If
+
         Dim i, j
-        For i = 0 To mLength - 1
-            For j = i + 1 To mLength
+        For i = 0 To mBound - 1
+            For j = i + 1 To mBound
                 If StrComp(mArray(i), mArray(j)) > 0 Then
                     Dim sTmp : sTmp = mArray(i) : mArray(i) = mArray(j) : mArray(j) = sTmp
                 End If
             Next
         Next
-    End Function
+    End Sub
 
     Public Function ToString()
-        If mLength <> -1 Then
+        If mBound <> -1 Then
             Dim i, sTmp
             sTmp = "v(0) = " & mArray(0)
-            If mLength > 0 Then
-                For i = 1 To mLength
+            If mBound > 0 Then
+                For i = 1 To mBound
                     If isArray(mArray(i)) Then
                         sTmp = sTmp & Vblf & "v(" & i & ") = " & join(mArray(i))
                     ElseIf isObject(mArray(i)) Then
@@ -226,77 +323,6 @@ Class VariableArray
             ToString = sTmp
         Else
             MsgBox("Error: ToString() mArray has no element")
-        End If
-    End Function
-End Class
-
-
-Const STATUS_INVALID = 0
-Const STATUS_VALID = 1
-Const STATUS_WAIT = 2
-
-Class StatusHolder
-    Private mValue, mStatus, mInvalidMsg
-
-    Private Sub Class_Initialize
-        mValue = ""
-        mStatus = STATUS_WAIT
-    End Sub
-
-    Public Property Get Value
-        Value = mValue
-    End Property
-
-    Public Property Get Status
-        Status = mStatus
-    End Property
-
-    Public Property Let Status(value)
-        mStatus = value
-    End Property
-
-    Public Property Get InvalidMsg
-        InvalidMsg = mInvalidMsg
-    End Property
-
-    Public Property Let InvalidMsg(value)
-        mInvalidMsg = value
-    End Property
-
-    Public Sub Reset()
-        mValue = ""
-        mStatus = STATUS_WAIT
-    End Sub
-
-    Public Sub SetValue(status, value)
-        mStatus = status
-        mValue = value
-    End Sub
-
-    Public Sub SetStatusAndMsg(status, msg, showMsg)
-        mStatus = status
-        mInvalidMsg = msg
-        If showMsg Then MsgBox(mInvalidMsg)
-    End Sub
-
-    Public Function checkInvalidAndShowMsg()
-        If mStatus = STATUS_INVALID Then
-            MsgBox(mInvalidMsg)
-            checkInvalidAndShowMsg = True
-            Exit Function
-        End If
-        checkInvalidAndShowMsg = False
-    End Function
-
-    Public Function checkStatusAndDoSomething(waitFun, invalidFun)
-        If mStatus = STATUS_WAIT Then
-            Call Execute(waitFun)
-            If mStatus = STATUS_INVALID Then
-                Call Execute(invalidFun)
-                checkStatusAndDoSomething = True
-            End If
-        ElseIf checkInvalidAndShowMsg() Then
-            checkStatusAndDoSomething = True
         End If
     End Function
 End Class

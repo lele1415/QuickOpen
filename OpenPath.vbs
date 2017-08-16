@@ -1,5 +1,3 @@
-Const PATH_TEXT_EDITOR = "F:\tools\Sublime_Text_3\sublime_text.exe"
-
 Const ID_INPUT_OPEN_PATH = "input_open_path"
 
 Const ID_LIST_OPEN_PATH_FLIE = "list_open_path_file"
@@ -249,7 +247,7 @@ Sub runOpenPath(path)
 	If oFso.FolderExists(path) Then
 		oWs.Run "explorer.exe " & path
 	ElseIf oFso.FileExists(path) Then
-		oWs.Run """" & PATH_TEXT_EDITOR & """" & " " & path
+		oWs.Run mTextEditorPath & " " & path
 	Else
 		MsgBox("not found :" & Vblf & path)
 	End If

@@ -96,11 +96,11 @@ Sub addFile()
 	Call vaSubFileName.ResetArray()
 	Call getSubFolderAndFileName()
 	Dim i
-	For i = 0 To vaSubFolderName.Length
-		Call addButtonOfFolder(ID_DIV_EXP_FILE, vaSubFolderName.Value(i))
+	For i = 0 To vaSubFolderName.Bound
+		Call addButtonOfFolder(ID_DIV_EXP_FILE, vaSubFolderName.V(i))
 	Next
-	For i = 0 To vaSubFileName.Length
-		Call addButtonOfFile(ID_DIV_EXP_FILE, vaSubFileName.Value(i))
+	For i = 0 To vaSubFileName.Bound
+		Call addButtonOfFile(ID_DIV_EXP_FILE, vaSubFileName.V(i))
 	Next
 End Sub
 
@@ -112,7 +112,7 @@ End Sub
 
 Sub openFile(path)
 	If oFso.FileExists(path) Then
-		oWs.Run """" & PATH_TEXT_EDITOR & """" & " " & path
+		oWs.Run mTextEditorPath & " " & path
 	End If
 End Sub
 
