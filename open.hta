@@ -140,8 +140,15 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <legend>当前代码路径</legend>
     <div class="form_codePath">
         <input type="text" id="input_code_path" 
+                onclick="showAndHide('list_code_path_select_ver','show')" 
                 onchange="onloadPrjAndOpt()" 
                 size="50" />
+        <div class="Menu_codePath" id="list_code_path_select_ver" onmouseleave="showAndHide('list_code_path_select_ver','hide')"> 
+            <div class="Menu2"> 
+                <ul id="ul_code_path_select_ver"> 
+                </ul> 
+            </div> 
+        </div>
         <div class="Menu_codePath" id="list_code_path_n0" onmouseleave="showAndHide('list_code_path_n0','hide')"> 
             <div class="Menu2"> 
                 <ul id="ul_code_path_n0"> 
@@ -154,16 +161,13 @@ body { font-family: sans-serif; color:#f8f8f2;}
                 </ul> 
             </div> 
         </div>
-        <div class="Menu_codePath" id="list_code_path" onmouseleave="showAndHide('list_code_path','hide')"> 
+        <div class="Menu_codePath" id="list_code_path_l1" onmouseleave="showAndHide('list_code_path_l1','hide')"> 
             <div class="Menu2"> 
-                <ul id="ul_code_path"> 
+                <ul id="ul_code_path_l1"> 
                 </ul> 
             </div> 
         </div>
     </div>
-    <input type="button" class="input_button" onclick="showAndHide('list_code_path_n0','show')" value="  N0  " />
-    <input type="button" class="input_button" onclick="showAndHide('list_code_path_m0','show')" value="  M0  " />
-    <input type="button" class="input_button" onclick="showAndHide('list_code_path','show')" value="  L1  " />
 
     <div class="form_project" onmouseleave="showAndHide('list_project','hide')">
         <input type="text" id="input_project"  
