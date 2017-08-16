@@ -13,72 +13,180 @@
     版本1.3
     1. 打开目录由下拉菜单改为按钮
     2. 增加打开文件功能
+
+    版本1.4
+    1. 优化文本框的添加和删除
+    2. 增加打开ProjectConfig.mk和system.prop的按钮
+    3. 扩展代码路径
+    4. 增加生成编译命令功能
+    5. 优化代码结构和报错提示
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <Title>QuickOpen</Title>
-</Head>
+
 <Script Language="VBScript">
 
-set ws=CreateObject("wscript.shell")
-Set Fso=CreateObject("Scripting.FileSystemObject")
-
-Sub Window_OnLoad
 Dim width,height
 width=CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
 Window.MoveTo width-400,300
-Window.ResizeTo 400,400
-End Sub
+Window.ResizeTo 400,450
 
-Function ReplaceStr(str,patrn_old,patrn_new)
-Set regEx = New RegExp
-regEx.IgnoreCase = true  '匹配大小写  
-regEx.Global = true  '打开全局搜索
-regEx.Pattern = patrn_old
-ReplaceStr = regEx.Replace(str,patrn_new)
-End Function
+</Script>
+</Head>
+
+<Body bgcolor="#9ACD32">
+<input type="button" onclick="addInputBox()" style="width:100; height:25;" value="增加一个文本框" />
+<input type="button" onclick="removeInputBoxUp()" style="width:120; height:25;" value="从顶部删除文本框" />
+<input type="button" onclick="removeInputBoxDown()" style="width:120; height:25;" value="从底部删除文本框" />
+<div id="input"></div>
+<br>
+<select id="source" name="source">
+<option value="Z:\8312C\alps">Z:\8312C\alps</option>
+<option value="Z:\8312D\alps">Z:\8312D\alps</option>
+<option value="Z:\MT8312\alps">Z:\MT8312\alps</option>
+<option value="Z:\MT8321\alps">Z:\MT8321\alps</option>
+<option value="Z:\backups\8312C\alps">Z:\backups\8312C\alps</option>
+<option value="Z:\backups\MT8312\alps">Z:\backups\MT8312\alps</option>
+<option value="Z:\l18321G_git\alps">Z:\l18321G_git\alps</option>
+<option value="Z:\l18321_git\alps">Z:\l18321_git\alps</option>
+</select>
+<br><br>
+<fieldset>
+    <legend>打开工程目录</legend>
+    工程名: <input id="project_name" type="text" />
+    <br><br>
+    <input type="button" onclick="OpenBinary()" style="width:50; height:30;" value="binary" />
+    &nbsp&nbsp
+    <input type="button" onclick="OpenConfig()" style="width:40; height:30;" value="config" />
+    &nbsp&nbsp
+    <input type="button" onclick="OpenCustom()" style="width:50; height:30;" value="custom" />
+    &nbsp&nbsp
+    <input type="button" onclick="OpenOverlay()" style="width:50; height:30;" value="overlay" />
+    &nbsp&nbsp
+    <input type="button" onclick="OpenOut()" style="width:50; height:30;" value="out" />
+    <br><br>
+    <input type="button" onclick="OpenProjectConfig_mk()" style="width:150; height:23;" value="ProjectConfig.mk" />
+    <br>
+    <input type="button" onclick="OpenSystem_prop()" style="width:150; height:23;" value="system.prop" />
+</fieldset> 
+<br>
+<fieldset>
+    <legend>打开文件</legend>
+    路径: <input id="path" type="text" size="50"/>
+    <br>
+    <font size="10"><input OnClick="OpenFile()" type="submit" value="OPEN"></font>
+</fieldset>
+<br>
+<fieldset>
+    <font size="10"><input type="button" onclick="CommandCommon()" value="生成普通编译命令"></font>
+    <font size="10"><input type="button" onclick="CommandOTA()" value="生成带OTA编译命令"></font>
+</fieldset>
+
+<br>
+<input type="button" OnClick="self.close()" value="Exit" />
+
+<Script Language="JavaScript">
+
+function addInputBox() {
+    var input = document.createElement("input");
+    input.id = "folder_name";
+    input.type = "text";
+    input.size = 100;
+         
+    document.getElementById("input").appendChild(input);
+}
+
+function removeInputBoxDown() {
+    var obj = document.getElementById("input");
+    var i = obj.childNodes.length;
+    //alert(i);
+    if (i > 0) 
+    {
+        obj.removeChild(obj.childNodes[i-1]);     
+    }
+}
+
+function removeInputBoxUp() {
+    var obj = document.getElementById("input");
+    var i = obj.childNodes.length;
+    //alert(i);
+    if (i > 0) 
+    {
+        obj.removeChild(obj.childNodes[0]);     
+    }
+}
+
+</Script>
+
+<Script Language="VBScript">
+
+Set ws=CreateObject("wscript.shell")
+Set Fso=CreateObject("Scripting.FileSystemObject")
+
+Function CopyString(s) 
+    Set forms=CreateObject("forms.form.1") 
+    Set textbox=forms.Controls.Add("forms.textbox.1").Object 
+    With textbox 
+        .multiline=True 
+        .text=s 
+        .selstart=0 
+        .sellength=Len(.text) 
+        .copy 
+    End With 
+End Function 
 
 Sub OpenBinary()
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
-    LK=SC&"mediatek\binary\packages\"&PN
-    ws.run "explorer.exe "&LK
+    LK=SC&"\mediatek\binary\packages\"&PN
+    If Fso.FolderExists(LK) Then
+        ws.run "explorer.exe "&LK
+    Else
+        msgbox("不存在相应的binary目录")
+    End If
 End Sub
 
 Sub OpenConfig()
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
-    LK=SC&"mediatek\config\"&PN
-    ws.run "explorer.exe "&LK
+    LK=SC&"\mediatek\config\"&PN
+    If Fso.FolderExists(LK) Then
+        ws.run "explorer.exe "&LK
+    Else
+        msgbox("不存在相应的config目录")
+    End If
 End Sub
 
 Sub OpenCustom()
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
-    LK=SC&"mediatek\custom\"&PN
-    ws.run "explorer.exe "&LK
+    LK=SC&"\mediatek\custom\"&PN
+    If Fso.FolderExists(LK) Then
+        ws.run "explorer.exe "&LK
+    Else
+        msgbox("不存在相应的custom目录")
+    End If
 End Sub
 
 Sub OpenOverlay()
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
 
-    PN = ReplaceStr(PN,"\[","-")
-    PN = ReplaceStr(PN,"\]","")
+    PN = Replace(PN,"[","-")
+    PN = Replace(PN,"]","")
 
-    LK=SC&"mediatek\custom\common\resource_overlay\roco\resandroid\"&PN
+    LK=SC&"\mediatek\custom\common\resource_overlay\roco\resandroid\"&PN
 
     If (Not Fso.FolderExists(LK)) Then
-        If (Fso.FolderExists(SC&"mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN)) Then
-            LK = SC&"mediatek\custom\common\resource_overlay\roco\reslight\"&PN
+        If (Fso.FolderExists(SC&"\mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN)) Then
+            LK = SC&"\mediatek\custom\common\resource_overlay\roco\reslight\"&PN
         Else    
             msgbox("不存在相应的overlay目录")
-            flag = 1
         End If    
     End If
-
     ws.run "explorer.exe "&LK
 End Sub
 
@@ -86,17 +194,17 @@ Sub OpenOut()
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
 
-    If Fso.FolderExists(SC&"out\target\product\") Then
-        Set MyFolder_PN = Fso.GetFolder(SC&"out\target\product\")
+    If Fso.FolderExists(SC&"\out\target\product\") Then
+        Set MyFolder_PN = Fso.GetFolder(SC&"\out\target\product\")
         Set Folders = MyFolder_PN.SubFolders
         For Each Folder in Folders
             FDN=Folder.Name
-            If Fso.FolderExists(SC&"out\target\product\"&FDN&"\system") Then
+            If Fso.FolderExists(SC&"\out\target\product\"&FDN&"\system") Then
                 PN1=Folder.Name
                 Exit For 
             End If
         Next
-        LK=SC&"out\target\product\"&PN1
+        LK=SC&"\out\target\product\"&PN1
     Else
         msgbox("不存在out目录")
     End If
@@ -108,57 +216,63 @@ Sub OpenFile()
     PT=document.getElementById("path").value
     SC=document.getElementById("source").value  
 
-    PT=ReplaceStr(PT,"/","\")
-    LK=SC&PT    
+    PT=Replace(PT,"/","\")
+    LK=SC&"\"&PT    
 
     If Fso.FolderExists(LK) Then
         ws.run "explorer.exe "&LK
     ElseIf Fso.FileExists(LK) Then
-        ws.run "F:\tools\Sublime\Sublime_Text\sublime_text.exe "&LK
+        ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
     Else
         msgbox("路径不存在")
     End If
 End Sub
 
+Sub OpenProjectConfig_mk()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+
+    If Len(PN) = 0 Then
+        msgbox("请输入工程名")
+    Else
+        LK=SC&"\mediatek\config\"&PN&"\ProjectConfig.mk"
+        If Fso.FileExists(LK) Then
+            ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
+        Else
+            msgbox("文件不存在")
+        End If
+    End If
+End Sub
+
+Sub OpenSystem_prop()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+
+    If Len(PN) = 0 Then
+        msgbox("请输入工程名")
+    Else
+        LK=SC&"\mediatek\config\"&PN&"\system.prop"
+        If Fso.FileExists(LK) Then
+            ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
+        Else
+            msgbox("文件不存在")
+        End If
+    End If
+End Sub
+
+Sub CommandCommon()
+    PN=document.getElementById("project_name").value
+    command_compile="rm -rf out/ && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" n"
+    CopyString(command_compile)
+End Sub
+
+Sub CommandOTA()
+    PN=document.getElementById("project_name").value
+    command_compile="rm -rf out/ && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" n && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" otapackage"
+    CopyString(command_compile)
+End Sub
+
 </Script>
 
-<Body bgcolor="#9ACD32">
-
-<input type=button onclick="document.body.insertAdjacentHTML 'afterBegin','<input type=text>'" value=添加文本框>
-<!--<textarea rows="3" cols="15"></textarea>-->
-<br><br>
-<select id="source" name="source">
-<option value="Z:\8312C\alps\">C</option>
-<option value="Z:\8312D\alps\">D</option>
-<option value="Z:\MT8312\alps\">M</option>
-<option value="Z:\MT8321\alps\">M2</option>
-<option value="Z:\backups\8312C\alps\">BC</option>
-<option value="Z:\backups\MT8312\alps\">BM</option>
-</select>
-<br><br>
-<fieldset>
-    <legend>打开工程目录</legend>
-    工程名: <input id="project_name" type="text" />
-    <br><br>
-    <input type="button" id="binary" onclick="OpenBinary()" style="width:50; height:30;" value="binary" />
-    &nbsp&nbsp
-    <input type="button" id="config" onclick="OpenConfig()" style="width:40; height:30;" value="config" />
-    &nbsp&nbsp
-    <input type="button" id="custom" onclick="OpenCustom()" style="width:50; height:30;" value="custom" />
-    &nbsp&nbsp
-    <input type="button" id="overlay" onclick="OpenOverlay()" style="width:50; height:30;" value="overlay" />
-    &nbsp&nbsp
-    <input type="button" id="out" onclick="OpenOut()" style="width:50; height:30;" value="out" />
-</fieldset> 
-<br>
-<fieldset>
-    <legend>打开文件</legend>
-    路径: <input id="path" type="text" size="50"/>
-    <br>
-    <font size="10"><input OnClick="Open()" type="submit" value="OPEN"></font>
-</fieldset>
-
-<br>
-<input type="button" OnClick="self.close()" value="Exit" />
 </Body>
 </Html>
