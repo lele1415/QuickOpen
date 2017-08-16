@@ -23,11 +23,13 @@ Const ID_UL_OPEN_PATH_VENDOR = "ul_open_path_vendor"
 Const ID_LIST_OPEN_PATH_OUT = "list_open_path_out"
 Const ID_UL_OPEN_PATH_OUT = "ul_open_path_out"
 
-Const PATH_SYSTEM_PROP = "..\system.prop"
-Const PATH_ITEMS_INI = "..\items.ini"
-Const PATH_PROJECTCONFIG_MK = "..\ProjectConfig.mk"
-Const PATH_DEVICE_MK = "..\device.mk"
-Const PATH_GMS_MK = "..\gms.mk"
+Const PATH_FILE_SYSTEM_PROP = "..\system.prop"
+Const PATH_FILE_ITEMS_INI = "..\items.ini"
+Const PATH_FILE_PROJECTCONFIG_MK = "..\ProjectConfig.mk"
+Const PATH_FILE_DEVICE_MK = "..\device.mk"
+Const PATH_FILE_CUSTOM_CONF = "..\custom.conf"
+Const PATH_FILE_GMS_MK = "..\gms.mk"
+Const PATH_FILE_BUILD_PROP = "..\build.prop"
 
 Const PATH_DEVICE = "device"
 Const PATH_DEVICE_PROJECT = "device\..\[project]"
@@ -37,7 +39,11 @@ Const PATH_DEVICE_OVERLAY = "device\mediatek\common\overlay\tablet"
 
 Const PATH_FRAMEWORKS = "frameworks"
 Const PATH_FRAMEWORKS_PACKAGES = "frameworks\base\packages"
+Const PATH_FRAMEWORKS_PACKAGES_SETTINGSPROVIDER = "frameworks\base\packages\SettingsProvider"
+Const PATH_FRAMEWORKS_PACKAGES_SETTINGSPROVIDER_DEFAULTS = "frameworks\base\packages\SettingsProvider\res\values\defaults.xml"
+Const PATH_FRAMEWORKS_PACKAGES_SYSTEMUI = "frameworks\base\packages\SystemUI"
 Const PATH_FRAMEWORKS_RES = "frameworks\base\core\res\res"
+Const PATH_FRAMEWORKS_RES_CONFIG = "frameworks\base\core\res\res\values\config.xml"
 
 Const PATH_KERNEL = "kernel.."
 Const PATH_KERNEL_ARM_DTS = "kernel..\arm\..\dts"
@@ -61,12 +67,15 @@ Const PATH_OUT = "out\..\"
 Const PATH_OUT_SYSTEM = "out\..\system"
 Const PATH_OUT_TARGET_FILES = "out\..\target_files_intermediates"
 
+Dim pathDict
+Set pathDict = CreateObject("Scripting.Dictionary")
+
 Dim aFUPath_File : aFUPath_File = Array( _
-		PATH_SYSTEM_PROP, _
-		PATH_ITEMS_INI, _
-		PATH_PROJECTCONFIG_MK, _
-		PATH_DEVICE_MK, _
-		PATH_GMS_MK)
+		PATH_FILE_SYSTEM_PROP, _
+		PATH_FILE_ITEMS_INI, _
+		PATH_FILE_PROJECTCONFIG_MK, _
+		PATH_FILE_DEVICE_MK, _
+		PATH_FILE_GMS_MK)
 
 Dim aFUPath_device : aFUPath_device = Array( _
 		PATH_DEVICE, _
@@ -78,7 +87,11 @@ Dim aFUPath_device : aFUPath_device = Array( _
 Dim aFUPath_framework : aFUPath_framework = Array( _
 		PATH_FRAMEWORKS, _
 		PATH_FRAMEWORKS_PACKAGES, _
-		PATH_FRAMEWORKS_RES)
+		PATH_FRAMEWORKS_PACKAGES_SETTINGSPROVIDER, _
+		PATH_FRAMEWORKS_PACKAGES_SETTINGSPROVIDER_DEFAULTS, _
+		PATH_FRAMEWORKS_PACKAGES_SYSTEMUI, _
+		PATH_FRAMEWORKS_RES, _
+		PATH_FRAMEWORKS_RES_CONFIG)
 
 Dim aFUPath_kernel_lk : aFUPath_kernel_lk = Array( _
 		PATH_KERNEL, _
@@ -113,12 +126,38 @@ Call onloadFUPath(aFUPath_kernel_lk, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_KERNE
 Call onloadFUPath(aFUPath_packages, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_PACKAGES, ID_UL_OPEN_PATH_PACKAGES)
 Call onloadFUPath(aFUPath_vendor, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_VENDOR, ID_UL_OPEN_PATH_VENDOR)
 Call onloadFUPath(aFUPath_out, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_OUT, ID_UL_OPEN_PATH_OUT)
+Call getWholePath()
 
 Sub onloadFUPath(aFUPath, inputId, listId, ulId)
 	Dim i
 	For i = 0 To UBound(aFUPath)
 		Call addAfterLi(aFUPath(i), inputId, listId, ulId)
 	Next
+End Sub
+
+Sub getWholePath()
+	Call pathDict.Add(PATH_FILE_SYSTEM_PROP, "[code]\device\joya_sz\[projectName]\roco\[optionName]\system.prop")
+	Call pathDict.Add(PATH_FILE_ITEMS_INI, "[code]\device\joya_sz\[projectName]\roco\[optionName]\items.ini")
+	Call pathDict.Add(PATH_FILE_PROJECTCONFIG_MK, "[code]\device\joya_sz\[projectName]\ProjectConfig.mk")
+	Call pathDict.Add(PATH_FILE_DEVICE_MK, "[code]\device\mediatek\common\device.mk")
+	Call pathDict.Add(PATH_FILE_CUSTOM_CONF, "[code]\device\mediatek\common\custom.conf")
+	Call pathDict.Add(PATH_FILE_BUILD_PROP, "[code]\out\target\product\[projectName]\system\build.prop")
+	Call pathDict.Add(PATH_FILE_GMS_MK, "[code]\vendor\google\products\gms.mk")
+	Call pathDict.Add(PATH_DEVICE_PROJECT, "[code]\device\joya_sz\[projectName]")
+	Call pathDict.Add(PATH_DEVICE_OPTION, "[code]\device\joya_sz\[projectName]\roco\[optionName]")
+	Call pathDict.Add(PATH_KERNEL, "[code]\[kernelName]")
+	Call pathDict.Add(PATH_KERNEL_IMGSENSOR, "[code]\[kernelName]\drivers\misc\mediatek\imgsensor")
+	Call pathDict.Add(PATH_VENDOR_HAL, "[code]\vendor\mediatek\proprietary\custom\{getPlatformName}\hal")
+	Call pathDict.Add(PATH_KERNEL_ARM_DTS, "[code]\[kernelName]\arch\arm\boot\dts")
+	Call pathDict.Add(PATH_KERNEL_ARM64_DTS, "[code]\[kernelName]\arch\arm64\boot\dts")
+	Call pathDict.Add(PATH_KERNEL_BATTERY, "{getBatteryPath}")
+	Call pathDict.Add(PATH_KERNEL_LCM, "[code]\[kernelName]\drivers\misc\mediatek\lcm")
+	Call pathDict.Add(PATH_LK_LCM, "{getLkLcmPath}")
+	Call pathDict.Add(PATH_OUT, "[code]\out\target\product\[projectName]")
+	Call pathDict.Add(PATH_OUT_SYSTEM, "[code]\out\target\product\[projectName]\system")
+	Call pathDict.Add(PATH_OUT_TARGET_FILES, "[code]\out\target\product\[projectName]\obj\PACKAGING\target_files_intermediates")
+
+
 End Sub
 
 Const DO_OPEN_PATH = 0
@@ -128,8 +167,6 @@ Function handlePath(doWhat)
 	Dim path : path = getElementValue(ID_INPUT_OPEN_PATH)
 
 	If Trim(code) = "" Then Exit Function
-
-	Dim kernelName : kernelName = getKernelName(code)
 
 	If InStr(path, "..") = 0 Then
 		path = code & "\" & path
@@ -143,47 +180,16 @@ Function handlePath(doWhat)
 
 	Dim projectName : projectName = getElementValue(ID_INPUT_PROJECT)
 	Dim optionName : optionName = getElementValue(ID_INPUT_OPTION)
+	Dim kernelName : kernelName = getKernelName(code)
 
-	'If Trim(projectName) = "" Or Trim(optionName) = "" Then Exit Function
-
-	Select Case path
-		Case PATH_SYSTEM_PROP
-			path = code & "\device\joya_sz\" & projectName & "\roco\" & optionName & "\system.prop"
-		Case PATH_ITEMS_INI
-			path = code & "\device\joya_sz\" & projectName & "\roco\" & optionName & "\items.ini"
-		Case PATH_PROJECTCONFIG_MK
-			path = code & "\device\joya_sz\" & projectName & "\ProjectConfig.mk"
-		Case PATH_DEVICE_MK
-			path = code & "\device\mediatek\common\device.mk"
-		Case PATH_GMS_MK
-			path = code & "\vendor\google\products\gms.mk"
-		Case PATH_DEVICE_PROJECT
-			path = code & "\device\joya_sz\" & projectName
-		Case PATH_DEVICE_OPTION
-			path = code & "\device\joya_sz\" & projectName & "\roco\" & optionName
-		Case PATH_KERNEL
-			path = code & kernelName
-		Case PATH_KERNEL_IMGSENSOR
-			path = code & kernelName & "\drivers\misc\mediatek\imgsensor"
-		Case PATH_VENDOR_HAL
-			path = code & "\vendor\mediatek\proprietary\custom\" & getPlatformName(code) & "\hal"
-		Case PATH_KERNEL_ARM_DTS
-			path = code & kernelName & "\arch\arm\boot\dts"
-		Case PATH_KERNEL_ARM64_DTS
-			path = code & kernelName & "\arch\arm64\boot\dts"
-		Case PATH_KERNEL_BATTERY
-			path = getBatteryPath(code, kernelName, projectName)
-		Case PATH_KERNEL_LCM
-			path = code & kernelName & "\drivers\misc\mediatek\lcm"
-		Case PATH_LK_LCM
-			path = getLkLcmPath(code, kernelName, projectName)
-		Case PATH_OUT
-			path = code & "\out\target\product\" & projectName
-		Case PATH_OUT_SYSTEM
-			path = code & "\out\target\product\" & projectName & "\system"
-		Case PATH_OUT_TARGET_FILES
-			path = code & "\out\target\product\" & projectName & "\obj\PACKAGING\target_files_intermediates"
-	End Select
+	path = pathDict.Item(path)
+	If InStr(path, "[code]") > 0 Then path = Replace(path, "[code]", code)
+	If InStr(path, "[projectName]") > 0 Then path = Replace(path, "[projectName]", projectName)
+	If InStr(path, "[optionName]") > 0 Then path = Replace(path, "[optionName]", optionName)
+	If InStr(path, "[kernelName]") > 0 Then path = Replace(path, "[kernelName]", kernelName)
+	If InStr(path, "{getPlatformName}") > 0 Then path = Replace(path, "{getPlatformName}", getPlatformName(code))
+	If InStr(path, "{getBatteryPath}") > 0 Then path = Replace(path, "{getBatteryPath}", getBatteryPath(code, kernelName, projectName))
+	If InStr(path, "{getLkLcmPath}") > 0 Then path = Replace(path, "{getLkLcmPath}", getLkLcmPath(code))
 
 	Select Case doWhat
 		Case DO_OPEN_PATH : Call runOpenPath(path)
@@ -193,9 +199,11 @@ End Function
 
 Function getKernelName(code)
 	If InStr(code, "l1") > 0 Or InStr(code, "8312") > 0 Then
-		getKernelName = "\kernel-3.10"
+		getKernelName = "kernel-3.10"
+	ElseIf InStr(code, "8167") > 0 Then
+		getKernelName = "kernel-4.4"
 	Else
-		getKernelName = "\kernel-3.18"
+		getKernelName = "kernel-3.18"
 	End If
 End Function
 
