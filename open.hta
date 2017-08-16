@@ -199,9 +199,17 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <br>
 <fieldset>
     <legend>复制命令</legend>
-    <input type="checkbox" id="checkbox_rm_out" checked=true >rm out</input>
-    <input type="checkbox" id="checkbox_build_ota" >ota</input>
-    <input type="button" class="input_button" onclick="CommandOfBuild()" value="copy">
+    <input type="radio" name="build_type" id="command_eng" >eng</input>
+    <input type="radio" name="build_type" id="command_userdebug" >userdebug</input>
+    <input type="radio" name="build_type" id="command_user" checked=true >user</input>
+    <br>
+    <input type="button" class="input_button" onclick="CommandOfLunch()" value="lunch command">
+    <br>
+    <br>
+    <input type="checkbox" id="command_rm_out" checked=true >rm out</input>
+    <input type="checkbox" id="command_build_ota" >ota</input>
+    <br>
+    <input type="button" class="input_button" onclick="CommandOfMake()" value="make command">
 </fieldset>
 <br>
 <fieldset>
