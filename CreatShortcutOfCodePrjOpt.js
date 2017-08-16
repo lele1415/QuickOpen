@@ -1,31 +1,14 @@
-function addShortcutButtonForL1(sCurrentCode, sCurrentPrj, sCurrentOpt, divId) 
+function addShortcutButton(sCurrentCode, sCurrentPrj, sCurrentOpt, divId) 
 {
 	var baseId = sCurrentCode + "/" + sCurrentPrj + "/" + sCurrentOpt
 	var shortcutId = baseId + "_shortcut";
 	var brId = baseId + "_br";
 	var removeId = baseId + "_remove";
 
-	var shortcutFun = function(){applyShortcutForL1(sCurrentCode, sCurrentPrj, sCurrentOpt)};
+	var shortcutFun = function(){applyShortcut(sCurrentCode, sCurrentPrj, sCurrentOpt)};
 	var removeFun = function(){removeShortcut(removeId, shortcutId, brId)};
 
 	var shortcutValue = " " + sCurrentCode + "\n" + sCurrentPrj + "\n" + sCurrentOpt + " "
-
-    parentNode_appendChild(divId, createRemoveBtn(removeId, removeFun));
-    parentNode_appendChild(divId, createShortcutBtn(shortcutId, shortcutValue, shortcutFun));
-    parentNode_appendChild(divId, createBr(brId));
-}
-
-function addShortcutButtonForKK(sCurrentCode, sCurrentPrj, divId) 
-{
-    var baseId = sCurrentCode + "/" + sCurrentPrj
-    var shortcutId = baseId + "_shortcut";
-    var brId = baseId + "_br";
-    var removeId = baseId + "_remove";
-
-    var shortcutFun = function(){applyShortcutForKK(sCurrentCode, sCurrentPrj)};
-    var removeFun = function(){removeShortcut(removeId, shortcutId, brId)};
-
-    var shortcutValue = " " + sCurrentCode + "\n" + sCurrentPrj + " "
 
     parentNode_appendChild(divId, createRemoveBtn(removeId, removeFun));
     parentNode_appendChild(divId, createShortcutBtn(shortcutId, shortcutValue, shortcutFun));

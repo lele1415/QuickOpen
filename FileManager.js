@@ -7,9 +7,9 @@ function removeAllButton(divId) {
     }
 }
 
-function addButtonOfFolder(divAreaId, name, divPathId, where) {
-	var btn_more = input_creat("button", "", "+", function(){AddSubFolder(name, 0, divAreaId, divPathId, where)}, 0);
-	var btn_folder = input_creat("button", "", " " + name + " ", function(){OpenFolder(name, where)}, 0);
+function addButtonOfFolder(divAreaId, folderName) {
+	var btn_more = input_creat("button", "", "+", function(){clickPlus(folderName)}, 0);
+	var btn_folder = input_creat("button", "", " " + folderName + " ", function(){clickFolder(folderName)}, 0);
 	var btn_br = document.createElement("br");
 
 	btn_more = setButtonStyle(btn_more);
@@ -20,8 +20,8 @@ function addButtonOfFolder(divAreaId, name, divPathId, where) {
     parentNode_appendChild(divAreaId, btn_br);
 }
 
-function addButtonOfFile(divAreaId, name, where) {
-	var btn_file = input_creat("button", "", " " + name + " ", function(){OpenFolder(name, where)}, 0);
+function addButtonOfFile(divAreaId, fileName) {
+	var btn_file = input_creat("button", "", " " + fileName + " ", function(){clickFile(fileName)}, 0);
 	var btn_br = document.createElement("br");
 
 	btn_file = setButtonStyle(btn_file);
@@ -30,15 +30,16 @@ function addButtonOfFile(divAreaId, name, where) {
     parentNode_appendChild(divAreaId, btn_br);
 }
 
-function addButtonOfCurrentPath(divPathId, name, pathDeepCount, divAreaId, where) {
-	var btn_Path = input_creat("button", "", name, function(){AddSubFolder(name, pathDeepCount, divAreaId, divPathId, where)}, 0);
+function addExpPath(divPathId, folderName, pathLength) {
+	var btn_Path = input_creat("button", "", folderName, function(){clickPath(pathLength)}, 0);
 	btn_Path = setButtonStyle(btn_Path);
 	parentNode_appendChild(divPathId, btn_Path);
 }
 
-function removeButtonOfCurrentPath(divAreaId, currentDeepCount, nextDeepCount) {
-	for (var i=currentDeepCount-1; i>nextDeepCount-1; i--) {
-		parentNode_removeChild(divAreaId, i);
+function delExpPath(divPathId, cutLength) {
+	var pathLength = parentNode_getChildNodesLength(divPathId);
+	for (var i = pathLength - 1; i > pathLength - cutLength - 1; i--) {
+		parentNode_removeChild(divPathId, i);
 	}
 }
 function setButtonStyle(btn) {

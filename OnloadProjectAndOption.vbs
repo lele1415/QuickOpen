@@ -1,27 +1,27 @@
-Const ID_INPUT_PROJECT_L1 = "input_project_l1"
-Const ID_LIST_PROJECT_L1 = "list_project_l1"
-Const ID_UL_PROJECT_L1 = "ul_project_l1"
-Const ID_INPUT_OPTION_L1 = "input_option_l1"
-Const ID_LIST_OPTION_L1 = "list_option_l1"
-Const ID_UL_OPTION_L1 = "ul_option_l1"
+Const ID_INPUT_PROJECT = "input_project"
+Const ID_LIST_PROJECT = "list_project"
+Const ID_UL_PROJECT = "ul_project"
+Const ID_INPUT_OPTION = "input_option"
+Const ID_LIST_OPTION = "list_option"
+Const ID_UL_OPTION = "ul_option"
 Dim vaProject, vaOption
 Dim pPrjRoot, pOptRoot
 
 Sub onloadPrj()
-	Call setElementValue(ID_INPUT_PROJECT_L1, "")
-	Call removeAllChild(ID_UL_PROJECT_L1)
+	Call setElementValue(ID_INPUT_PROJECT, "")
+	Call removeAllChild(ID_UL_PROJECT)
 
-	pPrjRoot = getElementValue(ID_INPUT_CODE_PATH_L1) & "\device\joya_sz"
+	pPrjRoot = getElementValue(ID_INPUT_CODE_PATH) & "\device\joya_sz"
 	If Not oFso.FolderExists(pPrjRoot) Then MsgBox("Path is not exist:" & Vblf & pPrjRoot) : Exit Sub
 
 	Call getAllProject(pPrjRoot)
 End Sub
 
 Sub onloadOpt()
-	Call setElementValue(ID_INPUT_OPTION_L1, "")
-	Call removeAllChild(ID_UL_OPTION_L1)
+	Call setElementValue(ID_INPUT_OPTION, "")
+	Call removeAllChild(ID_UL_OPTION)
 
-	pOptRoot = pPrjRoot & "\" & getElementValue(ID_INPUT_PROJECT_L1) & "\roco"
+	pOptRoot = pPrjRoot & "\" & getElementValue(ID_INPUT_PROJECT) & "\roco"
 	If Not oFso.FolderExists(pOptRoot) Then Exit Sub
 
 	Call getAllOption(pOptRoot)
@@ -40,11 +40,11 @@ Sub getAllProject(pPrjRoot)
 
 	Dim i
 	For i = 0 To vaProject.Length
-		Call addAfterLi(vaProject.Value(i), ID_INPUT_PROJECT_L1, ID_LIST_PROJECT_L1, ID_UL_PROJECT_L1)
+		Call addAfterLi(vaProject.Value(i), ID_INPUT_PROJECT, ID_LIST_PROJECT, ID_UL_PROJECT)
 	Next
 	'MsgBox(vaProject.ToString())
 
-	Call setElementValue(ID_INPUT_PROJECT_L1, vaProject.Value(0))
+	Call setElementValue(ID_INPUT_PROJECT, vaProject.Value(0))
 End Sub
 
 Sub getAllOption(pOptRoot)
@@ -55,9 +55,9 @@ Sub getAllOption(pOptRoot)
 
 	Dim i
 	For i = 0 To vaOption.Length
-		Call addAfterLi(vaOption.Value(i), ID_INPUT_OPTION_L1, ID_LIST_OPTION_L1, ID_UL_OPTION_L1)
+		Call addAfterLi(vaOption.Value(i), ID_INPUT_OPTION, ID_LIST_OPTION, ID_UL_OPTION)
 	Next
 	'MsgBox(vaOption.ToString())
 
-	Call setElementValue(ID_INPUT_OPTION_L1, vaOption.Value(0))
+	Call setElementValue(ID_INPUT_OPTION, vaOption.Value(0))
 End Sub
