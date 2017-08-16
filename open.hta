@@ -207,6 +207,14 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <fieldset>
     <legend>打开目录或文件</legend>
     <div class="form_codePath">
+        <input type="button" class="input_button" onclick="showAndHide('list_open_path_file','show')" value="file" />
+        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_device','show')" value="device" />
+        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_framework','show')" value="fwk" />
+        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_kernel_lk','show')" value="k&lk" />
+        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_packages','show')" value="pkgs" />
+        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_vendor','show')" value="vendor" />
+        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_out','show')" value="out" />
+
         <input type="text" id="input_open_path" 
                 size="50" />
         <div class="Menu_codePath" id="list_open_path_file" onmouseleave="showAndHide('list_open_path_file','hide')"> 
@@ -252,15 +260,6 @@ body { font-family: sans-serif; color:#f8f8f2;}
             </div>
         </div>
     </div>
-    <input type="button" class="input_button" onclick="showAndHide('list_open_path_file','show')" value="file" />
-    <input type="button" class="input_button" onclick="showAndHide('list_open_path_device','show')" value="device" />
-    <input type="button" class="input_button" onclick="showAndHide('list_open_path_framework','show')" value="framework" />
-    <input type="button" class="input_button" onclick="showAndHide('list_open_path_kernel_lk','show')" value="kernel_lk" />
-    <input type="button" class="input_button" onclick="showAndHide('list_open_path_packages','show')" value="packages" />
-    <br>
-    <input type="button" class="input_button" onclick="showAndHide('list_open_path_vendor','show')" value="vendor" />
-    <input type="button" class="input_button" onclick="showAndHide('list_open_path_out','show')" value="out" />
-    <br>
     <input type="button" class="input_button" onclick="handlePath(0)" value="打开" />
     <input type="button" class="input_button" onclick="initNewPath(0)" value="显示目录" />
     <input type="button" class="input_button" onclick="initNewPath(1)" value="关闭显示" />
