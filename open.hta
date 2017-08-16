@@ -28,6 +28,12 @@
     
     版本1.6
     1. 完善历史记录功能
+    
+    版本1.7
+    1. 增加L1代码兼容
+    2. 修复L1打不开kernel_img问题
+    3. 增加produc_roco.mk文件检查功能
+    4. 代码优化
 -->
 
 <Html>
@@ -49,12 +55,22 @@ body {font-family:sans-serif;}
 } 
 .Menu_2 { 
     position:relative; 
-    width:250px; 
+    width:800px; 
     height:127px; 
     z-index:1; 
     background: #FFF; 
     border:1px solid #000; 
     margin-top:-100px; 
+    display:none; 
+}
+.Menu_3 { 
+    position:relative; 
+    width:800px; 
+    height:127px; 
+    z-index:1; 
+    background: #FFF; 
+    border:1px solid #000; 
+    margin-top:-6px; 
     display:none; 
 } 
 .Menu2 { 
@@ -80,7 +96,7 @@ body {font-family:sans-serif;}
             } 
 .form{width:300px;height:auto;} 
 .form div{position:relative;top:0;left:0;margin-bottom:5px} 
-#List1#List2{left:0px;top:93px;} 
+#List1#List2#List3{left:0px;top:93px;} 
 -->
 </style>
 <Script Language="VBScript">
@@ -94,11 +110,14 @@ Window.ResizeTo 400,630
 </Head>
 
 <Body bgcolor="#9ACD32">
+<!--
 <input type="button" onclick="addInputBox()" style="width:100; height:25;" value="增加一个文本框" />
 <input type="button" onclick="removeInputBoxUp()" style="width:120; height:25;" value="从顶部删除文本框" />
 <input type="button" onclick="removeInputBoxDown()" style="width:120; height:25;" value="从底部删除文本框" />
-<div id="input"></div>
+-->
+===============KK版本===============
 <br>
+<div id="input"></div>
 <fieldset>
     <legend>代码路径</legend>
     <select id="source" name="source">
@@ -107,12 +126,24 @@ Window.ResizeTo 400,630
     <option value="Z:\8312D\alps">Z:\8312D\alps</option>
     <option value="Z:\MT8312\alps">Z:\MT8312\alps</option>
     <option value="Z:\backups\MT8312\alps">Z:\backups\MT8312\alps</option>
-    <option value="Z:\MT8321\alps">Z:\MT8321\alps</option>
-    <option value="Z:\l18321G_git\alps">Z:\l18321G_git\alps</option>
-    <option value="Z:\backups\l18321G_git\alps">Z:\backups\l18321G_git\alps</option>
-    <option value="Z:\l18312cw_git\alps">Z:\l18312cw_git\alps</option>
     </select>
 </fieldset> 
+<br>
+<fieldset>
+    <legend>打开文件</legend>
+    <div class="form">
+    <div>路径: 
+    <br><input id="FilePath_id" type="text" style="width:250;" onClick="showAndHide 'List2','show'" onblur="showAndHide 'List2','hide'"/>
+    <input type="button" onclick="WriteHistory 'Dict_OpenFile','FilePath_id','Openfile_ul_id'" value="保存" /></div>
+    <div class="Menu_3" id="List2"> 
+            <div class="Menu2"> 
+                <ul id="Openfile_ul_id"> 
+                </ul> 
+            </div> 
+        </div> 
+    </div>
+    <font size="10"><input onclick="OpenFile(0)" type="submit" value="OPEN" /></font>
+</fieldset>
 <br>
 <fieldset>
     <legend>获取工程名</legend>
@@ -135,19 +166,21 @@ Window.ResizeTo 400,630
     </div>
     <!--<button onclick="addLi('233')"></button>-->
     <br><br>
-    <input type="button" onclick="OpenBinary()" style="width:50" value="binary" />
+    <input type="button" onclick="openProjectFolder('binary')" style="width:50" value="binary" />
     &nbsp;&nbsp;
-    <input type="button" onclick="OpenConfig()" style="width:40;" value="config" />
+    <input type="button" onclick="openProjectFolder('config')" style="width:40;" value="config" />
     &nbsp;&nbsp;
-    <input type="button" onclick="OpenCustom()" style="width:50" value="custom" />
+    <input type="button" onclick="openProjectFolder('custom')" style="width:50" value="custom" />
     &nbsp;&nbsp;
-    <input type="button" onclick="OpenOverlay()" style="width:50" value="overlay" />
+    <input type="button" onclick="openProjectFolder('overlay')" style="width:50" value="overlay" />
     &nbsp;&nbsp;
-    <input type="button" onclick="OpenOut()" style="width:50" value="out" />
+    <input type="button" onclick="openProjectFolder('out')" style="width:50" value="out" />
     <br><br>
-    <input type="button" onclick="OpenProjectConfig_mk(1)" style="width:150;" value="ProjectConfig.mk" />
+    <input type="button" onclick="openProjectFile('ProjectConfig.mk')" style="width:150;" value="ProjectConfig.mk" />
     <br>
-    <input type="button" onclick="OpenSystem_prop()" style="width:150;" value="system.prop" />
+    <input type="button" onclick="openProjectFile('system.prop')" style="width:150;" value="system.prop" />
+    <br>
+    <input type="button" onclick="openProjectFile('product_roco.mk')" style="width:150;" value="product_roco.mk" />
 </fieldset> 
 <br>
 <fieldset>
@@ -155,35 +188,86 @@ Window.ResizeTo 400,630
     <input type="button" onclick="checkGPS()" style="width:100" value="GPS是否降成本" />
     &nbsp;&nbsp;
     <input type="button" onclick="checkOTA()" style="width:100" value="是否带OTA" />
+    <br>
+    <input type="button" onclick="checkProductFinal()" style="width:150" value="product_roco.mk检查" />
     &nbsp&nbsp
 </fieldset> 
+<br>
+<fieldset>
+    <font size="1"><input type="button" onclick="CommandCommon()" style="width:100;" value="复制编译命令"></font>
+    <select id="rmOut">
+    <option value="yes">rm -rf out</option>
+    <option value=""></option>
+    </select>
+    <select id="buildMode">
+    <option value="user">user</option>
+    <option value="eng">eng</option>
+    </select>
+    <select id="OTA">
+    <option value=""></option>
+    <option value="yes">otapackage</option>
+    </select>
+</fieldset>
+===============L1版本===============
+<fieldset>
+    <legend>代码路径</legend>
+    <select id="source_l1" name="source_l1" onchange="onloadL1Project1()">
+    <option value="Z:\l18321G_git\alps">Z:\l18321G_git\alps</option>
+    <option value="Z:\l18312cw_git\alps">Z:\l18312cw_git\alps</option>
+    <option value="Z:\l18163_git\alps">Z:\l18163_git\alps</option>
+    <option value="Z:\backups\l18163s_git\alps">Z:\backups\l18163s_git\alps</option>
+    <option value="Z:\MT8321\alps">Z:\MT8321\alps</option>
+    </select>
+</fieldset>
 <br>
 <fieldset>
     <legend>打开文件</legend>
     <div class="form">
     <div>路径: 
-    <br><input id="FilePath_id" type="text" style="width:250;" onClick="showAndHide 'List2','show'" onblur="showAndHide 'List2','hide'"/><input type="button" onclick="WriteHistory 'Dict_OpenFile','FilePath_id','Openfile_ul_id'" value="保存" /></div>
-    <div class="Menu_2" id="List2"> 
+    <br><input id="FilePath_l1_id" type="text" style="width:250;" onClick="showAndHide 'List3','show'" onblur="showAndHide 'List3','hide'"/>
+    <input type="button" onclick="WriteHistory 'Dict_OpenFile','FilePath_l1_id','Openfile_ul_l1_id'" value="保存" /></div>
+    <div class="Menu_2" id="List3"> 
             <div class="Menu2"> 
-                <ul id="Openfile_ul_id"> 
+                <ul id="Openfile_ul_l1_id"> 
                 </ul> 
             </div> 
         </div> 
     </div>
-    <br><font size="10"><input OnClick="OpenFile()" type="submit" value="OPEN" /></font>
+    <font size="10"><input onclick="OpenFile(1)" type="submit" value="OPEN" /></font>
 </fieldset>
+<div id="project_l1_div"></div>
+<br>
+<input type="button" onclick="openProjectFolderL1('device1_L1')" style="width:50" value="device1" />
+&nbsp;
+<input type="button" onclick="openProjectFolderL1('device2_L1')" style="width:50" value="device2" />
+&nbsp;
+<input type="button" onclick="openProjectFolderL1('kernel_arch')" style="width:75" value="kernel_arch" />
+&nbsp;
+<input type="button" onclick="openProjectFolderL1('kernel_driver')" style="width:80" value="kernel_driver" />
+&nbsp;
+<input type="button" onclick="openProjectFolderL1('custom_L1')" style="width:50" value="custom" />
+&nbsp;
+<input type="button" onclick="openProjectFolderL1('out_L1')" style="width:50" value="out" />
+<br>
+<input type="button" onclick="openProjectFileL1('ProjectConfig.mk')" style="width:150;" value="ProjectConfig.mk" />
+<br>
+<input type="button" onclick="openProjectFileL1('system.prop')" style="width:150;" value="system.prop" />
+<br>
+<input type="button" onclick="openProjectFileL1('items.ini')" style="width:150;" value="items.ini" />
+<br>
 <br>
 <fieldset>
-    <font size="10"><input type="button" onclick="CommandCommon()" value="生成普通编译命令"></font>
-    <font size="10"><input type="button" onclick="CommandOTA()" value="生成带OTA编译命令"></font>
+    <font size="10"><input type="button" onclick="CommandCommonL1()" value="生成普通编译命令"></font>
+    <font size="10"><input type="button" onclick="CommandOTAL1()" value="生成带OTA编译命令"></font>
 </fieldset>
-
+====================================
 <br>
 <input type="button" OnClick="self.close()" value="Exit" />
 
 <Script Language="JavaScript">
-
-function addInputBox() {
+/*
+function addInputBox()
+{
     var input = document.createElement("input");
     input.id = "folder_name";
     input.type = "text";
@@ -192,7 +276,8 @@ function addInputBox() {
     document.getElementById("input").appendChild(input);
 }
 
-function removeInputBoxDown() {
+function removeInputBoxDown()
+{
     var obj = document.getElementById("input");
     var i = obj.childNodes.length;
     //alert(i);
@@ -202,7 +287,8 @@ function removeInputBoxDown() {
     }
 }
 
-function removeInputBoxUp() {
+function removeInputBoxUp()
+{
     var obj = document.getElementById("input");
     var i = obj.childNodes.length;
     //alert(i);
@@ -211,8 +297,9 @@ function removeInputBoxUp() {
         obj.removeChild(obj.childNodes[0]);     
     }
 }
-
-function showAndHide(obj,types){ 
+*/
+function showAndHide(obj,types)
+{ 
     var Layer=window.document.getElementById(obj); 
     switch(types){ 
         case "show": 
@@ -223,12 +310,14 @@ function showAndHide(obj,types){
     } 
 } 
 
-function getValue(obj,str){ 
+function getValue(obj,str)
+{ 
     var input=window.document.getElementById(obj); 
     input.value=str; 
 }
 
-function removeLi(count){
+function removeLi(count)
+{
     var obj = document.getElementById("PN_ul_id");
     //var i = obj.childNodes.length;
     //alert(i);
@@ -241,7 +330,8 @@ function removeLi(count){
     //}
 }
 
-function addLi(str,inputId,ulId) {
+function addLi(str,inputId,ulId)
+{
     var obj = document.getElementById(ulId);
     var li = document.createElement("li");
     //li.onmousedown="showAndHide 'List1','hide'";
@@ -252,7 +342,8 @@ function addLi(str,inputId,ulId) {
     obj.appendChild(li);
 }
 
-function addBeforeLi(str,inputId,ulId) {
+function addBeforeLi(str,inputId,ulId)
+{
     var obj = document.getElementById(ulId);
         var li = document.createElement("li");
         li.onmousedown=function(){getValue(inputId,str)};
@@ -267,6 +358,45 @@ function addBeforeLi(str,inputId,ulId) {
     }
 }
 
+function addSelect(DivId,SelectId,flag) 
+{
+	var i = document.getElementById(DivId).childNodes.length;
+	if (i<2){
+	    var select = document.createElement("select");
+	    select.id = SelectId;
+	    if(flag==0){
+	        select.onchange = function(){onloadL1Project2()};
+	    }
+	    document.getElementById(DivId).appendChild(select);
+    }
+}
+
+function addOption(SelectId,OptionName,flag) 
+{
+	var obj = document.getElementById(SelectId);
+	var i = obj.childNodes.length;
+	//alert("i="+i);
+	if (i>0&&flag==0){
+		for(var j=0;j<i;j++){
+			//alert("j="+j);
+			obj.removeChild(obj.childNodes[0]);
+		}	
+	}
+    var option = document.createElement("option");
+    option.value = OptionName;
+    option.innerHTML = OptionName;
+    document.getElementById(SelectId).appendChild(option);
+}
+
+function addButton(DivId,FunName) 
+{
+    var input = document.createElement("input");
+    input.type = "button";
+    input.value = "onload";
+    input.onclick = function(){FunName()};
+    document.getElementById(DivId).appendChild(input);
+}
+
 </Script>
 
 <Script Language="VBScript">
@@ -274,8 +404,12 @@ function addBeforeLi(str,inputId,ulId) {
 Set ws=CreateObject("wscript.shell")
 Set Fso=CreateObject("Scripting.FileSystemObject")
 
+textEditorPath = "F:\tools\Sublime_Text_3\sublime_text.exe"
+
 ReadHistory "Dict_PN","project_name","PN_ul_id"
 ReadHistory "Dict_OpenFile","FilePath_id","Openfile_ul_id"
+ReadHistory "Dict_OpenFile","FilePath_l1_id","Openfile_ul_l1_id"
+onloadL1Project1()
 
 Function CopyString(s) 
     Set forms=CreateObject("forms.form.1") 
@@ -289,94 +423,83 @@ Function CopyString(s)
     End With 
 End Function 
 
-Sub OpenBinary()
+Function getPath(Name)
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
-    LK=SC&"\mediatek\binary\packages\"&PN
-    If Fso.FolderExists(LK) Then
-        ws.run "explorer.exe "&LK
-    Else
-        msgbox("不存在相应的binary目录")
-    End If
-End Sub
 
-Sub OpenConfig()
-    PN=document.getElementById("project_name").value
-    SC=document.getElementById("source").value
-    LK=SC&"\mediatek\config\"&PN
-    If Fso.FolderExists(LK) Then
-        ws.run "explorer.exe "&LK
-    Else
-        msgbox("不存在相应的config目录")
-    End If
-End Sub
+    Select Case Name
+        Case "binary"
+            LK = SC&"\mediatek\binary\packages\"&PN
+        Case "config"
+            LK = SC&"\mediatek\config\"&PN
+        Case "custom"
+            LK = SC&"\mediatek\custom\"&PN
+        Case "overlay"
+            PN = Replace(PN,"[","-")
+            PN = Replace(PN,"]","")
+            LK = SC&"\mediatek\custom\common\resource_overlay\roco\resandroid\"&PN
+        Case "out"
+            LK = SC&"\out\target\product"
+        Case "ProjectConfig.mk"
+            LK = SC&"\mediatek\config\"&PN&"\ProjectConfig.mk"
+        Case "system.prop"
+            LK = SC&"\mediatek\config\"&PN&"\system.prop"
+        Case "product_roco.mk"
+            LK = SC&"\mediatek\config\"&PN&"\product_roco.mk"
+    End Select
 
-Function OpenCustom()
-    PN=document.getElementById("project_name").value
-    SC=document.getElementById("source").value
-    LK=SC&"\mediatek\custom\"&PN
-    If Fso.FolderExists(LK) Then
-        ws.run "explorer.exe "&LK
-    Else
-        msgbox("不存在相应的custom目录")
-    End If
+    getPath = LK
+
 End Function
 
-Function GetCustom()
-    PN=document.getElementById("project_name").value
-    SC=document.getElementById("source").value
-    LK=SC&"\mediatek\custom\"&PN
-    If Fso.FolderExists(LK) Then
-        GetCustom = LK
+Sub openProjectFile(Name)
+    LK=getPath(Name)
+    If Fso.FileExists(LK) Then
+        ws.run textEditorPath&" "&LK
     Else
-        msgbox("不存在相应的custom目录")
+        msgbox(Name&"不存在")
     End If
-End Function
-
-Sub OpenOverlay()
-    PN=document.getElementById("project_name").value
-    SC=document.getElementById("source").value
-
-    PN = Replace(PN,"[","-")
-    PN = Replace(PN,"]","")
-
-    LK=SC&"\mediatek\custom\common\resource_overlay\roco\resandroid\"&PN
-
-    If (Not Fso.FolderExists(LK)) Then
-        If (Fso.FolderExists(SC&"\mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN)) Then
-            LK = SC&"\mediatek\custom\common\resource_overlay\roco\reslight\"&PN
-        Else    
-            msgbox("不存在相应的overlay目录")
-        End If    
-    End If
-    ws.run "explorer.exe "&LK
 End Sub
 
-Sub OpenOut()
-    PN=document.getElementById("project_name").value
-    SC=document.getElementById("source").value
+Sub openProjectFolder(Name)
+    LK=getPath(Name)
+    flag = 0
 
-    If Fso.FolderExists(SC&"\out\target\product\") Then
-        Set MyFolder_PN = Fso.GetFolder(SC&"\out\target\product\")
-        Set Folders = MyFolder_PN.SubFolders
-        For Each Folder in Folders
-            FDN=Folder.Name
-            If Fso.FolderExists(SC&"\out\target\product\"&FDN&"\system") Then
-                PN1=Folder.Name
-                Exit For 
+    Select Case Name
+        Case "overlay"
+            If (Not Fso.FolderExists(LK)) Then
+                LK = SC&"\mediatek\custom\common\resource_overlay\roco\reslight\"&PN 
             End If
-        Next
-        LK=SC&"\out\target\product\"&PN1
+        Case "out"
+            If Fso.FolderExists(LK) Then
+                Set MyFolder_PN = Fso.GetFolder(LK)
+                Set Folders = MyFolder_PN.SubFolders
+                For Each Folder in Folders
+                    FDN=Folder.Name
+                    If Fso.FolderExists(LK&"\"&FDN&"\system") Then
+                        PN1=Folder.Name
+                        Exit For 
+                    End If
+                Next
+                LK=LK&"\"&PN1
+            End If
+    End Select
+
+    If Fso.FolderExists(LK) Then
+        ws.run "explorer.exe "&LK
     Else
-        msgbox("不存在out目录")
+        msgbox(Name&"不存在")
     End If
-   
-    ws.run "explorer.exe "&LK
 End Sub
 
-Function OpenFile()
-    FP=document.getElementById("FilePath_id").value
-    SC=document.getElementById("source").value  
+Function OpenFile(flag)
+    If flag = 0 Then
+    	SC=document.getElementById("source").value  
+        FP=document.getElementById("FilePath_id").value
+    Else
+        SC=document.getElementById("source_l1").value
+        FP=document.getElementById("FilePath_l1_id").value
+    End If
     If Len(FP) > 0 Then
         FP=Replace(FP,"/","\")
         LK=SC&"\"&FP
@@ -386,7 +509,7 @@ Function OpenFile()
     If Fso.FolderExists(LK) Then
         ws.run "explorer.exe "&LK
     ElseIf Fso.FileExists(LK) Then
-        ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
+        ws.run textEditorPath&" "&LK
         Dim DictPath, oDict
         DictPath = ws.CurrentDirectory
         If Fso.FileExists(DictPath&"\Dict.txt")=False Then
@@ -428,57 +551,37 @@ Function OpenHistoryFile()
     If Fso.FolderExists(LK) Then
         ws.run "explorer.exe "&LK
     ElseIf Fso.FileExists(LK) Then
-        ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
+        ws.run textEditorPath&" "&LK
     Else
         msgbox("路径不存在")
     End If
 End Function
 
-Function OpenProjectConfig_mk(OpenFlag)
-    PN=document.getElementById("project_name").value
-    SC=document.getElementById("source").value
-
-    If Len(PN) = 0 Then
-        msgbox("请输入工程名")
-    Else
-        LK=SC&"\mediatek\config\"&PN&"\ProjectConfig.mk"
-        If Fso.FileExists(LK) Then
-            If OpenFlag = 0 Then
-                OpenProjectConfig_mk = LK
-            Else
-                ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
-            End If
-        Else
-            msgbox("文件不存在")
-        End If
-    End If
-End Function
-
-Sub OpenSystem_prop()
-    PN=document.getElementById("project_name").value
-    SC=document.getElementById("source").value
-
-    If Len(PN) = 0 Then
-        msgbox("请输入工程名")
-    Else
-        LK=SC&"\mediatek\config\"&PN&"\system.prop"
-        If Fso.FileExists(LK) Then
-            ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
-        Else
-            msgbox("文件不存在")
-        End If
-    End If
-End Sub
-
 Sub CommandCommon()
     PN=document.getElementById("project_name").value
-    command_compile="rm -rf out/ && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" n"
+    mRmOut=document.getElementById("rmOut").value
+    mBuildMode=document.getElementById("buildMode").value
+    mOTA=document.getElementById("OTA").value
+
+    If mRmOut = "yes" Then
+        mRmOut="rm -rf out/ && "
+    End If
+
+    If mOTA = "yes" Then
+        mOTA=" && ./mk -o=TARGET_BUILD_VARIANT="&mBuildMode&" "&PN&" otapackage"
+    End If
+
+    command_compile=mRmOut&"./mk -o=TARGET_BUILD_VARIANT="&mBuildMode&" "&PN&" n"&mOTA
     CopyString(command_compile)
 End Sub
 
-Sub CommandOTA()
-    PN=document.getElementById("project_name").value
-    command_compile="rm -rf out/ && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" n && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" otapackage"
+Sub CommandCommonL1()
+    command_compile="rm -rf out/ && make -j24 2>&1 | tee build.log"
+    CopyString(command_compile)
+End Sub
+
+Sub CommandOTAL1()
+    command_compile="rm -rf out/ && make -j24 2>&1 | tee build.log && make -j24 otapackage"
     CopyString(command_compile)
 End Sub
 
@@ -526,12 +629,6 @@ Function getProjectName()
     End If
 End Function
 
-Function SetFile(LK)
-    Dim fso
-    Set fso=createobject("scripting.filesystemobject")
-    set SetFile=fso.opentextfile(LK,1)
-End Function
-
 Function SearchStr(fread,Str,LK,flag)
     Dim LineStr, fread_new
     Do Until fread.AtEndOfStream
@@ -545,64 +642,71 @@ Function SearchStr(fread,Str,LK,flag)
         End If
     Loop
     If flag = 0 Then
-        Set fread_new = SetFile(LK)
+        Set fread_new = Fso.opentextfile(LK,1)
         SearchStr = SearchStr(fread_new,Str,LK,1)
     End If   
 End Function
 
 Function checkGPS()
     GPS_flag = ""
-    LK = OpenProjectConfig_mk(0)
-    Set fso = createobject("scripting.filesystemobject")
-    Set fread = fso.opentextfile(LK,1)
+    LK = getPath("ProjectConfig.mk")
+    If Fso.FileExists(LK) Then
+        Set fread = Fso.opentextfile(LK,1)
 
-    str_Version = Trim(SearchStr(fread,"ROCO_SW_VERSION=",LK,0))
-    str_Modem = Trim(SearchStr(fread,"CUSTOM_MODEM=",LK,0))
+        str_Version = Trim(SearchStr(fread,"ROCO_SW_VERSION=",LK,0))
+        str_Modem = Trim(SearchStr(fread,"CUSTOM_MODEM=",LK,0))
 
-    If InStr(str_Version,"LOW") > 0 Then
-        GPS_flag = GPS_flag&"1"
-    End If
+        If InStr(str_Version,"LOW") > 0 Then
+            GPS_flag = GPS_flag&"1"
+        End If
 
-    If InStr(str_Modem,"LOW_GPS") > 0 Then
-        GPS_flag = GPS_flag&"2"
-    End If
+        If InStr(str_Modem,"LOW_GPS") > 0 Then
+            GPS_flag = GPS_flag&"2"
+        End If
 
-    LK = GetCustom()
+        LK = getPath("custom")
+        If Fso.FolderExists(LK) Then
 
-    If fso.FileExists(LK&"\cgen\cfgdefault\CFG_GPS_Default.h") Then
-        Set oCgen = fso.OpenTextFile(LK&"\cgen\cfgdefault\CFG_GPS_Default.h",1)
-        Do Until oCgen.AtEndOfStream
-            If InStr(oCgen.ReadLine,"0xFE") > 0 Then
-                GPS_flag = GPS_flag&"3"
-                Exit Do
+            If Fso.FileExists(LK&"\cgen\cfgdefault\CFG_GPS_Default.h") Then
+                Set oCgen = Fso.OpenTextFile(LK&"\cgen\cfgdefault\CFG_GPS_Default.h",1)
+                Do Until oCgen.AtEndOfStream
+                    If InStr(oCgen.ReadLine,"0xFE") > 0 Then
+                        GPS_flag = GPS_flag&"3"
+                        Exit Do
+                    End If
+                Loop
+                Set oCgen = Nothing
             End If
-        Loop
-        Set oCgen = Nothing
-    End If
 
-    If fso.FileExists(LK&"\hal\ant\mt6582_ant_m1\WMT_SOC.cfg") Then
-        Set oAnt = fso.OpenTextFile(LK&"\hal\ant\mt6582_ant_m1\WMT_SOC.cfg",1)
-        Do Until oAnt.AtEndOfStream
-            If InStr(oAnt.ReadLine,"flag=1") > 0 Then
-                GPS_flag = GPS_flag&"4"
-                Exit Do
+            If Fso.FileExists(LK&"\hal\ant\mt6582_ant_m1\WMT_SOC.cfg") Then
+                Set oAnt = Fso.OpenTextFile(LK&"\hal\ant\mt6582_ant_m1\WMT_SOC.cfg",1)
+                Do Until oAnt.AtEndOfStream
+                    If InStr(oAnt.ReadLine,"flag=1") > 0 Then
+                        GPS_flag = GPS_flag&"4"
+                        Exit Do
+                    End If
+                Loop
+                Set oAnt = Nothing
             End If
-        Loop
-        Set oAnt = Nothing
-    End If
 
-    If GPS_flag = "" Then
-        msgbox "GPS不降成本"
-    ElseIf GPS_flag = "1234" Then
-        msgbox "GPS降成本"
+            If GPS_flag = "" Then
+                msgbox "GPS不降成本"
+            ElseIf GPS_flag = "1234" Then
+                msgbox "GPS降成本"
+            Else
+                msgbox "改动不完全，请检查"
+            End If
+        Else
+            msgbox("custom目录不存在")
+        End If
     Else
-        msgbox "改动不完全，请检查"
+        msgbox("ProjectConfig.mk文件不存在")
     End If
 End Function
 
 Function checkOTA()
     OTA_flag = ""
-    LK = OpenProjectConfig_mk(0)
+    LK = getPath("ProjectConfig.mk")
     Set fso = createobject("scripting.filesystemobject")
     Set fread = fso.opentextfile(LK,1)
 
@@ -627,6 +731,96 @@ Function checkOTA()
     End If
 End Function
 
+Function getProductInfo(fileName)
+    flag_product = 0
+    flag_shut = 0
+    LK = getPath("product_roco.mk")
+    If Fso.FileExists(LK) Then
+        Set fread = Fso.opentextfile(LK,1)
+        Do Until fread.AtEndOfStream
+            strLine = fread.ReadLine
+            If InStr(strLine,fileName) > 0 Then
+                If NOT InStr(strLine,"#") > 0 Then
+                    flag_product = 1
+                    Exit Do
+                End If
+            End If 
+        Loop
+    Else
+        msgbox("product_roco.mk文件不存在")
+    End If
+    ''//msgbox("flag_custom = "&flag_custom&"    flag_shut = "&flag_shut)
+End Function
+
+Function getCustomInfo()
+    flag_custom = 0
+    LK = getPath("custom")
+    If Fso.FolderExists(LK) Then
+        LK = LK&"\prebuilts\system\media"
+        If Fso.FolderExists(LK) Then
+            If Fso.FileExists(LK&"\"&fileName) Then
+                flag_custom = 1
+                ''//check system.prop for shut file. begin
+                If InStr(fileName,"shut") > 0 Then
+                    flag_shut = checkShutFile()
+                End If
+                ''//end
+            End If
+        End If
+    Else
+        msgbox("custom目录不存在")
+    End If
+End Function
+
+Function checkBootShutFile()
+    getProductInfo = 0
+    If flag_product = flag_custom Then
+        If InStr(fileName,"shut") > 0 Then
+            If (flag_custom = 1) AND (flag_shut = 0) Then
+                msgbox("system.prop文件中缺少ro.operator.optr=CUST")
+                getProductInfo = 1
+            End If
+        End If
+    Else
+        msgbox("product_roco.mk文件中的"&fileName&"部分有问题，请检查")
+        getProductInfo = 1
+    End If
+End Function
+
+Function checkShutFile()
+    flag_shut = 0
+    LK = getPath("system.prop")
+    If Fso.FileExists(LK) Then
+        Set fread = Fso.opentextfile(LK,1)
+        Do Until fread.AtEndOfStream
+            strLine = fread.ReadLine
+            If InStr(strLine,"ro.operator.optr=CUST") > 0 Then
+                If NOT InStr(strLine,"#") > 0 Then
+                    flag_shut = 1
+                    Exit Do
+                End If
+            End If 
+        Loop
+    Else
+        msgbox("system.prop文件不存在")
+    End If
+    checkShutFile = flag_shut
+End Function
+
+Function checkProductFinal()
+    flag1 = getProductInfo("bootanimation.zip")
+    flag2 = getProductInfo("bootanimation1.zip")
+    flag3 = getProductInfo("shutanimation.zip")
+    flag4 = getProductInfo("shutanimation1.zip")
+    flag5 = getProductInfo("bootaudio.mp3")
+    flag6 = getProductInfo("bootaudio1.mp3")
+    flag7 = getProductInfo("shutaudio.mp3")
+    flag8 = getProductInfo("shutaudio1.mp3")
+    If (flag1=0) AND (flag2=0) AND (flag3=0) AND (flag4=0) AND (flag5=0) AND (flag6=0) AND (flag7=0) AND (flag8=0) Then
+        msgbox("检查OK")
+    End If
+End Function
+
 Function WriteHistory(DictName,inputId,ulId)
     Dim str
     str = document.getElementById(inputId).value
@@ -637,10 +831,8 @@ Function WriteHistory(DictName,inputId,ulId)
         DictPath = ws.CurrentDirectory
         If Fso.FileExists(DictPath&"\"&DictName&".txt")=False Then
             Set oDict = fso.CreateTextFile(DictPath&"\"&DictName&".txt", True)
-            Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",1)
-        Else
-            Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",1)
         End If    
+        Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",1)
 
         Dim strArray(9), lineCount
         lineCount = 0
@@ -722,6 +914,114 @@ Function ReadHistory(DictName,inputId,ulId)
         addBeforeLi strArray(i),inputId,ulId
     Next
 End Function
+
+Function onloadL1Project1()
+    Dim SC, LK, flag
+    flag = 0
+    SC = document.getElementById("source_l1").value
+    LK = SC&"\device\joya_sz\"
+    If Fso.FolderExists(LK) Then
+        addSelect "project_l1_div","projectFolder_1","0"
+        Set MyFolder = Fso.GetFolder(LK)
+        Set Folders = MyFolder.SubFolders
+        For Each Folder in Folders
+            If Fso.FolderExists(LK&Folder.Name&"\roco\") Then
+                addOption "projectFolder_1",Folder.Name,flag
+                flag = 1
+            End If
+        Next
+        Set MyFolder = Nothing
+        Set Folders = Nothing
+        
+        If flag = 1 Then
+            onloadL1Project2()
+        End If
+    Else
+        msgbox("not found device\joya_sz")
+    End If
+End Function
+
+Function onloadL1Project2()
+	Dim PJ1, LK, SC, flag
+	flag = 0
+	SC = document.getElementById("source_l1").value
+    PJ1 = document.getElementById("projectFolder_1").value
+    LK = SC&"\device\joya_sz\"&PJ1&"\roco\"
+    addSelect "project_l1_div","projectFolder_2","1"
+    Set MyFolder = Fso.GetFolder(LK)
+    Set Folders = MyFolder.SubFolders
+    For Each Folder in Folders
+        addOption "projectFolder_2",Folder.Name,flag
+        flag = 1
+    Next
+    Set MyFolder = Nothing
+    Set Folders = Nothing
+End Function
+
+Function getPathL1(Name)
+    SC=document.getElementById("source_l1").value
+    PJ1 = document.getElementById("projectFolder_1").value
+    PJ2 = document.getElementById("projectFolder_2").value
+
+    Select Case Name
+        Case "device1_L1"
+            LK = SC&"\device\joya_sz\"&PJ1
+        Case "device2_L1"
+            LK = SC&"\device\joya_sz\"&PJ1&"\roco\"&PJ2
+        Case "kernel_arch"
+            LK = SC&"\kernel-3.10\arch\arm\"
+        Case "kernel_driver"
+            LK = SC&"\kernel-3.10\drivers\misc\mediatek\"
+        Case "custom_L1"
+            LK = SC&"\vendor\mediatek\proprietary\custom\"&PJ1
+        Case "out_L1"
+            LK = SC&"\out\target\product"
+        Case "ProjectConfig.mk"
+            LK = SC&"\device\joya_sz\"&PJ1&"\ProjectConfig.mk"
+        Case "system.prop"
+            LK = SC&"\device\joya_sz\"&PJ1&"\roco\"&PJ2&"\system.prop"
+        Case "items.ini"
+            LK = SC&"\device\joya_sz\"&PJ1&"\roco\"&PJ2&"\items.ini"
+    End Select
+
+    getPathL1 = LK
+
+End Function
+
+Sub openProjectFileL1(Name)
+    LK=getPathL1(Name)
+    If Fso.FileExists(LK) Then
+        ws.run textEditorPath&" "&LK
+    Else
+        msgbox(Name&"不存在")
+    End If
+End Sub
+
+Sub openProjectFolderL1(Name)
+    LK=getPathL1(Name)
+
+    Select Case Name
+        Case "out_L1"
+            If Fso.FolderExists(LK) Then
+                Set MyFolder_PN = Fso.GetFolder(LK)
+                Set Folders = MyFolder_PN.SubFolders
+                For Each Folder in Folders
+                    FDN=Folder.Name
+                    If Fso.FolderExists(LK&"\"&FDN&"\system") Then
+                        PN1=Folder.Name
+                        Exit For 
+                    End If
+                Next
+                LK=LK&"\"&PN1
+            End If
+    End Select
+
+    If Fso.FolderExists(LK) Then
+        ws.run "explorer.exe "&LK
+    Else
+        msgbox(Name&"不存在")
+    End If
+End Sub
 
 </Script>
 
