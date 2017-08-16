@@ -1,14 +1,18 @@
-function showAndHide(obj,types)
+function showAndHide(listId, types)
 { 
-    var Layer=window.document.getElementById(obj); 
-    switch(types){ 
-        case "show": 
-            Layer.style.display="block"; 
-            break; 
-        case "hide": 
-            Layer.style.display="none"; 
-    } 
-} 
+    //var listIdArray = listId.split("$")
+    //for (var i = 0; i < listIdArray.length; i++) {
+        var Layer=window.document.getElementById(listId); 
+        switch (types) { 
+            case "show": 
+                Layer.style.display="block"; 
+                break; 
+            case "hide": 
+                Layer.style.display="none";
+                break; 
+        }
+    //}
+}
 
 function addAfterLi(str, inputId, listId, ulId)
 {

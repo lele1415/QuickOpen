@@ -1,30 +1,17 @@
-Const ID_CHECKBOX_RM_OUT_L1 = "checkbox_rm_out_l1"
-Const ID_CHECKBOX_BUILD_OTA_L1 = "checkbox_build_ota_l1"
-Const ID_CHECKBOX_RM_OUT_KK = "checkbox_rm_out_kk"
-Const ID_CHECKBOX_USER_KK = "checkbox_user_kk"
-Const ID_CHECKBOX_BUILD_OTA_KK = "checkbox_build_ota_kk"
+Const ID_CHECKBOX_RM_OUT = "checkbox_rm_out"
+Const ID_CHECKBOX_USER = "checkbox_user"
+Const ID_CHECKBOX_BUILD_OTA = "checkbox_build_ota"
 
-Sub CommandOfBuildL1()
-    Dim commandFinal, commandOta
-    commandFinal = "make -j12 2>&1 | tee build.log"
-    commandOta = "make -j12 otapackage 2>&1 | tee build_ota.log"
-
-    If element_isChecked(ID_CHECKBOX_RM_OUT_L1) Then commandFinal = "rm -rf out/ && " & commandFinal
-    If element_isChecked(ID_CHECKBOX_BUILD_OTA_L1) Then commandFinal = commandFinal & " && " & commandOta
-
-    Call CopyString(commandFinal)
-End Sub
-
-Sub CommandOfBuildKK()
+Sub CommandOfBuild()
     Dim userOrEng, optionName, commandOta, commandFinal
     userOrEng = "user"
-    If Not element_isChecked(ID_CHECKBOX_USER_KK) Then userOrEng = "eng"
-    optionName = getElementValue(ID_INPUT_PROJECT_KK)
+    If Not element_isChecked(ID_CHECKBOX_USER) Then userOrEng = "eng"
+    optionName = getElementValue(ID_INPUT_PROJECT)
     commandFinal = "./mk -o=TARGET_BUILD_VARIANT=" & userOrEng & " " & optionName & " n"
     commandOta = "./mk -o=TARGET_BUILD_VARIANT=" & userOrEng & " " & optionName & " otapackage"
 
-    If element_isChecked(ID_CHECKBOX_RM_OUT_KK) Then commandFinal = "rm -rf out/ && " & commandFinal
-    If element_isChecked(ID_CHECKBOX_BUILD_OTA_KK) Then commandFinal = commandFinal & " && " & commandOta
+    If element_isChecked(ID_CHECKBOX_RM_OUT) Then commandFinal = "rm -rf out/ && " & commandFinal
+    If element_isChecked(ID_CHECKBOX_BUILD_OTA) Then commandFinal = commandFinal & " && " & commandOta
 
     Call CopyString(commandFinal)
 End Sub

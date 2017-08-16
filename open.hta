@@ -66,29 +66,22 @@
         4. 添加KK版本的 创建切换工程项目的快捷按钮
         5. 编译命令默认j24
         6. 添加显示文件目录结构的功能
+
+    版本2.0_20170617
+        1. 去掉L1版本部分
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>QuickOpen</Title>
+<Title>QuickOpen v2.0 For KK</Title>
 
 <style type="text/css">
 
 <!-- 
 body { font-family: sans-serif; color:#f8f8f2;}
 
-#shoudongshuru { font-size:14px; font-style:italic; }
-
-#getVerName { font-size:15px; }
-
-#ota { font-size:13px; }
-
 .Menu_codePath { position:relative; width:335px; height:50px; z-index:1; margin-top:0px; display:none; }
-
-.Menu_project_l1 { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
-
-.Menu_option_l1 { position:relative; width:95px; height:50px; z-index:1; margin-top:0px; display:none; }
 
 .Menu2 { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
 
@@ -123,12 +116,6 @@ body { font-family: sans-serif; color:#f8f8f2;}
 .form_codePath { width:335px; height:auto; }
 .form_codePath div{ position:relative; top:0; left:0; margin-bottom:5px; }
 
-.form_project_l1 { width:155px; height:auto; }
-.form_project_l1 div{ position:relative; top:0; left:0; margin-bottom:5px; }
-
-.form_option_l1 { width:95px; height:auto; }
-.form_option_l1 div{ position:relative; top:0; left:0; margin-bottom:5px; }
-
 .input_text{border:1px solid #aaa;}
 .input_button{border:1px solid #aaa; background:none; color:#f8f8f2;}
 
@@ -139,142 +126,66 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 <Body bgcolor="#272822">
 
-===============L1版本===============
 <fieldset>
     <legend>当前代码路径</legend>
-    <div class="form_codePath" onmouseleave="showAndHide('list_code_path_l1','hide')">
-        <input type="text" id="input_code_path_l1" 
-                onchange="onloadPrjAndOpt()" 
-                onclick="showAndHide('list_code_path_l1','show')" 
+    <div class="form_codePath" onmouseleave="showAndHide('list_code_path','hide')">
+        <input type="text" id="input_code_path"
+                onclick="showAndHide('list_code_path','show')"
                 size="50" />
-        <div class="Menu_codePath" id="list_code_path_l1"> 
+        <div class="Menu_codePath" id="list_code_path"> 
             <div class="Menu2"> 
-                <ul id="ul_code_path_l1"> 
-                </ul> 
-            </div> 
-        </div>
-    </div>
-
-    <div class="form_project_l1" onmouseleave="showAndHide('list_project_l1','hide')">
-        <input type="text" id="input_project_l1"  
-                onclick="showAndHide('list_project_l1','show')" 
-                size="20" />
-        <div class="Menu_project_l1" id="list_project_l1"> 
-            <div class="Menu2"> 
-                <ul id="ul_project_l1"> 
-                </ul> 
-            </div> 
-        </div>
-    </div>
-    
-    <div class="form_option_l1" onmouseleave="showAndHide('list_option_l1','hide')">
-        <input type="text" id="input_option_l1"  
-                onclick="showAndHide('list_option_l1','show')" 
-                size="10" />
-        <div class="Menu_option_l1" id="list_option_l1"> 
-            <div class="Menu2"> 
-                <ul id="ul_option_l1"> 
-                </ul> 
-            </div> 
-        </div>
-    </div>
-    <input type="button" class="input_button" onclick="creatShortcutForL1()" value="creatShortcut" />
-    <br>
-    <div id="div_shortcut_l1"></div>
-</fieldset>
-<br>
-<fieldset>
-    <legend>打开目录或文件</legend>
-    <div class="form_codePath" onkeydown="showAndHide('list_open_path_l1','hide')" onmouseleave="showAndHide('list_open_path_l1','hide')">
-        <input type="text" id="input_open_path_l1" 
-                onclick="showAndHide('list_open_path_l1','show')" 
-                size="50" />
-        <div class="Menu_codePath" id="list_open_path_l1"> 
-            <div class="Menu2_openPath"> 
-                <ul id="ul_open_path_l1"> 
-                </ul> 
-            </div>
-        </div>
-    </div>
-    <input type="button" class="input_button" onclick="handlePathFromL1(0)" value="打开" />
-    <input type="button" class="input_button" onclick="initPath(0)" value="显示目录" />
-    <br><br>
-<div id="current_path_l1">&nbsp;</div>
-<br>
-<div id="show_area_l1"></div>
-</fieldset>
-<br>
-<fieldset>
-    <legend>复制命令</legend>
-    <input type="checkbox" id="checkbox_rm_out_l1" checked=true >rm out</input>
-    <input type="checkbox" id="checkbox_build_ota_l1" >ota</input>
-    <input type="button" class="input_button" onclick="CommandOfBuildL1()" value="copy">
-</fieldset>
-
-<br>
-===============KK版本===============
-<fieldset>
-    <legend>当前代码路径</legend>
-    <div class="form_codePath" onmouseleave="showAndHide('list_code_path_kk','hide')">
-        <input type="text" id="input_code_path_kk"
-                onclick="showAndHide('list_code_path_kk','show')"
-                size="50" />
-        <div class="Menu_codePath" id="list_code_path_kk"> 
-            <div class="Menu2"> 
-                <ul id="ul_code_path_kk"> 
+                <ul id="ul_code_path"> 
                 </ul> 
             </div> 
         </div> 
     </div> 
-    <input type="text" id="input_project_kk" size="35">
+    <input type="text" id="input_project" size="35">
     <br>
-    <input type="button" class="input_button" onclick="creatShortcutForKK()" value="creatShortcut" />
+    <input type="button" class="input_button" onclick="creatShortcut()" value="creatShortcut" />
     <br>
-    <div id="div_shortcut_kk"></div>
+    <div id="div_shortcut"></div>
 </fieldset> 
 <br>
 <fieldset>
     <legend>打开目录或文件</legend>
-    <div class="form_codePath" onkeydown="showAndHide('list_open_path_kk','hide')" onmouseleave="showAndHide('list_open_path_kk','hide')">
-        <input type="text" id="input_open_path_kk" 
-                onclick="showAndHide('list_open_path_kk','show')" 
+    <div class="form_codePath" onkeydown="showAndHide('list_open_path','hide')" onmouseleave="showAndHide('list_open_path','hide')">
+        <input type="text" id="input_open_path" 
+                onclick="showAndHide('list_open_path','show')" 
                 size="50" />
-        <div class="Menu_codePath" id="list_open_path_kk"> 
+        <div class="Menu_codePath" id="list_open_path"> 
             <div class="Menu2_openPath"> 
-                <ul id="ul_open_path_kk"> 
+                <ul id="ul_open_path"> 
                 </ul> 
             </div> 
         </div>
     </div>
-    <input type="button" class="input_button" onclick="handlePathFromKK(0)" value="打开" />
-    <input type="button" class="input_button" onclick="initPath(1)" value="显示目录" />
+    <input type="button" class="input_button" onclick="handlePath(0)" value="打开" />
+    <input type="button" class="input_button" onclick="initNewPath(0)" value="显示目录" />
+    <input type="button" class="input_button" onclick="initNewPath(1)" value="关闭显示" />
     <br><br>
-<div id="current_path_kk">&nbsp;</div>
+<div id="exp_path">&nbsp;</div>
 <br>
-<div id="show_area_kk"></div>
+<div id="exp_file"></div>
 </fieldset>
 <br>
 <fieldset>
     <legend>复制命令</legend>
-    <input type="checkbox" id="checkbox_rm_out_kk" checked=true >rm out</input>
-    <input type="checkbox" id="checkbox_user_kk" checked=true >user</input>
-    <input type="checkbox" id="checkbox_build_ota_kk" >ota</input>
-    <input type="button" class="input_button" onclick="CommandOfBuildKK()" value="copy">
+    <input type="checkbox" id="checkbox_rm_out" checked=true >rm out</input>
+    <input type="checkbox" id="checkbox_user" checked=true >user</input>
+    <input type="checkbox" id="checkbox_build_ota" >ota</input>
+    <input type="button" class="input_button" onclick="CommandOfBuild()" value="copy">
 </fieldset>
 
 
 <Script Language="JavaScript" src="CoreFun.js"></Script>
 <Script Language="JavaScript" src="ReadCodePath.js"></Script>
-<Script Language="JavaScript" src="OnloadProjectAndOption.js"></Script>
 <Script Language="JavaScript" src="CreatShortcutOfCodePrjOpt.js"></Script>
 <Script Language="JavaScript" src="FileManager.js"></Script>
 
 <Script Language="VBScript" src="CoreObjAndFun.vbs"></Script>
 <Script Language="VBScript" src="ReadCodePath.vbs"></Script>
-<Script Language="VBScript" src="OnloadProjectAndOption.vbs"></Script>
 <Script Language="VBScript" src="CreatShortcutOfCodePrjOpt.vbs"></Script>
-<Script Language="VBScript" src="OpenPathFromL1.vbs"></Script>
-<Script Language="VBScript" src="OpenPathFromKK.vbs"></Script>
+<Script Language="VBScript" src="OpenPath.vbs"></Script>
 <Script Language="VBScript" src="CopyCommand.vbs"></Script>
 <Script Language="VBScript" src="FileManager.vbs"></Script>
 

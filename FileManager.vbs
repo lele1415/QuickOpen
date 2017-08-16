@@ -1,87 +1,125 @@
-Const ID_DIV_SHOW_AREA_L1 = "show_area_l1"
-Const ID_DIV_CURRENT_PATH_L1 = "current_path_l1"
-Const ID_DIV_SHOW_AREA_KK = "show_area_kk"
-Const ID_DIV_CURRENT_PATH_KK = "current_path_kk"
+Const ID_DIV_EXP_FILE = "exp_file"
+Const ID_DIV_EXP_PATH = "exp_path"
+Const EXP_SHOW = 0
+Const EXP_HIDE = 1
 
-Dim aDivAreaId : aDivAreaId = Array(ID_DIV_SHOW_AREA_L1, ID_DIV_SHOW_AREA_KK)
-Dim aDivPathId : aDivPathId = Array(ID_DIV_CURRENT_PATH_L1, ID_DIV_CURRENT_PATH_KK)
-Dim aCurrentPath : aCurrentPath = Array(1)
-Dim aCurrentDeepCount : aCurrentDeepCount = Array(1)
+Dim iCrtPathLength, sCrtPath
+iCrtPathLength = 0
+sCrtPath = ""
 
 Dim vaSubFolderName : Set vaSubFolderName = New VariableArray
 Dim vaSubFileName : Set vaSubFileName = New VariableArray
 
-
-Const FROM_L1 = 0
-Const FROM_KK = 1
-Sub initPath(where)
-	Dim rootPath
-	Select Case where
-		Case FROM_L1 : rootPath = handlePathFromL1(1)
-		Case FROM_KK : rootPath = handlePathFromKK(1)
+Sub initNewPath(doWhat)
+	Dim cutLength
+	Select Case doWhat
+		Case EXP_SHOW
+			Dim rootPath : rootPath = handlePath(1)
+			If isValidRootPath(rootPath) Then
+				cutLength = iCrtPathLength
+				Call delPath(cutLength)
+				Call addPath(rootPath)
+				Call removeFile()
+				Call addFile()
+			End If
+		Case EXP_HIDE
+			cutLength = iCrtPathLength
+			Call delPath(cutLength)
+			Call removeFile()
 	End Select
-	
-	If oFso.FolderExists(rootPath) Then
-		If Right(rootPath, 1) = "\" Then rootPath = Mid(rootPath, 1, Len(rootPath)-1)
-		Call AddSubFolder(rootPath, -1, aDivAreaId(where), aDivPathId(where), where)
+End Sub
+
+Sub clickPath(iPathLength)
+	Dim cutLength : cutLength = iCrtPathLength - iPathLength
+
+	If cutLength = 0 Then
+		Call openFolder(sCrtPath)
 	Else
-		MsgBox("path is not exist!")
+		Call delPath(cutLength)
+		Call removeFile()
+		Call addFile()
 	End If
 End Sub
 
-Sub AddSubFolder(folderName, nextDeepCount, divAreaId, divPathId, where)
-	If nextDeepCount = aCurrentDeepCount(where) Then Exit Sub
+Sub clickPlus(folderName)
+	Call addPath(folderName)
+	Call removeFile()
+	Call addFile()
+End Sub
 
-	Call updateCurrentPath(folderName, nextDeepCount, divAreaId, divPathId, where)
-	Call resetShowArea(divAreaId)
-	Call getSubFolderAndFileName(where)
+Sub clickFolder(folderName)
+	Call openFolder(sCrtPath & "\" & folderName)
+End Sub
 
+Sub clickFile(fileName)
+	Call openFile(sCrtPath & "\" & fileName)
+End Sub
+
+
+
+Sub addPath(folderName)
+	iCrtPathLength = iCrtPathLength + 1
+	If iCrtPathLength = 1 Then
+		sCrtPath = folderName
+	Else
+		sCrtPath = sCrtPath & "\" & folderName
+	End If
+
+	Call addExpPath(ID_DIV_EXP_PATH, folderName, iCrtPathLength)
+End Sub
+
+Sub delPath(iCut)
+	iCrtPathLength = iCrtPathLength - iCut
 	Dim i
-	For i = 0 To vaSubFolderName.Length
-		Call addButtonOfFolder(divAreaId, vaSubFolderName.Value(i), divPathId, where)
+	For i = 1 To iCut
+		sCrtPath = Mid(sCrtPath, 1, InStrRev(sCrtPath, "\") - 1)
 	Next
-	For i = 0 To vaSubFileName.Length
-		Call addButtonOfFile(divAreaId, vaSubFileName.Value(i), where)
-	Next
+	Call delExpPath(ID_DIV_EXP_PATH, iCut)
 End Sub
 
-Sub updateCurrentPath(folderName, nextDeepCount, divAreaId, divPathId, where)
-	If nextDeepCount = -1 Then
-	'//when change root path
-		aCurrentPath(where) = folderName
-		Call removeButtonOfCurrentPath(divPathId, aCurrentDeepCount(where), 0)
-		Call addButtonOfCurrentPath(divPathId, folderName, aCurrentDeepCount(where), divAreaId, where)
-		aCurrentDeepCount(where) = 1
-	ElseIf nextDeepCount = 0 Then
-	'//when show sub folder
-		aCurrentDeepCount(where) = aCurrentDeepCount(where) + 1
-		aCurrentPath(where) = aCurrentPath(where) & "\" & folderName
-		Call addButtonOfCurrentPath(divPathId, folderName, aCurrentDeepCount(where), divAreaId, where)
-	Else
-	'//when show past folder in path
-		Dim i
-		For i = 1 To aCurrentDeepCount(where) - nextDeepCount
-			aCurrentPath(where) = removeLastFolderNameOfPath(aCurrentPath(where))
-		Next
-
-		Call removeButtonOfCurrentPath(divPathId, aCurrentDeepCount(where), nextDeepCount)
-		aCurrentDeepCount(where) = nextDeepCount
-	End If
+Sub removeFile()
+	Call removeAllButton(ID_DIV_EXP_FILE)
 End Sub
 
-Function removeLastFolderNameOfPath(path)
-	Dim iInStr : iInStr = InStrRev(path, "\")
-	removeLastFolderNameOfPath = Mid(path, 1, iInStr-1)
-End Function
-
-Sub resetShowArea(divAreaId)
-	Call removeAllButton(divAreaId)
+Sub addFile()
 	Call vaSubFolderName.ResetArray()
 	Call vaSubFileName.ResetArray()
+	Call getSubFolderAndFileName()
+	Dim i
+	For i = 0 To vaSubFolderName.Length
+		Call addButtonOfFolder(ID_DIV_EXP_FILE, vaSubFolderName.Value(i))
+	Next
+	For i = 0 To vaSubFileName.Length
+		Call addButtonOfFile(ID_DIV_EXP_FILE, vaSubFileName.Value(i))
+	Next
 End Sub
 
-Sub getSubFolderAndFileName(where)
-	Dim oRootFolder : Set oRootFolder = oFso.GetFolder(aCurrentPath(where))
+Sub openFolder(path)
+	If oFso.FolderExists(path) Then
+		oWs.Run "explorer.exe " & path
+	End If
+End Sub
+
+Sub openFile(path)
+	If oFso.FileExists(path) Then
+		oWs.Run """" & PATH_TEXT_EDITOR & """" & " " & path
+	End If
+End Sub
+
+
+
+Function isValidRootPath(sPath)
+	If oFso.FolderExists(sPath) Then
+		If Right(sPath, 1) = "\" Then sPath = Mid(sPath, 1, Len(sPath) - 1)
+		isValidRootPath = True
+	Else
+		MsgBox("path is not exist!")
+		isValidRootPath = False
+	End If
+End Function
+
+Sub getSubFolderAndFileName()
+	Dim oRootFolder : Set oRootFolder = oFso.GetFolder(sCrtPath)
 	Dim subFolder, subFile
 
 	For Each subFolder In oRootFolder.SubFolders
@@ -93,18 +131,4 @@ Sub getSubFolderAndFileName(where)
 		vaSubFileName.Append(subFile.Name)
 	Next
 	vaSubFileName.SortArray()
-End Sub
-
-Sub OpenFolder(folderName, where)
-	runOpenPath(aCurrentPath(where) & "\" & folderName)
-End Sub
-
-Sub runOpenPath(path)
-	If oFso.FolderExists(path) Then
-		oWs.Run "explorer.exe " & path
-	ElseIf oFso.FileExists(path) Then
-		oWs.Run """" & PATH_TEXT_EDITOR & """" & " " & path
-	Else
-		MsgBox("not found :" & Vblf & path)
-	End If
 End Sub
