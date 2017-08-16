@@ -11,22 +11,17 @@ Dim vaSubFolderName : Set vaSubFolderName = New VariableArray
 Dim vaSubFileName : Set vaSubFileName = New VariableArray
 
 Sub initNewPath(doWhat)
-	Dim cutLength
-	Select Case doWhat
-		Case EXP_SHOW
-			Dim rootPath : rootPath = handlePath(1)
-			If isValidRootPath(rootPath) Then
-				cutLength = iCrtPathLength
-				Call delPath(cutLength)
-				Call addPath(rootPath)
-				Call removeFile()
-				Call addFile()
-			End If
-		Case EXP_HIDE
-			cutLength = iCrtPathLength
-			Call delPath(cutLength)
-			Call removeFile()
-	End Select
+	Dim cutLength : cutLength = iCrtPathLength
+	Call delPath(cutLength)
+	Call removeFile()
+
+	If doWhat = EXP_SHOW Then
+		Dim rootPath : rootPath = handlePath(1)
+		If isValidRootPath(rootPath) Then
+			Call addRootPath(rootPath)
+			Call addFile()
+		End If
+	End If
 End Sub
 
 Sub clickPath(iPathLength)
@@ -57,6 +52,16 @@ End Sub
 
 
 
+Sub addRootPath(rootPath)
+	Dim aFileName, i
+	aFileName = Split(rootPath, "\")
+	For i = 0 To UBound(aFileName)
+		If aFileName(i) <> "" Then
+			addPath(aFileName(i))
+		End If
+	Next
+End Sub
+
 Sub addPath(folderName)
 	iCrtPathLength = iCrtPathLength + 1
 	If iCrtPathLength = 1 Then
@@ -70,9 +75,14 @@ End Sub
 
 Sub delPath(iCut)
 	iCrtPathLength = iCrtPathLength - iCut
-	Dim i
+	Dim i, iInStrRev
 	For i = 1 To iCut
-		sCrtPath = Mid(sCrtPath, 1, InStrRev(sCrtPath, "\") - 1)
+		iInStrRev = InStrRev(sCrtPath, "\")
+		If iInStrRev > 0 Then
+			sCrtPath = Mid(sCrtPath, 1, iInStrRev - 1)
+		Else
+			sCrtPath = ""
+		End If
 	Next
 	Call delExpPath(ID_DIV_EXP_PATH, iCut)
 End Sub
