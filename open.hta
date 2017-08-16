@@ -1,3 +1,12 @@
+<!--
+升级日志：
+-----------------------
+    版本1.1
+    1. 适配不同分辨率的屏幕
+    2. 路径检测，提示报错
+    3. 优化打开overla目录功能
+-->
+
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -6,30 +15,62 @@
 <Script Language="VBScript">
 
 set ws=CreateObject("wscript.shell")
+Set Fso=CreateObject("Scripting.FileSystemObject")
 
 Sub Window_OnLoad
-Window.MoveTo 1660,300
+Dim width,height
+width=CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
+Window.MoveTo width-260,300
 Window.ResizeTo 200,320
 End Sub
 
 Sub Open()
 FN=document.getElementById("folder_name").value
 PN=document.getElementById("project_name").value
-LK=document.getElementById("link").value
-ws.run "explorer.exe "&LK&FN&"\"&PN
+SC=document.getElementById("source").value
+
+If (FN = "mediatek\custom\common\resource_overlay\roco\resandroid") Then
+    Set regEx = New RegExp
+    regEx.IgnoreCase = true  '匹配大小写  
+    regEx.Global = true  '打开全局搜索
+    regEx.Pattern = "\["
+    PN = regEx.Replace(PN,"-")
+    regEx.Pattern = "\]"
+    PN = regEx.Replace(PN,"")
+End If
+
+LK=SC&FN&"\"&PN
+
+If ((FN = "mediatek\custom\common\resource_overlay\roco\resandroid") AND (Not Fso.FolderExists(LK))) Then
+    If (Fso.FolderExists(SC&"mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN)) Then
+        LK = SC&"mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN
+    Else    
+        msgbox("不存在相应的overlay目录")
+        flag = 1
+    End If    
+ElseIf (Not Fso.FolderExists(LK)) Then
+    msgbox("目录不存在")
+    flag = 1
+End If
+
+If flag <> 1 Then
+    ws.run "explorer.exe "&lk
+End If
+
 End Sub
 </Script>
+
 <Body bgcolor="#9ACD32">
 
 <input type=button onclick="document.body.insertAdjacentHTML 'afterBegin','<input type=text>'" value=添加文本框>
 <!--<textarea rows="3" cols="15"></textarea>-->
 <br><br>
-<select id="link" name="link">
+<select id="source" name="source">
 <option value="Z:\8312C\alps\">C</option>
 <option value="Z:\8312D\alps\">D</option>
-<option value="Z:\alps\">M</option>
+<option value="Z:\MT8312\alps\">M</option>
 <option value="Z:\backups\8312C\alps\">BC</option>
-<option value="Z:\backups\alps\">BM</option>
+<option value="Z:\backups\MT8312\alps\">BM</option>
 </select>
 
 <select id="folder_name" name="Folder_name">
