@@ -6,8 +6,8 @@ Const ID_CHECKBOX_BUILD_OTA_KK = "checkbox_build_ota_kk"
 
 Sub CommandOfBuildL1()
     Dim commandFinal, commandOta
-    commandFinal = "make -j24 2>&1 | tee build.log"
-    commandOta = "make -j24 otapackage 2>&1 | tee build_ota.log"
+    commandFinal = "make -j12 2>&1 | tee build.log"
+    commandOta = "make -j12 otapackage 2>&1 | tee build_ota.log"
 
     If element_isChecked(ID_CHECKBOX_RM_OUT_L1) Then commandFinal = "rm -rf out/ && " & commandFinal
     If element_isChecked(ID_CHECKBOX_BUILD_OTA_L1) Then commandFinal = commandFinal & " && " & commandOta

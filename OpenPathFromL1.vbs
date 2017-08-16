@@ -9,13 +9,26 @@ Const PATH_ITEMS_INI = "..\items.ini"
 Const PATH_PROJECTCONFIG_MK = "..\ProjectConfig.mk"
 Const PATH_DEVICE_MK = "..\device.mk"
 Const PATH_GMS_MK = "..\gms.mk"
+
+Const PATH_BUILD = "build"
+Const PATH_DEVICE = "device"
+Const PATH_DEVICE_COMMON = "device\mediatek\common"
+Const PATH_DEVICE_OVERLAY = "device\mediatek\common\overlay\tablet"
+Const PATH_FRAMEWORKS = "frameworks"
+Const PATH_FRAMEWORKS_PACKAGES = "frameworks\base\packages"
+Const PATH_FRAMEWORKS_RES = "frameworks\base\core\res\res"
+Const PATH_KERNEL = "kernel.."
+Const PATH_PACKAGES = "packages\apps"
+Const PATH_VENDOR = "vendor"
+Const PATH_VENDOR_PACKAGES = "vendor\mediatek\proprietary\packages\apps"
+
 Const PATH_DEVICE_PROJECT = "device\..\[project]"
 Const PATH_DEVICE_OPTION = "device\..\[option]"
 Const PATH_KERNEL_IMGSENSOR = "kernel..\imgsensor"
-Const PATH_HAL_IMGSENSOR = "..\hal\imgsensor"
-Const PATH_ARM_DTS = "..\arm\..\dts"
-Const PATH_ARM64_DTS = "..\arm64\..\dts"
-Const PATH_BATTERY = "..\[battery]"
+Const PATH_VENDOR_HAL = "vendor\..\hal"
+Const PATH_KERNEL_ARM_DTS = "kernel..\arm\..\dts"
+Const PATH_KERNEL_ARM64_DTS = "kernel..\arm64\..\dts"
+Const PATH_KERNEL_BATTERY = "kernel..\[battery]"
 Const PATH_KERNEL_LCM = "kernel..\lcm"
 Const PATH_LK_LCM = "..\lk\..\lcm"
 Const PATH_OUT = "out\..\"
@@ -26,13 +39,24 @@ Dim aFUPath : aFUPath = Array( _
 		PATH_PROJECTCONFIG_MK, _
 		PATH_DEVICE_MK, _
 		PATH_GMS_MK, _
+		PATH_BUILD, _
+		PATH_DEVICE, _
+		PATH_DEVICE_COMMON, _
+		PATH_DEVICE_OVERLAY, _
+		PATH_FRAMEWORKS, _
+		PATH_FRAMEWORKS_PACKAGES, _
+		PATH_FRAMEWORKS_RES, _
+		PATH_KERNEL, _
+		PATH_PACKAGES, _
+		PATH_VENDOR, _
+		PATH_VENDOR_PACKAGES, _
 		PATH_DEVICE_PROJECT, _
 		PATH_DEVICE_OPTION, _
 		PATH_KERNEL_IMGSENSOR, _
-		PATH_HAL_IMGSENSOR, _
-		PATH_ARM_DTS, _
-		PATH_ARM64_DTS, _
-		PATH_BATTERY, _
+		PATH_VENDOR_HAL, _
+		PATH_KERNEL_ARM_DTS, _
+		PATH_KERNEL_ARM64_DTS, _
+		PATH_KERNEL_BATTERY, _
 		PATH_KERNEL_LCM, _
 		PATH_LK_LCM, _
 		PATH_OUT)
@@ -46,25 +70,30 @@ Sub onloadFUPathFromL1()
 	Next
 End Sub
 
-Sub handlePathFromL1()
+Const DO_OPEN_PATH = 0
+Const DO_RETURN_PATH = 1
+Function handlePathFromL1(doWhat)
 	Dim code : code = getElementValue(ID_INPUT_CODE_PATH_L1)
 	Dim path : path = getElementValue(ID_INPUT_OPEN_PATH_L1)
 
-	If Trim(code) = "" Then Exit Sub
+	If Trim(code) = "" Then Exit Function
 
 	Dim kernelName : kernelName = getKernelNameFromL1(code)
 
-	If InStr(path, "..\") = 0 Then
+	If InStr(path, "..") = 0 Then
 		path = code & "\" & path
 		path = Replace(path, "/", "\")
-		Call runOpenPath(path)
-		Exit Sub
+		Select Case doWhat
+			Case DO_OPEN_PATH : Call runOpenPath(path)
+			Case DO_RETURN_PATH : handlePathFromL1 = path
+		End Select
+		Exit Function
 	End If
 
 	Dim projectName : projectName = getElementValue(ID_INPUT_PROJECT_L1)
 	Dim optionName : optionName = getElementValue(ID_INPUT_OPTION_L1)
 
-	'If Trim(projectName) = "" Or Trim(optionName) = "" Then Exit Sub
+	'If Trim(projectName) = "" Or Trim(optionName) = "" Then Exit Function
 
 	Select Case path
 		Case PATH_SYSTEM_PROP
@@ -81,15 +110,17 @@ Sub handlePathFromL1()
 			path = code & "\device\joya_sz\" & projectName
 		Case PATH_DEVICE_OPTION
 			path = code & "\device\joya_sz\" & projectName & "\roco\" & optionName
+		Case PATH_KERNEL
+			path = code & kernelName
 		Case PATH_KERNEL_IMGSENSOR
 			path = code & kernelName & "\drivers\misc\mediatek\imgsensor"
-		Case PATH_HAL_IMGSENSOR
-			path = code & "\vendor\mediatek\proprietary\custom\" & getPlatformNameFromL1(code) & "\hal\imgsensor"
-		Case PATH_ARM_DTS
+		Case PATH_VENDOR_HAL
+			path = code & "\vendor\mediatek\proprietary\custom\" & getPlatformNameFromL1(code) & "\hal"
+		Case PATH_KERNEL_ARM_DTS
 			path = code & kernelName & "\arch\arm\boot\dts"
-		Case PATH_ARM64_DTS
+		Case PATH_KERNEL_ARM64_DTS
 			path = code & kernelName & "\arch\arm64\boot\dts"
-		Case PATH_BATTERY
+		Case PATH_KERNEL_BATTERY
 			path = getBatteryPathFromL1(code, kernelName, projectName)
 		Case PATH_KERNEL_LCM
 			path = code & kernelName & "\drivers\misc\mediatek\lcm"
@@ -99,8 +130,11 @@ Sub handlePathFromL1()
 			path = code & "\out\target\product\" & projectName
 	End Select
 
-	Call runOpenPath(path)
-End Sub
+	Select Case doWhat
+		Case DO_OPEN_PATH : Call runOpenPath(path)
+		Case DO_RETURN_PATH : handlePathFromL1 = path
+	End Select
+End Function
 
 Function getKernelNameFromL1(code)
 	If InStr(code, "l1") > 0 Or InStr(code, "8312") > 0 Then
@@ -152,7 +186,7 @@ Sub runOpenPath(path)
 	If oFso.FolderExists(path) Then
 		oWs.Run "explorer.exe " & path
 	ElseIf oFso.FileExists(path) Then
-		oWs.Run PATH_TEXT_EDITOR & " " & path
+		oWs.Run """" & PATH_TEXT_EDITOR & """" & " " & path
 	Else
 		MsgBox("not found :" & Vblf & path)
 	End If

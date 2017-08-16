@@ -1,5 +1,5 @@
-Const WINDOW_WIDTH = 400
-Const WINDOW_HEIGHT = 750
+Const WINDOW_WIDTH = 500
+Const WINDOW_HEIGHT = 800
 Sub Window_OnLoad
     Dim ScreenWidth : ScreenWidth = CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
     Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
@@ -194,7 +194,7 @@ Class VariableArray
 
     Public Function SortArray()
         If mLength = -1 Then
-            MsgBox("Error: SortArray() mLength <= 0, no need to sort")
+            'MsgBox("Error: SortArray() mLength <= 0, no need to sort")
             Exit Function
         End If
 
@@ -402,3 +402,11 @@ End Function
                 End If
             End If
         End Function
+
+Function getElementValue(elementId)
+    getElementValue = document.getElementById(elementId).value
+End Function
+
+Sub setElementValue(elementId, str)
+    document.getElementById(elementId).value = str
+End Sub

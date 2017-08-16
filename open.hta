@@ -58,6 +58,14 @@
     版本2.0_debug_20170413
         1. 重写: 打开特定文件和目录
         2. 重写: 拷贝编译命令
+
+    版本2.0_debug_20170422
+        1. 背景颜色改为黑灰
+        2. 字体颜色改为白色
+        3. 按钮样式修改
+        4. 添加KK版本的 创建切换工程项目的快捷按钮
+        5. 编译命令默认j24
+        6. 添加显示文件目录结构的功能
 -->
 
 <Html>
@@ -68,7 +76,7 @@
 <style type="text/css">
 
 <!-- 
-body { font-family: sans-serif; }
+body { font-family: sans-serif; color:#f8f8f2;}
 
 #shoudongshuru { font-size:14px; font-style:italic; }
 
@@ -89,7 +97,7 @@ body { font-family: sans-serif; }
 .Menu2 ul li{ width:100%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
     change:expression( 
         this.onmouseover=function(){ 
-            this.style.background="#F2F5EF"; 
+            this.style.background="#66d9ef"; 
         }, 
         this.onmouseout=function(){ 
             this.style.background=""; 
@@ -104,7 +112,7 @@ body { font-family: sans-serif; }
 .Menu2_openPath ul li{ display:inline; width:49%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
     change:expression( 
         this.onmouseover=function(){ 
-            this.style.background="#F2F5EF"; 
+            this.style.background="#66d9ef"; 
         }, 
         this.onmouseout=function(){ 
             this.style.background=""; 
@@ -121,12 +129,15 @@ body { font-family: sans-serif; }
 .form_option_l1 { width:95px; height:auto; }
 .form_option_l1 div{ position:relative; top:0; left:0; margin-bottom:5px; }
 
+.input_text{border:1px solid #aaa;}
+.input_button{border:1px solid #aaa; background:none; color:#f8f8f2;}
+
 -->
 </style>
 
 </Head>
 
-<Body bgcolor="#9ACD32">
+<Body bgcolor="#272822">
 
 ===============L1版本===============
 <fieldset>
@@ -167,14 +178,14 @@ body { font-family: sans-serif; }
             </div> 
         </div>
     </div>
+    <input type="button" class="input_button" onclick="creatShortcutForL1()" value="creatShortcut" />
     <br>
-    <input type="button" onclick="creatShortcut()" value="creatShortcut" />
-    <div id="div_shortcut"></div>
+    <div id="div_shortcut_l1"></div>
 </fieldset>
 <br>
 <fieldset>
     <legend>打开目录或文件</legend>
-    <div class="form_codePath" onmouseleave="showAndHide('list_open_path_l1','hide')">
+    <div class="form_codePath" onkeydown="showAndHide('list_open_path_l1','hide')" onmouseleave="showAndHide('list_open_path_l1','hide')">
         <input type="text" id="input_open_path_l1" 
                 onclick="showAndHide('list_open_path_l1','show')" 
                 size="50" />
@@ -185,14 +196,19 @@ body { font-family: sans-serif; }
             </div>
         </div>
     </div>
-    <input type="button" onclick="handlePathFromL1()" value="打开" />
+    <input type="button" class="input_button" onclick="handlePathFromL1(0)" value="打开" />
+    <input type="button" class="input_button" onclick="initPath(0)" value="显示目录" />
+    <br><br>
+<div id="current_path_l1">&nbsp;</div>
+<br>
+<div id="show_area_l1"></div>
 </fieldset>
 <br>
 <fieldset>
     <legend>复制命令</legend>
     <input type="checkbox" id="checkbox_rm_out_l1" checked=true >rm out</input>
     <input type="checkbox" id="checkbox_build_ota_l1" >ota</input>
-    <input type="button" onclick="CommandOfBuildL1()" value="copy">
+    <input type="button" class="input_button" onclick="CommandOfBuildL1()" value="copy">
 </fieldset>
 
 <br>
@@ -211,11 +227,15 @@ body { font-family: sans-serif; }
         </div> 
     </div> 
     <input type="text" id="input_project_kk" size="35">
+    <br>
+    <input type="button" class="input_button" onclick="creatShortcutForKK()" value="creatShortcut" />
+    <br>
+    <div id="div_shortcut_kk"></div>
 </fieldset> 
 <br>
 <fieldset>
     <legend>打开目录或文件</legend>
-    <div class="form_codePath" onmouseleave="showAndHide('list_open_path_kk','hide')">
+    <div class="form_codePath" onkeydown="showAndHide('list_open_path_kk','hide')" onmouseleave="showAndHide('list_open_path_kk','hide')">
         <input type="text" id="input_open_path_kk" 
                 onclick="showAndHide('list_open_path_kk','show')" 
                 size="50" />
@@ -226,7 +246,12 @@ body { font-family: sans-serif; }
             </div> 
         </div>
     </div>
-    <input type="button" onclick="handlePathFromKK()" value="打开" />
+    <input type="button" class="input_button" onclick="handlePathFromKK(0)" value="打开" />
+    <input type="button" class="input_button" onclick="initPath(1)" value="显示目录" />
+    <br><br>
+<div id="current_path_kk">&nbsp;</div>
+<br>
+<div id="show_area_kk"></div>
 </fieldset>
 <br>
 <fieldset>
@@ -234,7 +259,7 @@ body { font-family: sans-serif; }
     <input type="checkbox" id="checkbox_rm_out_kk" checked=true >rm out</input>
     <input type="checkbox" id="checkbox_user_kk" checked=true >user</input>
     <input type="checkbox" id="checkbox_build_ota_kk" >ota</input>
-    <input type="button" onclick="CommandOfBuildKK()" value="copy">
+    <input type="button" class="input_button" onclick="CommandOfBuildKK()" value="copy">
 </fieldset>
 
 
@@ -242,6 +267,7 @@ body { font-family: sans-serif; }
 <Script Language="JavaScript" src="ReadCodePath.js"></Script>
 <Script Language="JavaScript" src="OnloadProjectAndOption.js"></Script>
 <Script Language="JavaScript" src="CreatShortcutOfCodePrjOpt.js"></Script>
+<Script Language="JavaScript" src="FileManager.js"></Script>
 
 <Script Language="VBScript" src="CoreObjAndFun.vbs"></Script>
 <Script Language="VBScript" src="ReadCodePath.vbs"></Script>
@@ -250,6 +276,7 @@ body { font-family: sans-serif; }
 <Script Language="VBScript" src="OpenPathFromL1.vbs"></Script>
 <Script Language="VBScript" src="OpenPathFromKK.vbs"></Script>
 <Script Language="VBScript" src="CopyCommand.vbs"></Script>
+<Script Language="VBScript" src="FileManager.vbs"></Script>
 
 </Body>
 </Html>

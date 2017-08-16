@@ -1,22 +1,40 @@
-function addShortcutButton(sCurrentCode, sCurrentPrj, sCurrentOpt) 
+function addShortcutButtonForL1(sCurrentCode, sCurrentPrj, sCurrentOpt, divId) 
 {
 	var baseId = sCurrentCode + "/" + sCurrentPrj + "/" + sCurrentOpt
 	var shortcutId = baseId + "_shortcut";
 	var brId = baseId + "_br";
 	var removeId = baseId + "_remove";
 
-	var shortcutFun = function(){applyShortcut(sCurrentCode, sCurrentPrj, sCurrentOpt)};
+	var shortcutFun = function(){applyShortcutForL1(sCurrentCode, sCurrentPrj, sCurrentOpt)};
 	var removeFun = function(){removeShortcut(removeId, shortcutId, brId)};
 
-	var shortcutValue = sCurrentCode + "\n" + sCurrentPrj + "\n" + sCurrentOpt
+	var shortcutValue = " " + sCurrentCode + "\n" + sCurrentPrj + "\n" + sCurrentOpt + " "
 
-    parentNode_appendChild("div_shortcut", createRemoveBtn(removeId, removeFun));
-    parentNode_appendChild("div_shortcut", createShortcutBtn(shortcutId, shortcutValue, shortcutFun));
-    parentNode_appendChild("div_shortcut", createBr(brId));
+    parentNode_appendChild(divId, createRemoveBtn(removeId, removeFun));
+    parentNode_appendChild(divId, createShortcutBtn(shortcutId, shortcutValue, shortcutFun));
+    parentNode_appendChild(divId, createBr(brId));
+}
+
+function addShortcutButtonForKK(sCurrentCode, sCurrentPrj, divId) 
+{
+    var baseId = sCurrentCode + "/" + sCurrentPrj
+    var shortcutId = baseId + "_shortcut";
+    var brId = baseId + "_br";
+    var removeId = baseId + "_remove";
+
+    var shortcutFun = function(){applyShortcutForKK(sCurrentCode, sCurrentPrj)};
+    var removeFun = function(){removeShortcut(removeId, shortcutId, brId)};
+
+    var shortcutValue = " " + sCurrentCode + "\n" + sCurrentPrj + " "
+
+    parentNode_appendChild(divId, createRemoveBtn(removeId, removeFun));
+    parentNode_appendChild(divId, createShortcutBtn(shortcutId, shortcutValue, shortcutFun));
+    parentNode_appendChild(divId, createBr(brId));
 }
 
 function createShortcutBtn(id, value, fun) {
     var btn = input_creat("button", id, value, fun, 0);
+    btn = setButtonStyle(btn);
     return btn;
 }
 
@@ -27,7 +45,8 @@ function createBr(id) {
 }
 
 function createRemoveBtn(id, fun) {
-    var btn = input_creat("button", id, "-", fun, 0);
+    var btn = input_creat("button", id, " - ", fun, 0);
+    btn = setButtonStyle(btn);
     return btn;
 }
 

@@ -36,17 +36,20 @@ Sub onloadFUPathFromKK()
 	Next
 End Sub
 
-Sub handlePathFromKK()
+Function handlePathFromKK(doWhat)
 	Dim code : code = getElementValue(ID_INPUT_CODE_PATH_KK)
 	Dim path : path = getElementValue(ID_INPUT_OPEN_PATH_KK)
 
-	If Trim(code) = "" Then Exit Sub
+	If Trim(code) = "" Then Exit Function
 
 	If InStr(path, "..\") = 0 Then
 		path = code & "\" & path
 		path = Replace(path, "/", "\")
-		Call runOpenPath(path)
-		Exit Sub
+		Select Case doWhat
+			Case DO_OPEN_PATH : Call runOpenPath(path)
+			Case DO_RETURN_PATH : handlePathFromKK = path
+		End Select
+		Exit Function
 	End If
 
 	Dim optionName : optionName = getElementValue(ID_INPUT_PROJECT_KK)
@@ -75,13 +78,16 @@ Sub handlePathFromKK()
 			sTmp = Replace(sTmp, "]", "")
 			path = code & "\mediatek\custom\common\resource_overlay\roco\resandroid\" & sTmp
 			If Not oFso.FolderExists(path) Then path = Replace(path, "resandroid", "reslight")
-			If Not oFso.FolderExists(path) Then Exit Sub
+			If Not oFso.FolderExists(path) Then Exit Function
 		Case PATH_KK_OUT
 			path = code & "\out\target\product\" & projectName
 	End Select
 
-	Call runOpenPath(path)
-End Sub
+	Select Case doWhat
+		Case DO_OPEN_PATH : Call runOpenPath(path)
+		Case DO_RETURN_PATH : handlePathFromKK = path
+	End Select
+End Function
 
 Function getProjectName(optionName)
 	Dim iInStr : iInStr = InStr(optionName, "[")

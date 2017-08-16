@@ -47,11 +47,3 @@ Sub setListValue(inputId, listId, value)
             Call onloadOpt()
     End Select
 End Sub
-
-Function getElementValue(elementId)
-    getElementValue = document.getElementById(elementId).value
-End Function
-
-Sub setElementValue(elementId, str)
-    document.getElementById(elementId).value = str
-End Sub
