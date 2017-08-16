@@ -5,6 +5,10 @@
     1. 适配不同分辨率的屏幕
     2. 路径检测，提示报错
     3. 优化打开overla目录功能
+
+    版本1.2
+    1. 优化out目录打开
+    2. 增加代码路径
 -->
 
 <Html>
@@ -53,8 +57,25 @@ ElseIf (Not Fso.FolderExists(LK)) Then
     flag = 1
 End If
 
+If FN = "out\target\product" Then
+    If Fso.FolderExists(SC&"out\target\product\") Then
+        Set MyFolder_PN = Fso.GetFolder(SC&"out\target\product\")
+        Set Folders = MyFolder_PN.SubFolders
+        For Each Folder in Folders
+            FDN=Folder.Name
+            If Fso.FolderExists(SC&"out\target\product\"&FDN&"\system") Then
+                PN1=Folder.Name
+                Exit For 
+            End If
+        Next
+        LK=SC&"out\target\product\"&PN1
+    Else
+        msgbox("不存在out目录")
+    End If
+End If            
+
 If flag <> 1 Then
-    ws.run "explorer.exe "&lk
+    ws.run "explorer.exe "&LK
 End If
 
 End Sub
@@ -69,6 +90,7 @@ End Sub
 <option value="Z:\8312C\alps\">C</option>
 <option value="Z:\8312D\alps\">D</option>
 <option value="Z:\MT8312\alps\">M</option>
+<option value="Z:\MT8321\alps\">M2</option>
 <option value="Z:\backups\8312C\alps\">BC</option>
 <option value="Z:\backups\MT8312\alps\">BM</option>
 </select>
