@@ -50,6 +50,7 @@ function setButtonStyle(btn) {
 	btn.style.solid = "#f8f8f2";
 	btn.style.background = "none";
 	btn.style.color = "#f8f8f2";
+	btn.style.fontSize = "14";
 	btn.onmouseover = function(){ 
             this.style.background="#66d9ef";}
     btn.onmouseout = function(){ 
