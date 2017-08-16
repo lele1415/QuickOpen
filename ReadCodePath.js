@@ -1,0 +1,22 @@
+function showAndHide(obj,types)
+{ 
+    var Layer=window.document.getElementById(obj); 
+    switch(types){ 
+        case "show": 
+            Layer.style.display="block"; 
+            break; 
+        case "hide": 
+            Layer.style.display="none"; 
+    } 
+} 
+
+function addAfterLi(str, inputId, listId, ulId)
+{
+    var obj = document.getElementById(ulId);
+    var li = document.createElement("li");
+    li.onmousedown = function(){setListValue(inputId, listId, str)};
+    li.innerHTML = str;
+    li.style.fontSize = "x-small";
+    
+    obj.appendChild(li);
+}

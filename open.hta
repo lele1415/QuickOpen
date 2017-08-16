@@ -45,45 +45,48 @@
     1. 代码路径在txt文件中保存和读取
     2. 代码路径选择改为多行显示
     3. L1区域增加打开文件目录结构功能
+
+    版本2.0_debug_20170401
+        模块化分离文件
+        1. 重写读取代码路径
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <Title>QuickOpen</Title>
-<style type="text/css"> 
+
+<style type="text/css">
+
 <!-- 
-body {font-family:sans-serif;}
+body {
+    font-family: sans-serif;
+}
+
+#shoudongshuru {
+    font-size:14px;
+    font-style:italic;
+}
+
+#getVerName {
+    font-size:15px;
+}
+
+#ota {
+    font-size:13px;
+}
+
 .Menu { 
     position:relative; 
-    width:250px; 
+    width:320px; 
     height:127px; 
     z-index:1; 
     background: #FFF; 
     border:1px solid #000; 
-    margin-top:-6px; 
-    display:none; 
-} 
-.Menu_2 { 
-    position:relative; 
-    width:800px; 
-    height:127px; 
-    z-index:1; 
-    background: #FFF; 
-    border:1px solid #000; 
-    margin-top:-100px; 
+    margin-top:0px; 
     display:none; 
 }
-.Menu_3 { 
-    position:relative; 
-    width:800px; 
-    height:127px; 
-    z-index:1; 
-    background: #FFF; 
-    border:1px solid #000; 
-    margin-top:-6px; 
-    display:none; 
-} 
+
 .Menu2 { 
     position: absolute; 
     left:0; 
@@ -93,199 +96,99 @@ body {font-family:sans-serif;}
     overflow:hidden; 
     z-index:1; 
 } 
-.Menu2 ul{margin:0;padding:0} 
-.Menu2 ul li{width:100%;height:25px;line-height:25px;text-indent:5px; 
-             border-bottom:1px solid #ccc;cursor:pointer; 
-             change:expression( 
-              this.onmouseover=function(){ 
-                this.style.background="#F2F5EF"; 
-              }, 
-              this.onmouseout=function(){ 
-                this.style.background=""; 
-              } 
-             ) 
-            } 
-.form{width:300px;height:auto;} 
-.form div{position:relative;top:0;left:0;margin-bottom:5px} 
-#List1#List2#List3{left:0px;top:93px;} 
+
+.Menu2 ul{
+    margin:0;
+    padding:0
+} 
+
+.Menu2 ul li{
+    width:100%;
+    height:25px;
+    line-height:25px;
+    text-indent:5px; 
+    border-bottom:1px solid #ccc;
+    cursor:pointer; 
+    change:expression( 
+        this.onmouseover=function(){ 
+            this.style.background="#F2F5EF"; 
+        }, 
+        this.onmouseout=function(){ 
+            this.style.background=""; 
+        } 
+    ) 
+}
+
+.form {
+    width:300px;
+    height:auto;
+}
+
+.form div{
+    position:relative;
+    top:0;left:0;
+    margin-bottom:5px
+} 
 -->
 </style>
-
 
 </Head>
 
 <Body bgcolor="#9ACD32">
 
-===============KK版本===============
-<br>
-<div id="input_text"></div>
-<fieldset>
-    <legend>代码路径</legend>
-    <select id="codePath_KK" onchange="removeAllMoreButton('KK')" multiple="multiple" size="5"></select>
-</fieldset> 
-
-<fieldset id="project_list_div">
-    <legend>project list</legend>
-    <input type="button" id="project_list_has" onclick="changeButtonStatus('project')" value="+">
-
-</fieldset> 
-
-<fieldset id="modem_kk_list_div">
-    <legend>modem list</legend>
-    <input type="button" id="modem_kk_list_has" onclick="changeButtonStatus('modem_kk')" value="+">
-</fieldset> 
-
-<fieldset>
-    <legend>打开文件</legend>
-    <div class="form">
-        <div>
-            <input id="FilePath_id" type="text" style="width:250;" onclick="showAndHide('List2','show')" onblur="showAndHide('List2','hide')"/>
-            <input type="button" onclick="WriteHistory('Dict_OpenFile','FilePath_id','Openfile_ul_id','KK')" value="保存" />
-            <input type="button" onclick="OpenFile('KK')" value="OPEN" />
-        </div>
-        <div class="Menu_3" id="List2"> 
-            <div class="Menu2"> 
-                <ul id="Openfile_ul_id"> 
-                </ul> 
-            </div> 
-        </div> 
-    </div>
-</fieldset>
-
-<fieldset>
-    <legend>获取工程名</legend>
-    软件路径: 
-    <br><input id="getProjectName_id" type="text" size="50"/>
-    <br><input type="button" onclick="getProjectName()" value="getProjectName" />
-</fieldset>
-
-<fieldset>
-    <legend>打开工程目录</legend>
-    <div class="form"> 
-        <div>工程名: 
-        <br><input id="project_name" type="text" style="width:250;" onclick="showAndHide('List1','show')" onchange="removeAllMoreButton('KK')" onblur="showAndHide('List1','hide')"/>
-        <input type="button" onclick="WriteHistory('Dict_PN','project_name','PN_ul_id','KK')" value="保存" /></div>
-        <div class="Menu" id="List1"> 
-            <div class="Menu2"> 
-                <ul id="PN_ul_id"> 
-                </ul> 
-            </div> 
-        </div> 
-    </div>
-    <!--<button onclick="addLi('233')"></button>-->
-
-    <input type="button" onclick="addShortcutOfProjectName('KK')" value="create shortcut!" />
-    <div id="shortcut_id"></div>
-    <br>
-    <input type="button" id="alps_More_id" onclick="OpenMore('alps',getPath('alps'),1)" value="+" />
-    <input type="button" id="alps" onclick="openProjectFolder('alps')" value="alps" />
-    <br>
-    <input type="button" id="binary_More_id" onclick="OpenMore('binary',getPath('binary'),1)" value="+" />
-    <input type="button" id="binary" onclick="openProjectFolder('binary')" value="binary" />
-    <br>
-    <input type="button" id="config_More_id" onclick="OpenMore('config',getPath('config'),1)" value="+" />
-    <input type="button" id="config" onclick="openProjectFolder('config')" value="config" />
-    <br>
-    <input type="button" id="custom_More_id" onclick="OpenMore('custom',getPath('custom'),1)" value="+" />
-    <input type="button" id="custom" onclick="openProjectFolder('custom')" value="custom" />
-    <br>
-    <input type="button" id="overlay_More_id" onclick="OpenMore('overlay',getPath('overlay'),1)" value="+" />
-    <input type="button" id="overlay" onclick="openProjectFolder('overlay')" value="overlay" />
-    <br>
-    <input type="button" id="out_More_id" onclick="OpenMore('out',getPath('out'),1)" value="+" />
-    <input type="button" id="out" onclick="openProjectFolder('out')" value="out" />
-</fieldset> 
-
-<fieldset>
-    <legend>检查信息</legend>
-    <input type="button" onclick="checkGPS()" style="width:100" value="GPS是否降成本" />
-    &nbsp;&nbsp;
-    <input type="button" onclick="checkOTA()" style="width:100" value="是否带OTA" />
-    <br>
-    <input type="button" onclick="checkProductFinal()" style="width:150" value="product_roco.mk检查" />
-    &nbsp;&nbsp;
-    <input type="button" onclick="checkGsensor()" style="width:150" value="是否兼容Gsensor" />
-    <br>
-    <input type="button" onclick="checkBattery()" style="width:150" value="Battery文件检查" />
-</fieldset> 
-<br>
-<fieldset>
-    <input type="checkbox" id="rm_out_kk_id" checked=true >rm out</input>
-    <input type="checkbox" id="is_user_kk_id" checked=true >user</input>
-    <input type="checkbox" id="build_ota_kk_id" >ota</input>
-    <br>
-    <font size="1"><input type="button" onclick="CommandOfBuildKK()" style="width:100;" value="复制编译命令"></font>
-</fieldset>
 ===============L1版本===============
 <fieldset>
-    <legend>代码路径</legend>
-    <select id="codePath_L1" onchange="onloadL1Project1()" multiple="multiple" size="5"></select>
+    <legend>当前代码路径</legend>
+    <div class="form">
+        <input type="text" id="input_code_path_l1" onchange="onloadL1Project1()" size="50" />
+        <div class="Menu" id="list_code_path_l1" onmouseleave="showAndHide('list_code_path_l1','hide')"> 
+            <div class="Menu2"> 
+                <ul id="ul_code_path_l1"> 
+                </ul> 
+            </div> 
+        </div>
+    </div>
+    <input type="button" onclick="showAndHide('list_code_path_l1','show')" value="本地代码路径" />
 </fieldset>
 
-<fieldset id="modem_l1_list_div">
-    <legend>modem list</legend>
-    <input type="button" id="modem_l1_list_has" onclick="changeButtonStatus('modem_l1')" value="+">
-</fieldset> 
-
 <fieldset>
-    <legend>打开文件</legend>
+    <legend>打开目录或文件</legend>
+    <div>
+        <input type="text" id="open_path_l1" size="50" />
+    </div>
+    <input type="button" onclick="openCodePath(0)" value="打开" />
+</fieldset>
+
+
+===============KK版本===============
+<fieldset>
+    <legend>当前代码路径</legend>
     <div class="form">
-    <div>路径: 
-    <br><input id="FilePath_l1_id" type="text" style="width:250;" onclick="showAndHide('List3','show')" onblur="showAndHide('List3','hide')"/>
-    <input type="button" onclick="WriteHistory('Dict_OpenFile','FilePath_l1_id','Openfile_ul_l1_id','L1')" value="保存" /></div>
-    <div class="Menu_2" id="List3"> 
+        <input type="text" id="input_code_path_kk" onchange="removeAllMoreButton('KK')" size="50" />
+        <div class="Menu" id="list_code_path_kk" onmouseleave="showAndHide('list_code_path_kk','hide')"> 
             <div class="Menu2"> 
-                <ul id="Openfile_ul_l1_id"> 
+                <ul id="ul_code_path_kk"> 
                 </ul> 
             </div> 
         </div> 
-    </div>
-    <font size="10"><input onclick="OpenFile('L1')" type="submit" value="OPEN" /></font>
-</fieldset>
-<div id="project_l1_div"></div>
-<br>
-<input type="button" onclick="addShortcutOfProjectName('L1')" value="create shortcut!" />
-<div id="shortcut_l1_id"></div>
-<br>
-<input type="button" id="alps_L1_More_id" onclick="OpenMore('alps_L1',getPathL1('alps_L1'),1)" value="+" />
-<input type="button" id="alps_L1" onclick="openProjectFolderL1('alps_L1')" style="width:50" value="alps" />
-<br>
-<input type="button" id="device1_L1_More_id" onclick="OpenMore('device1_L1',getPathL1('device1_L1'),1)" value="+" />
-<input type="button" id="device1_L1" onclick="openProjectFolderL1('device1_L1')" style="width:50" value="device1" />
-<br>
-<input type="button" id="device2_L1_More_id" onclick="OpenMore('device2_L1',getPathL1('device2_L1'),1)" value="+" />
-<input type="button" id="device2_L1" onclick="openProjectFolderL1('device2_L1')" style="width:50" value="device2" />
-<br>
-<input type="button" id="custom_L1_More_id" onclick="OpenMore('custom_L1',getPathL1('custom_L1'),1)" value="+" />
-<input type="button" id="custom_L1" onclick="openProjectFolderL1('custom_L1')" style="width:50" value="custom" />
-<br>
-<input type="button" id="out_L1_More_id" onclick="OpenMore('out_L1',getPathL1('out_L1'),1)" value="+" />
-<input type="button" id="out_L1" onclick="openProjectFolderL1('out_L1')" style="width:50" value="out" />
-<br>
-<input type="button" onclick="openProjectFileL1('ProjectConfig.mk')" style="width:150;" value="ProjectConfig.mk" />
-<br>
-<input type="button" onclick="openProjectFileL1('system.prop')" style="width:150;" value="system.prop" />
-<br>
-<input type="button" onclick="openProjectFileL1('items.ini')" style="width:150;" value="items.ini" />
-<br>
-<br>
-<fieldset>
-    <input type="checkbox" id="rm_out_l1_id" checked=true >rm out</input>
-    <input type="checkbox" id="build_ota_l1_id" >ota</input>
-    <br>
-    <font size="1"><input type="button" onclick="CommandOfBuildL1()" style="width:100;" value="复制编译命令"></font>
-</fieldset>
-====================================
-<br>
-<input type="button" onclick="runApplication('F:\ZC\tools\vbs\bootanimation\bootanimation_v1.1.hta')" value="BootanimationTool" />
-<input type="button" onclick="runApplication('F:\ZC\tools\vbs\checklist\write_checklist.hta')" value="ChecklistTool" />
-<input type="button" onclick="runApplication('F:\ZC\tools\vbs\apk_name\replaceStrInFileName_v1.3.hta')" value="FileNameTool" />
-<br>
-<input type="button" OnClick="self.close()" value="Exit" />
+    </div> 
+    <input type="button" onclick="showAndHide('list_code_path_kk','show')" value="本地代码路径" />
+</fieldset> 
 
-<Script Language="JavaScript" src="toolFun.js"></Script>
-<Script Language="JavaScript" src="open.js"></Script>
-<Script Language="VBScript" src="open.vbs"></Script>
+<fieldset>
+    <legend>打开目录或文件</legend>
+    <div>
+        <input type="text" id="open_path_kk" size="50" />
+    </div>
+    <input type="button" onclick="openCodePath(1)" value="打开" />
+</fieldset>
+
+
+<Script Language="JavaScript" src="CoreFun.js"></Script>
+<Script Language="JavaScript" src="ReadCodePath.js"></Script>
+<Script Language="VBScript" src="CoreObjAndFun.vbs"></Script>
+<Script Language="VBScript" src="ReadCodePath.vbs"></Script>
+<Script Language="VBScript" src="OpenPath.vbs"></Script>
 
 </Body>
 </Html>
