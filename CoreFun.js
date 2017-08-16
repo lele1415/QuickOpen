@@ -7,7 +7,7 @@ function input_creat(inputType,inputId,inputValue,inputOnclickFun,inputSize) {
     }
     if (inputOnclickFun) {
         input.onclick = function(){inputOnclickFun()};
- }
+    }
     if (inputSize){
         input.style.width = inputSize;
     }

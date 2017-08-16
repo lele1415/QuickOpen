@@ -303,23 +303,36 @@ Const SEARCH_ROOT = 0
 Const SEARCH_SUB = 1
 Const SEARCH_WHOLE_NAME = 0
 Const SEARCH_PART_NAME = 1
+Const SEARCH_ONE = 0
+Const SEARCH_ALL = 1
+Const SEARCH_RETURN_PATH = 0
+Const SEARCH_RETURN_NAME = 1
 
-Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode)
+Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode, searchTimes, returnType)
     If Not oFso.FolderExists(pRootFolder) Then searchFolder = "" : Exit Function
+    If searchMode = SEARCH_WHOLE_NAME Then searchTimes = SEARCH_ONE
 
     Dim oRootFolder : Set oRootFolder = oFso.GetFolder(pRootFolder)
 
     Dim Folder, sTmp
     Select Case True
         Case searchType = SEARCH_FILE And searchWhere = SEARCH_ROOT
-            searchFolder = startSearch(oRootFolder.Files, pRootFolder, str, searchMode)
+            If searchTimes = SEARCH_ALL Then
+                Set searchFolder = startSearch(oRootFolder.Files, pRootFolder, str, searchMode, SEARCH_ALL, returnType)
+            Else
+                searchFolder = startSearch(oRootFolder.Files, pRootFolder, str, searchMode, SEARCH_ONE, returnType)
+            End If
 
         Case searchType = SEARCH_FOLDER And searchWhere = SEARCH_ROOT
-            searchFolder = startSearch(oRootFolder.SubFolders, pRootFolder, str, searchMode)
+            If searchTimes = SEARCH_ALL Then
+                Set searchFolder = startSearch(oRootFolder.SubFolders, pRootFolder, str, searchMode, SEARCH_ALL, returnType)
+            Else
+                searchFolder = startSearch(oRootFolder.SubFolders, pRootFolder, str, searchMode, SEARCH_ONE, returnType)
+            End If
 
         Case searchType = SEARCH_FILE And searchWhere = SEARCH_SUB
             For Each Folder In oRootFolder.SubFolders
-                sTmp = startSearch(Folder.Files, pRootFolder & "\" & Folder.Name, str, searchMode)
+                sTmp = startSearch(Folder.Files, pRootFolder & "\" & Folder.Name, str, searchMode, SEARCH_ONE, returnType)
                 If sTmp <> "" Then
                     searchFolder = sTmp
                     Exit Function
@@ -329,7 +342,7 @@ Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode)
 
         Case searchType = SEARCH_FILE And searchWhere = SEARCH_SUB
             For Each Folder In oRootFolder.SubFolders
-                sTmp = startSearch(Folder.SubFolders, pRootFolder & "\" & Folder.Name, str, searchMode)
+                sTmp = startSearch(Folder.SubFolders, pRootFolder & "\" & Folder.Name, str, searchMode, SEARCH_ONE, returnType)
                 If sTmp <> "" Then
                     searchFolder = sTmp
                     Exit Function
@@ -339,14 +352,34 @@ Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode)
     End Select
 End Function
 
-        Function startSearch(oAll, pRootFolder, str, searchMode)
+        Function startSearch(oAll, pRootFolder, str, searchMode, searchTimes, returnType)
             Dim oSingle
-            For Each oSingle In oAll
-                If checkSearchName(oSingle.Name, str, searchMode) Then
-                    startSearch = pRootFolder & "\" & oSingle.Name
-                    Exit Function
-                End If
-            Next
+
+            If searchTimes = SEARCH_ALL Then
+                Dim vaStr : Set vaStr = New VariableArray
+                For Each oSingle In oAll
+                    If checkSearchName(oSingle.Name, str, searchMode) Then
+                        If returnType = SEARCH_RETURN_PATH Then
+                            vaStr.Append(pRootFolder & "\" & oSingle.Name)
+                        Else
+                            vaStr.Append(oSingle.Name)
+                        End If
+                    End If
+                Next
+                Set startSearch = vaStr
+                Exit Function
+            Else
+                For Each oSingle In oAll
+                    If checkSearchName(oSingle.Name, str, searchMode) Then
+                        If returnType = SEARCH_RETURN_PATH Then
+                            startSearch = pRootFolder & "\" & oSingle.Name
+                        Else
+                            startSearch = oSingle.Name
+                        End If
+                        Exit Function
+                    End If
+                Next
+            End If
             startSearch = ""
         End Function
 

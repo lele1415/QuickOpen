@@ -49,6 +49,11 @@
     版本2.0_debug_20170401
         模块化分离文件
         1. 重写读取代码路径
+
+    版本2.0_debug_20170408
+        1. 优化: 读取代码路径
+        2. 重写: 载入工程和项目
+        3. 重写: 创建切换工程项目的快捷按钮
 -->
 
 <Html>
@@ -59,56 +64,25 @@
 <style type="text/css">
 
 <!-- 
-body {
-    font-family: sans-serif;
-}
+body { font-family: sans-serif; }
 
-#shoudongshuru {
-    font-size:14px;
-    font-style:italic;
-}
+#shoudongshuru { font-size:14px; font-style:italic; }
 
-#getVerName {
-    font-size:15px;
-}
+#getVerName { font-size:15px; }
 
-#ota {
-    font-size:13px;
-}
+#ota { font-size:13px; }
 
-.Menu { 
-    position:relative; 
-    width:320px; 
-    height:127px; 
-    z-index:1; 
-    background: #FFF; 
-    border:1px solid #000; 
-    margin-top:0px; 
-    display:none; 
-}
+.Menu_codePath { position:relative; width:335px; height:50px; z-index:1; background: #FFF; border:1px solid #000; margin-top:0px; display:none; }
 
-.Menu2 { 
-    position: absolute; 
-    left:0; 
-    top:0; 
-    width:100%; 
-    height:auto; 
-    overflow:hidden; 
-    z-index:1; 
-} 
+.Menu_project_l1 { position:relative; width:155px; height:50px; z-index:1; background: #FFF; border:1px solid #000; margin-top:0px; display:none; }
 
-.Menu2 ul{
-    margin:0;
-    padding:0
-} 
+.Menu_option_l1 { position:relative; width:95px; height:50px; z-index:1; background: #FFF; border:1px solid #000; margin-top:0px; display:none; }
 
-.Menu2 ul li{
-    width:100%;
-    height:25px;
-    line-height:25px;
-    text-indent:5px; 
-    border-bottom:1px solid #ccc;
-    cursor:pointer; 
+.Menu2 { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
+
+.Menu2 ul{ margin:0; padding:0; } 
+
+.Menu2 ul li{ width:100%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
     change:expression( 
         this.onmouseover=function(){ 
             this.style.background="#F2F5EF"; 
@@ -119,16 +93,15 @@ body {
     ) 
 }
 
-.form {
-    width:300px;
-    height:auto;
-}
+.form_codePath { width:335px; height:auto; }
+.form_codePath div{ position:relative; top:0; left:0; margin-bottom:5px; }
 
-.form div{
-    position:relative;
-    top:0;left:0;
-    margin-bottom:5px
-} 
+.form_project_l1 { width:155px; height:auto; }
+.form_project_l1 div{ position:relative; top:0; left:0; margin-bottom:5px; }
+
+.form_option_l1 { width:95px; height:auto; }
+.form_option_l1 div{ position:relative; top:0; left:0; margin-bottom:5px; }
+
 -->
 </style>
 
@@ -139,17 +112,46 @@ body {
 ===============L1版本===============
 <fieldset>
     <legend>当前代码路径</legend>
-    <div class="form">
-        <input type="text" id="input_code_path_l1" onchange="onloadL1Project1()" size="50" />
-        <div class="Menu" id="list_code_path_l1" onmouseleave="showAndHide('list_code_path_l1','hide')"> 
+    <div class="form_codePath" onmouseleave="showAndHide('list_code_path_l1','hide')">
+        <input type="text" id="input_code_path_l1" 
+                onchange="onloadPrjAndOpt()" 
+                onclick="showAndHide('list_code_path_l1','show')" 
+                size="50" />
+        <div class="Menu_codePath" id="list_code_path_l1"> 
             <div class="Menu2"> 
                 <ul id="ul_code_path_l1"> 
                 </ul> 
             </div> 
         </div>
     </div>
-    <input type="button" onclick="showAndHide('list_code_path_l1','show')" value="本地代码路径" />
+
+    <div class="form_project_l1" onmouseleave="showAndHide('list_project_l1','hide')">
+        <input type="text" id="input_project_l1"  
+                onclick="showAndHide('list_project_l1','show')" 
+                size="20" />
+        <div class="Menu_project_l1" id="list_project_l1"> 
+            <div class="Menu2"> 
+                <ul id="ul_project_l1"> 
+                </ul> 
+            </div> 
+        </div>
+    </div>
+    
+    <div class="form_option_l1" onmouseleave="showAndHide('list_option_l1','hide')">
+        <input type="text" id="input_option_l1"  
+                onclick="showAndHide('list_option_l1','show')" 
+                size="10" />
+        <div class="Menu_option_l1" id="list_option_l1"> 
+            <div class="Menu2"> 
+                <ul id="ul_option_l1"> 
+                </ul> 
+            </div> 
+        </div>
+    </div>
 </fieldset>
+<br>
+<input type="button" onclick="creatShortcut()" value="creatShortcut" />
+<div id="div_shortcut"></div>
 
 <fieldset>
     <legend>打开目录或文件</legend>
@@ -163,16 +165,17 @@ body {
 ===============KK版本===============
 <fieldset>
     <legend>当前代码路径</legend>
-    <div class="form">
-        <input type="text" id="input_code_path_kk" onchange="removeAllMoreButton('KK')" size="50" />
-        <div class="Menu" id="list_code_path_kk" onmouseleave="showAndHide('list_code_path_kk','hide')"> 
+    <div class="form_codePath" onmouseleave="showAndHide('list_code_path_kk','hide')">
+        <input type="text" id="input_code_path_kk"
+                onclick="showAndHide('list_code_path_kk','show')"
+                size="50" />
+        <div class="Menu_codePath" id="list_code_path_kk"> 
             <div class="Menu2"> 
                 <ul id="ul_code_path_kk"> 
                 </ul> 
             </div> 
         </div> 
     </div> 
-    <input type="button" onclick="showAndHide('list_code_path_kk','show')" value="本地代码路径" />
 </fieldset> 
 
 <fieldset>
@@ -186,9 +189,14 @@ body {
 
 <Script Language="JavaScript" src="CoreFun.js"></Script>
 <Script Language="JavaScript" src="ReadCodePath.js"></Script>
+<Script Language="JavaScript" src="OnloadProjectAndOption.js"></Script>
+<Script Language="JavaScript" src="CreatShortcutOfCodePrjOpt.js"></Script>
+
 <Script Language="VBScript" src="CoreObjAndFun.vbs"></Script>
 <Script Language="VBScript" src="ReadCodePath.vbs"></Script>
 <Script Language="VBScript" src="OpenPath.vbs"></Script>
+<Script Language="VBScript" src="OnloadProjectAndOption.vbs"></Script>
+<Script Language="VBScript" src="CreatShortcutOfCodePrjOpt.vbs"></Script>
 
 </Body>
 </Html>

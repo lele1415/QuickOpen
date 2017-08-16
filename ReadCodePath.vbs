@@ -11,7 +11,6 @@ Dim pCodePathTxt_L1 : pCodePathTxt_L1 = oWs.CurrentDirectory & "\codePath_L1.txt
 Dim pID_LIST_CODE_PATH_KK : pID_LIST_CODE_PATH_KK = oWs.CurrentDirectory & "\codePath_KK" 
 Dim pID_LIST_CODE_PATH_L1 : pID_LIST_CODE_PATH_L1 = oWs.CurrentDirectory & "\codePath_L1"
 
-
 Call readCodePath(pCodePathTxt_KK, ID_INPUT_CODE_PATH_KK, ID_LIST_CODE_PATH_KK, ID_UL_CODE_PATH_KK)
 Call readCodePath(pCodePathTxt_L1, ID_INPUT_CODE_PATH_L1, ID_LIST_CODE_PATH_L1, ID_UL_CODE_PATH_L1)
 
@@ -41,6 +40,13 @@ End Sub
 Sub setListValue(inputId, listId, value)
     Call showAndHide(listId, "hide")
     Call setElementValue(inputId, value)
+
+    Select Case inputId
+        Case ID_INPUT_CODE_PATH_L1
+            Call onloadPrjAndOpt()
+        Case ID_INPUT_PROJECT_L1
+            Call onloadOpt()
+    End Select
 End Sub
 
 Function getElementValue(elementId)
