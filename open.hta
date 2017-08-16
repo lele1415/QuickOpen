@@ -25,13 +25,64 @@
     1. 增加获取工程名功能
     2. 增加检查信息功能
     3. 增加打开文件历史记录功能
+    
+    版本1.6
+    1. 完善历史记录功能
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <Title>QuickOpen</Title>
-
+<style type="text/css"> 
+<!-- 
+body {font-family:sans-serif;}
+.Menu { 
+    position:relative; 
+    width:250px; 
+    height:127px; 
+    z-index:1; 
+    background: #FFF; 
+    border:1px solid #000; 
+    margin-top:-6px; 
+    display:none; 
+} 
+.Menu_2 { 
+    position:relative; 
+    width:250px; 
+    height:127px; 
+    z-index:1; 
+    background: #FFF; 
+    border:1px solid #000; 
+    margin-top:-100px; 
+    display:none; 
+} 
+.Menu2 { 
+    position: absolute; 
+    left:0; 
+    top:0; 
+    width:100%; 
+    height:auto; 
+    overflow:hidden; 
+    z-index:1; 
+} 
+.Menu2 ul{margin:0;padding:0} 
+.Menu2 ul li{width:100%;height:25px;line-height:25px;text-indent:5px; 
+             border-bottom:1px solid #ccc;cursor:pointer; 
+             change:expression( 
+              this.onmouseover=function(){ 
+                this.style.background="#F2F5EF"; 
+              }, 
+              this.onmouseout=function(){ 
+                this.style.background=""; 
+              } 
+             ) 
+            } 
+.form{width:300px;height:auto;} 
+.form div{position:relative;top:0;left:0;margin-bottom:5px} 
+#List1#List2{left:0px;top:93px;} 
+-->
+</style>
 <Script Language="VBScript">
 
 Dim width,height
@@ -52,13 +103,14 @@ Window.ResizeTo 400,630
     <legend>代码路径</legend>
     <select id="source" name="source">
     <option value="Z:\8312C\alps">Z:\8312C\alps</option>
+    <option value="Z:\backups\8312C\alps">Z:\backups\8312C\alps</option>
     <option value="Z:\8312D\alps">Z:\8312D\alps</option>
     <option value="Z:\MT8312\alps">Z:\MT8312\alps</option>
-    <option value="Z:\MT8321\alps">Z:\MT8321\alps</option>
-    <option value="Z:\backups\8312C\alps">Z:\backups\8312C\alps</option>
     <option value="Z:\backups\MT8312\alps">Z:\backups\MT8312\alps</option>
+    <option value="Z:\MT8321\alps">Z:\MT8321\alps</option>
     <option value="Z:\l18321G_git\alps">Z:\l18321G_git\alps</option>
-    <option value="Z:\l18321_git\alps">Z:\l18321_git\alps</option>
+    <option value="Z:\backups\l18321G_git\alps">Z:\backups\l18321G_git\alps</option>
+    <option value="Z:\l18312cw_git\alps">Z:\l18312cw_git\alps</option>
     </select>
 </fieldset> 
 <br>
@@ -71,7 +123,17 @@ Window.ResizeTo 400,630
 <br>
 <fieldset>
     <legend>打开工程目录</legend>
-    工程名: <input id="project_name" type="text" />
+    <div class="form"> 
+        <div>工程名: 
+        <br><input id="project_name" type="text" style="width:250;" onClick="showAndHide 'List1','show'" onblur="showAndHide 'List1','hide'"/><input type="button" onclick="WriteHistory 'Dict_PN','project_name','PN_ul_id'" value="保存" /></div>
+        <div class="Menu" id="List1"> 
+            <div class="Menu2"> 
+                <ul id="PN_ul_id"> 
+                </ul> 
+            </div> 
+        </div> 
+    </div>
+    <!--<button onclick="addLi('233')"></button>-->
     <br><br>
     <input type="button" onclick="OpenBinary()" style="width:50" value="binary" />
     &nbsp;&nbsp;
@@ -98,12 +160,17 @@ Window.ResizeTo 400,630
 <br>
 <fieldset>
     <legend>打开文件</legend>
-    路径: 
-    <br><input id="FilePath_id" type="text" size="50"/>
+    <div class="form">
+    <div>路径: 
+    <br><input id="FilePath_id" type="text" style="width:250;" onClick="showAndHide 'List2','show'" onblur="showAndHide 'List2','hide'"/><input type="button" onclick="WriteHistory 'Dict_OpenFile','FilePath_id','Openfile_ul_id'" value="保存" /></div>
+    <div class="Menu_2" id="List2"> 
+            <div class="Menu2"> 
+                <ul id="Openfile_ul_id"> 
+                </ul> 
+            </div> 
+        </div> 
+    </div>
     <br><font size="10"><input OnClick="OpenFile()" type="submit" value="OPEN" /></font>
-    <br><select id="OpenFileSelect_id"></select>
-    <br><input OnClick="DictRead()" type="button" value="view history" />
-    <br><input OnClick="OpenHistoryFile()" type="button" value="open history" />
 </fieldset>
 <br>
 <fieldset>
@@ -145,12 +212,59 @@ function removeInputBoxUp() {
     }
 }
 
-function addOption(SelectId,optionName) 
-{
-    var option = document.createElement("option");
-    option.value = optionName;
-    option.innerHTML = optionName;
-    document.getElementById(SelectId).appendChild(option);
+function showAndHide(obj,types){ 
+    var Layer=window.document.getElementById(obj); 
+    switch(types){ 
+        case "show": 
+            Layer.style.display="block"; 
+            break; 
+        case "hide": 
+            Layer.style.display="none"; 
+    } 
+} 
+
+function getValue(obj,str){ 
+    var input=window.document.getElementById(obj); 
+    input.value=str; 
+}
+
+function removeLi(count){
+    var obj = document.getElementById("PN_ul_id");
+    //var i = obj.childNodes.length;
+    //alert(i);
+    //if (i > 0) 
+    //{
+        //for(var j=0;j<i;j++){
+        //alert(j);
+            obj.removeChild(obj.childNodes[count]);  
+        //}   
+    //}
+}
+
+function addLi(str,inputId,ulId) {
+    var obj = document.getElementById(ulId);
+    var li = document.createElement("li");
+    //li.onmousedown="showAndHide 'List1','hide'";
+    li.onmousedown=function(){getValue(inputId,str)};
+    li.innerHTML = str;
+    li.style.fontSize = "x-small";
+         
+    obj.appendChild(li);
+}
+
+function addBeforeLi(str,inputId,ulId) {
+    var obj = document.getElementById(ulId);
+        var li = document.createElement("li");
+        li.onmousedown=function(){getValue(inputId,str)};
+        li.innerHTML = str;
+        li.style.fontSize = "x-small";
+    if(obj.childNodes.length > 0){
+        var node = obj.childNodes[0];
+        obj.insertBefore(li,node);
+    }
+    else{
+    obj.appendChild(li);
+    }
 }
 
 </Script>
@@ -159,6 +273,9 @@ function addOption(SelectId,optionName)
 
 Set ws=CreateObject("wscript.shell")
 Set Fso=CreateObject("Scripting.FileSystemObject")
+
+ReadHistory "Dict_PN","project_name","PN_ul_id"
+ReadHistory "Dict_OpenFile","FilePath_id","Openfile_ul_id"
 
 Function CopyString(s) 
     Set forms=CreateObject("forms.form.1") 
@@ -422,11 +539,12 @@ Function SearchStr(fread,Str,LK,flag)
         If InStr(LineStr,Str) > 0 Then
             If InStr(LineStr,"#"&Str) = 0 Then
                 SearchStr = Mid(LineStr,Len(Str)+1)
+                flag = 1
                 Exit Do
             End If
         End If
     Loop
-    If ((Not (Len(Str) > 0)) AND (flag = 0))Then
+    If flag = 0 Then
         Set fread_new = SetFile(LK)
         SearchStr = SearchStr(fread_new,Str,LK,1)
     End If   
@@ -494,19 +612,115 @@ Function checkOTA()
 
     If str_SHULIAN = "yes" Then
         If str_FOTA1 <> "yes" Then
-            msgbox("数联OTA")
+            msgbox("数联OTA，注意修改版本号哦！")
         Else
             msgbox("数联OTA和广升OTA同时存在，请检查！")
         End If
     ElseIf str_FOTA1 = "yes" Then
         If Len(str_FOTA2) > 0 Then
-            msgbox("广升OTA")
+            msgbox("广升OTA，注意修改DISPLAY_ID哦！")
         Else
             msgbox("广升OTA，未写DISPLAY_ID，请检查！")
         End If
     Else
         msgbox("不带OTA")
     End If
+End Function
+
+Function WriteHistory(DictName,inputId,ulId)
+    Dim str
+    str = document.getElementById(inputId).value
+    If Len(str) = 0 Then
+        msgbox("请输入")
+    Else
+        Dim DictPath, oDict
+        DictPath = ws.CurrentDirectory
+        If Fso.FileExists(DictPath&"\"&DictName&".txt")=False Then
+            Set oDict = fso.CreateTextFile(DictPath&"\"&DictName&".txt", True)
+            Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",1)
+        Else
+            Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",1)
+        End If    
+
+        Dim strArray(9), lineCount
+        lineCount = 0
+        Do Until oDict.AtEndOfStream
+            strArray(lineCount) = oDict.ReadLine
+            lineCount = lineCount + 1
+        Loop
+        
+        Dim i, j, equalsFlag, countFlag
+        equalsFlag = -1 
+        countFlag = lineCount - 1    
+
+        For i = 0 To countFlag
+            If strArray(i) = str Then
+                equalsFlag = i     
+                Exit For
+            End If
+        Next
+
+        If equalsFlag = -1 Then
+            If countFlag < 9 Then
+                Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",8)
+                oDict.WriteLine(str)
+                addBeforeLi str,inputId,ulId
+            Else
+                For i = 0 To countFlag - 1
+                    strArray(i) = strArray(i + 1)
+                Next
+                strArray(countFlag) = str
+                oDict.Close
+                fso.DeleteFile(DictPath&"\"&DictName&".txt")
+                Set oDict = fso.CreateTextFile(DictPath&"\"&DictName&".txt", True)
+                For i = 0 To countFlag
+                    oDict.WriteLine(strArray(i))
+                Next
+                removeLi(countFlag)
+                addBeforeLi str,inputId,ulId
+            End If
+        ElseIf equalsFlag < countFlag Then
+            For j = equalsFlag To countFlag - 1
+                strArray(j) = strArray(j + 1)
+            Next
+            strArray(countFlag) = str
+            oDict.Close
+            fso.DeleteFile(DictPath&"\"&DictName&".txt")
+            Set oDict = fso.CreateTextFile(DictPath&"\"&DictName&".txt", True)
+            For i = 0 To countFlag
+                oDict.WriteLine(strArray(i))
+            Next
+            removeLi(countFlag-equalsFlag)
+            addBeforeLi str,inputId,ulId
+        End If
+
+        oDict.Close
+    End If
+End Function
+    
+Function ReadHistory(DictName,inputId,ulId)
+    Dim DictPath, oDict
+    DictPath = ws.CurrentDirectory
+    If Fso.FileExists(DictPath&"\"&DictName&".txt")=False Then
+        Set oDict = fso.CreateTextFile(DictPath&"\"&DictName&".txt", True)
+        Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",1)
+    Else
+        Set oDict = fso.OpenTextFile(DictPath&"\"&DictName&".txt",1)
+    End If    
+
+    Dim strArray(9), lineCount
+    lineCount = 0
+    Do Until oDict.AtEndOfStream
+        strArray(lineCount) = oDict.ReadLine
+        lineCount = lineCount + 1
+    Loop
+
+    Dim i, countFlag
+    countFlag = lineCount - 1   
+
+    For i = 0 To countFlag
+        addBeforeLi strArray(i),inputId,ulId
+    Next
 End Function
 
 </Script>
