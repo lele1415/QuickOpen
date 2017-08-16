@@ -1,4 +1,3 @@
-Const PATH_TEXT_EDITOR = "F:\tools\Sublime_Text_3\sublime_text.exe"
 Const ID_INPUT_CODE_PATH_KK = "input_code_path_kk"
 Const ID_LIST_CODE_PATH_KK = "list_code_path_kk"
 Const ID_UL_CODE_PATH_KK = "ul_code_path_kk"

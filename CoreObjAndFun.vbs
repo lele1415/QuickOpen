@@ -1,7 +1,11 @@
-Dim width,height
-width=CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
-Window.MoveTo width-500,100
-Window.ResizeTo 500,800
+Const WINDOW_WIDTH = 400
+Const WINDOW_HEIGHT = 750
+Sub Window_OnLoad
+    Dim ScreenWidth : ScreenWidth = CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
+    Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
+    Window.MoveTo ScreenWidth - WINDOW_WIDTH ,(ScreenHeight - WINDOW_HEIGHT) \ 3
+    Window.ResizeTo WINDOW_WIDTH, WINDOW_HEIGHT
+End Sub
 
 Set oWs=CreateObject("wscript.shell")
 Set oFso=CreateObject("Scripting.FileSystemObject")

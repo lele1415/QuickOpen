@@ -54,6 +54,10 @@
         1. 优化: 读取代码路径
         2. 重写: 载入工程和项目
         3. 重写: 创建切换工程项目的快捷按钮
+
+    版本2.0_debug_20170413
+        1. 重写: 打开特定文件和目录
+        2. 重写: 拷贝编译命令
 -->
 
 <Html>
@@ -72,17 +76,32 @@ body { font-family: sans-serif; }
 
 #ota { font-size:13px; }
 
-.Menu_codePath { position:relative; width:335px; height:50px; z-index:1; background: #FFF; border:1px solid #000; margin-top:0px; display:none; }
+.Menu_codePath { position:relative; width:335px; height:50px; z-index:1; margin-top:0px; display:none; }
 
-.Menu_project_l1 { position:relative; width:155px; height:50px; z-index:1; background: #FFF; border:1px solid #000; margin-top:0px; display:none; }
+.Menu_project_l1 { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
 
-.Menu_option_l1 { position:relative; width:95px; height:50px; z-index:1; background: #FFF; border:1px solid #000; margin-top:0px; display:none; }
+.Menu_option_l1 { position:relative; width:95px; height:50px; z-index:1; margin-top:0px; display:none; }
 
 .Menu2 { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
 
 .Menu2 ul{ margin:0; padding:0; } 
 
 .Menu2 ul li{ width:100%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
+    change:expression( 
+        this.onmouseover=function(){ 
+            this.style.background="#F2F5EF"; 
+        }, 
+        this.onmouseout=function(){ 
+            this.style.background=""; 
+        } 
+    ) 
+}
+
+.Menu2_openPath { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
+
+.Menu2_openPath ul{ margin:0; padding:0; } 
+
+.Menu2_openPath ul li{ display:inline; width:49%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
     change:expression( 
         this.onmouseover=function(){ 
             this.style.background="#F2F5EF"; 
@@ -148,20 +167,35 @@ body { font-family: sans-serif; }
             </div> 
         </div>
     </div>
+    <br>
+    <input type="button" onclick="creatShortcut()" value="creatShortcut" />
+    <div id="div_shortcut"></div>
 </fieldset>
 <br>
-<input type="button" onclick="creatShortcut()" value="creatShortcut" />
-<div id="div_shortcut"></div>
-
 <fieldset>
     <legend>打开目录或文件</legend>
-    <div>
-        <input type="text" id="open_path_l1" size="50" />
+    <div class="form_codePath" onmouseleave="showAndHide('list_open_path_l1','hide')">
+        <input type="text" id="input_open_path_l1" 
+                onclick="showAndHide('list_open_path_l1','show')" 
+                size="50" />
+        <div class="Menu_codePath" id="list_open_path_l1"> 
+            <div class="Menu2_openPath"> 
+                <ul id="ul_open_path_l1"> 
+                </ul> 
+            </div>
+        </div>
     </div>
-    <input type="button" onclick="openCodePath(0)" value="打开" />
+    <input type="button" onclick="handlePathFromL1()" value="打开" />
+</fieldset>
+<br>
+<fieldset>
+    <legend>复制命令</legend>
+    <input type="checkbox" id="checkbox_rm_out_l1" checked=true >rm out</input>
+    <input type="checkbox" id="checkbox_build_ota_l1" >ota</input>
+    <input type="button" onclick="CommandOfBuildL1()" value="copy">
 </fieldset>
 
-
+<br>
 ===============KK版本===============
 <fieldset>
     <legend>当前代码路径</legend>
@@ -176,14 +210,31 @@ body { font-family: sans-serif; }
             </div> 
         </div> 
     </div> 
+    <input type="text" id="input_project_kk" size="35">
 </fieldset> 
-
+<br>
 <fieldset>
     <legend>打开目录或文件</legend>
-    <div>
-        <input type="text" id="open_path_kk" size="50" />
+    <div class="form_codePath" onmouseleave="showAndHide('list_open_path_kk','hide')">
+        <input type="text" id="input_open_path_kk" 
+                onclick="showAndHide('list_open_path_kk','show')" 
+                size="50" />
+        <div class="Menu_codePath" id="list_open_path_kk"> 
+            <div class="Menu2_openPath"> 
+                <ul id="ul_open_path_kk"> 
+                </ul> 
+            </div> 
+        </div>
     </div>
-    <input type="button" onclick="openCodePath(1)" value="打开" />
+    <input type="button" onclick="handlePathFromKK()" value="打开" />
+</fieldset>
+<br>
+<fieldset>
+    <legend>复制命令</legend>
+    <input type="checkbox" id="checkbox_rm_out_kk" checked=true >rm out</input>
+    <input type="checkbox" id="checkbox_user_kk" checked=true >user</input>
+    <input type="checkbox" id="checkbox_build_ota_kk" >ota</input>
+    <input type="button" onclick="CommandOfBuildKK()" value="copy">
 </fieldset>
 
 
@@ -194,9 +245,11 @@ body { font-family: sans-serif; }
 
 <Script Language="VBScript" src="CoreObjAndFun.vbs"></Script>
 <Script Language="VBScript" src="ReadCodePath.vbs"></Script>
-<Script Language="VBScript" src="OpenPath.vbs"></Script>
 <Script Language="VBScript" src="OnloadProjectAndOption.vbs"></Script>
 <Script Language="VBScript" src="CreatShortcutOfCodePrjOpt.vbs"></Script>
+<Script Language="VBScript" src="OpenPathFromL1.vbs"></Script>
+<Script Language="VBScript" src="OpenPathFromKK.vbs"></Script>
+<Script Language="VBScript" src="CopyCommand.vbs"></Script>
 
 </Body>
 </Html>
