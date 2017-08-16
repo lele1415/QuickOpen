@@ -20,6 +20,11 @@
     3. 扩展代码路径
     4. 增加生成编译命令功能
     5. 优化代码结构和报错提示
+    
+    版本1.5
+    1. 增加获取工程名功能
+    2. 增加检查信息功能
+    3. 增加打开文件历史记录功能
 -->
 
 <Html>
@@ -31,8 +36,8 @@
 
 Dim width,height
 width=CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
-Window.MoveTo width-400,300
-Window.ResizeTo 400,450
+Window.MoveTo width-400,200
+Window.ResizeTo 400,630
 
 </Script>
 </Head>
@@ -43,41 +48,62 @@ Window.ResizeTo 400,450
 <input type="button" onclick="removeInputBoxDown()" style="width:120; height:25;" value="从底部删除文本框" />
 <div id="input"></div>
 <br>
-<select id="source" name="source">
-<option value="Z:\8312C\alps">Z:\8312C\alps</option>
-<option value="Z:\8312D\alps">Z:\8312D\alps</option>
-<option value="Z:\MT8312\alps">Z:\MT8312\alps</option>
-<option value="Z:\MT8321\alps">Z:\MT8321\alps</option>
-<option value="Z:\backups\8312C\alps">Z:\backups\8312C\alps</option>
-<option value="Z:\backups\MT8312\alps">Z:\backups\MT8312\alps</option>
-<option value="Z:\l18321G_git\alps">Z:\l18321G_git\alps</option>
-<option value="Z:\l18321_git\alps">Z:\l18321_git\alps</option>
-</select>
-<br><br>
+<fieldset>
+    <legend>代码路径</legend>
+    <select id="source" name="source">
+    <option value="Z:\8312C\alps">Z:\8312C\alps</option>
+    <option value="Z:\8312D\alps">Z:\8312D\alps</option>
+    <option value="Z:\MT8312\alps">Z:\MT8312\alps</option>
+    <option value="Z:\MT8321\alps">Z:\MT8321\alps</option>
+    <option value="Z:\backups\8312C\alps">Z:\backups\8312C\alps</option>
+    <option value="Z:\backups\MT8312\alps">Z:\backups\MT8312\alps</option>
+    <option value="Z:\l18321G_git\alps">Z:\l18321G_git\alps</option>
+    <option value="Z:\l18321_git\alps">Z:\l18321_git\alps</option>
+    </select>
+</fieldset> 
+<br>
+<fieldset>
+    <legend>获取工程名</legend>
+    软件路径: 
+    <br><input id="getProjectName_id" type="text" size="50"/>
+    <br><input type="button" onclick="getProjectName()" value="点击获取工程名" />
+</fieldset>
+<br>
 <fieldset>
     <legend>打开工程目录</legend>
     工程名: <input id="project_name" type="text" />
     <br><br>
-    <input type="button" onclick="OpenBinary()" style="width:50; height:30;" value="binary" />
-    &nbsp&nbsp
-    <input type="button" onclick="OpenConfig()" style="width:40; height:30;" value="config" />
-    &nbsp&nbsp
-    <input type="button" onclick="OpenCustom()" style="width:50; height:30;" value="custom" />
-    &nbsp&nbsp
-    <input type="button" onclick="OpenOverlay()" style="width:50; height:30;" value="overlay" />
-    &nbsp&nbsp
-    <input type="button" onclick="OpenOut()" style="width:50; height:30;" value="out" />
+    <input type="button" onclick="OpenBinary()" style="width:50" value="binary" />
+    &nbsp;&nbsp;
+    <input type="button" onclick="OpenConfig()" style="width:40;" value="config" />
+    &nbsp;&nbsp;
+    <input type="button" onclick="OpenCustom()" style="width:50" value="custom" />
+    &nbsp;&nbsp;
+    <input type="button" onclick="OpenOverlay()" style="width:50" value="overlay" />
+    &nbsp;&nbsp;
+    <input type="button" onclick="OpenOut()" style="width:50" value="out" />
     <br><br>
-    <input type="button" onclick="OpenProjectConfig_mk()" style="width:150; height:23;" value="ProjectConfig.mk" />
+    <input type="button" onclick="OpenProjectConfig_mk(1)" style="width:150;" value="ProjectConfig.mk" />
     <br>
-    <input type="button" onclick="OpenSystem_prop()" style="width:150; height:23;" value="system.prop" />
+    <input type="button" onclick="OpenSystem_prop()" style="width:150;" value="system.prop" />
+</fieldset> 
+<br>
+<fieldset>
+    <legend>检查信息</legend>
+    <input type="button" onclick="checkGPS()" style="width:100" value="GPS是否降成本" />
+    &nbsp;&nbsp;
+    <input type="button" onclick="checkOTA()" style="width:100" value="是否带OTA" />
+    &nbsp&nbsp
 </fieldset> 
 <br>
 <fieldset>
     <legend>打开文件</legend>
-    路径: <input id="path" type="text" size="50"/>
-    <br>
-    <font size="10"><input OnClick="OpenFile()" type="submit" value="OPEN"></font>
+    路径: 
+    <br><input id="FilePath_id" type="text" size="50"/>
+    <br><font size="10"><input OnClick="OpenFile()" type="submit" value="OPEN" /></font>
+    <br><select id="OpenFileSelect_id"></select>
+    <br><input OnClick="DictRead()" type="button" value="view history" />
+    <br><input OnClick="OpenHistoryFile()" type="button" value="open history" />
 </fieldset>
 <br>
 <fieldset>
@@ -94,7 +120,7 @@ function addInputBox() {
     var input = document.createElement("input");
     input.id = "folder_name";
     input.type = "text";
-    input.size = 100;
+    input.size = 50;
          
     document.getElementById("input").appendChild(input);
 }
@@ -117,6 +143,14 @@ function removeInputBoxUp() {
     {
         obj.removeChild(obj.childNodes[0]);     
     }
+}
+
+function addOption(SelectId,optionName) 
+{
+    var option = document.createElement("option");
+    option.value = optionName;
+    option.innerHTML = optionName;
+    document.getElementById(SelectId).appendChild(option);
 }
 
 </Script>
@@ -160,7 +194,7 @@ Sub OpenConfig()
     End If
 End Sub
 
-Sub OpenCustom()
+Function OpenCustom()
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
     LK=SC&"\mediatek\custom\"&PN
@@ -169,7 +203,18 @@ Sub OpenCustom()
     Else
         msgbox("不存在相应的custom目录")
     End If
-End Sub
+End Function
+
+Function GetCustom()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+    LK=SC&"\mediatek\custom\"&PN
+    If Fso.FolderExists(LK) Then
+        GetCustom = LK
+    Else
+        msgbox("不存在相应的custom目录")
+    End If
+End Function
 
 Sub OpenOverlay()
     PN=document.getElementById("project_name").value
@@ -212,13 +257,57 @@ Sub OpenOut()
     ws.run "explorer.exe "&LK
 End Sub
 
-Sub OpenFile()
-    PT=document.getElementById("path").value
+Function OpenFile()
+    FP=document.getElementById("FilePath_id").value
     SC=document.getElementById("source").value  
+    If Len(FP) > 0 Then
+        FP=Replace(FP,"/","\")
+        LK=SC&"\"&FP
+    Else
+        LK = SC
+    End If    
+    If Fso.FolderExists(LK) Then
+        ws.run "explorer.exe "&LK
+    ElseIf Fso.FileExists(LK) Then
+        ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
+        Dim DictPath, oDict
+        DictPath = ws.CurrentDirectory
+        If Fso.FileExists(DictPath&"\Dict.txt")=False Then
+            Set oDict = fso.CreateTextFile(DictPath&"\Dict.txt", True)
+        Else
+            Set oDict = fso.OpenTextFile(DictPath&"\Dict.txt",8)
+        End If
 
-    PT=Replace(PT,"/","\")
-    LK=SC&"\"&PT    
+        oDict.WriteLine(FP)
+    Else
+        msgbox("路径不存在")
+    End If
+End Function
 
+Function DictRead()
+    Dim DictPath
+    DictPath = ws.CurrentDirectory
+    If Fso.FileExists(DictPath&"\Dict.txt") Then
+        Dim oDict, strDict, i
+        Set oDict = fso.OpenTextFile(DictPath&"\Dict.txt",1)
+        Do Until oDict.AtEndOfStream
+            strDict = strDict&";"&oDict.ReadLine()
+        Loop
+        strDict=Replace(strDict,";","",1,1)
+        strArryDict = Split(strDict,";")
+        For i = 0 To UBound(strArryDict)
+            addOption "OpenFileSelect_id",strArryDict(i)
+        Next
+    Else
+        msgbox("不存在Dict.txt")
+    End If
+
+End Function
+
+Function OpenHistoryFile()
+    FP=document.getElementById("OpenFileSelect_id").value
+    SC=document.getElementById("source").value  
+    LK=SC&"\"&FP
     If Fso.FolderExists(LK) Then
         ws.run "explorer.exe "&LK
     ElseIf Fso.FileExists(LK) Then
@@ -226,9 +315,9 @@ Sub OpenFile()
     Else
         msgbox("路径不存在")
     End If
-End Sub
+End Function
 
-Sub OpenProjectConfig_mk()
+Function OpenProjectConfig_mk(OpenFlag)
     PN=document.getElementById("project_name").value
     SC=document.getElementById("source").value
 
@@ -237,12 +326,16 @@ Sub OpenProjectConfig_mk()
     Else
         LK=SC&"\mediatek\config\"&PN&"\ProjectConfig.mk"
         If Fso.FileExists(LK) Then
-            ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
+            If OpenFlag = 0 Then
+                OpenProjectConfig_mk = LK
+            Else
+                ws.run "F:\tools\Sublime_Text_3\sublime_text.exe "&LK
+            End If
         Else
             msgbox("文件不存在")
         End If
     End If
-End Sub
+End Function
 
 Sub OpenSystem_prop()
     PN=document.getElementById("project_name").value
@@ -271,6 +364,150 @@ Sub CommandOTA()
     command_compile="rm -rf out/ && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" n && ./mk -o=TARGET_BUILD_VARIANT=user "&PN&" otapackage"
     CopyString(command_compile)
 End Sub
+
+Function getProjectName()
+    path = document.getElementById("getProjectName_id").value
+    If Fso.FolderExists(path) Then
+        Set cklFolder = Fso.GetFolder(path&"\")
+        Set cklFile = cklFolder.Files
+        For Each File in cklFile
+            If InStr(File.Name,"checklist") > 0 Then
+                flag_CklExist = 1
+                Set ExcelApp = CreateObject("Excel.Application")
+                Set ExcelBook= ExcelApp.Workbooks.Open(path&"\"&File.Name)
+                Set ExcelSheet = ExcelBook.Sheets(1)
+                For RowCount = 1 To 1000
+                    If Not ExcelSheet.Rows(RowCount).Hidden Then
+                        cklCellValue = ExcelSheet.Cells(RowCount,2).value
+                        pjStart = InStr(cklCellValue,"project")
+                        If pjStart > 0 Then
+                            document.getElementById("project_name").value = Trim(Mid(cklCellValue,pjStart+8))
+                            flag = 1
+                            Exit For
+                        End If
+                    End If
+                Next
+            End If
+            If flag = 1 Then
+                Exit For
+            End If
+        Next
+        If flag_CklExist = 1 Then
+            ExcelBook.Close
+            ExcelApp.Quit
+            Set ExcelSheet = Nothing
+            Set ExcelBook = Nothing
+            Set ExcelApp = Nothing
+            'msgbox("done")
+        Else
+            msgbox("软件路径不存在checklist，请确认后重试")
+        End If
+    ElseIf Len(path) = 0 Then
+        msgbox("请输入软件路径")
+    Else
+        msgbox("软件路径不存在，请确认后重试")
+    End If
+End Function
+
+Function SetFile(LK)
+    Dim fso
+    Set fso=createobject("scripting.filesystemobject")
+    set SetFile=fso.opentextfile(LK,1)
+End Function
+
+Function SearchStr(fread,Str,LK,flag)
+    Dim LineStr, fread_new
+    Do Until fread.AtEndOfStream
+        LineStr=fread.readline
+        If InStr(LineStr,Str) > 0 Then
+            If InStr(LineStr,"#"&Str) = 0 Then
+                SearchStr = Mid(LineStr,Len(Str)+1)
+                Exit Do
+            End If
+        End If
+    Loop
+    If ((Not (Len(Str) > 0)) AND (flag = 0))Then
+        Set fread_new = SetFile(LK)
+        SearchStr = SearchStr(fread_new,Str,LK,1)
+    End If   
+End Function
+
+Function checkGPS()
+    GPS_flag = ""
+    LK = OpenProjectConfig_mk(0)
+    Set fso = createobject("scripting.filesystemobject")
+    Set fread = fso.opentextfile(LK,1)
+
+    str_Version = Trim(SearchStr(fread,"ROCO_SW_VERSION=",LK,0))
+    str_Modem = Trim(SearchStr(fread,"CUSTOM_MODEM=",LK,0))
+
+    If InStr(str_Version,"LOW") > 0 Then
+        GPS_flag = GPS_flag&"1"
+    End If
+
+    If InStr(str_Modem,"LOW_GPS") > 0 Then
+        GPS_flag = GPS_flag&"2"
+    End If
+
+    LK = GetCustom()
+
+    If fso.FileExists(LK&"\cgen\cfgdefault\CFG_GPS_Default.h") Then
+        Set oCgen = fso.OpenTextFile(LK&"\cgen\cfgdefault\CFG_GPS_Default.h",1)
+        Do Until oCgen.AtEndOfStream
+            If InStr(oCgen.ReadLine,"0xFE") > 0 Then
+                GPS_flag = GPS_flag&"3"
+                Exit Do
+            End If
+        Loop
+        Set oCgen = Nothing
+    End If
+
+    If fso.FileExists(LK&"\hal\ant\mt6582_ant_m1\WMT_SOC.cfg") Then
+        Set oAnt = fso.OpenTextFile(LK&"\hal\ant\mt6582_ant_m1\WMT_SOC.cfg",1)
+        Do Until oAnt.AtEndOfStream
+            If InStr(oAnt.ReadLine,"flag=1") > 0 Then
+                GPS_flag = GPS_flag&"4"
+                Exit Do
+            End If
+        Loop
+        Set oAnt = Nothing
+    End If
+
+    If GPS_flag = "" Then
+        msgbox "GPS不降成本"
+    ElseIf GPS_flag = "1234" Then
+        msgbox "GPS降成本"
+    Else
+        msgbox "改动不完全，请检查"
+    End If
+End Function
+
+Function checkOTA()
+    OTA_flag = ""
+    LK = OpenProjectConfig_mk(0)
+    Set fso = createobject("scripting.filesystemobject")
+    Set fread = fso.opentextfile(LK,1)
+
+    str_SHULIAN = Trim(SearchStr(fread,"ROCO_SHULIAN_FOTA_SUPPORT=",LK,0))
+    str_FOTA1 = Trim(SearchStr(fread,"ADUPS_FOTA_SUPPORT=",LK,0))
+    str_FOTA2 = Trim(SearchStr(fread,"ROCO_DISPLAY_ID=",LK,0))
+
+    If str_SHULIAN = "yes" Then
+        If str_FOTA1 <> "yes" Then
+            msgbox("数联OTA")
+        Else
+            msgbox("数联OTA和广升OTA同时存在，请检查！")
+        End If
+    ElseIf str_FOTA1 = "yes" Then
+        If Len(str_FOTA2) > 0 Then
+            msgbox("广升OTA")
+        Else
+            msgbox("广升OTA，未写DISPLAY_ID，请检查！")
+        End If
+    Else
+        msgbox("不带OTA")
+    End If
+End Function
 
 </Script>
 
