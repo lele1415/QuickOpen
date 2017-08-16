@@ -9,6 +9,10 @@
     版本1.2
     1. 优化out目录打开
     2. 增加代码路径
+
+    版本1.3
+    1. 打开目录由下拉菜单改为按钮
+    2. 增加打开文件功能
 -->
 
 <Html>
@@ -24,40 +28,64 @@ Set Fso=CreateObject("Scripting.FileSystemObject")
 Sub Window_OnLoad
 Dim width,height
 width=CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
-Window.MoveTo width-260,300
-Window.ResizeTo 200,320
+Window.MoveTo width-400,300
+Window.ResizeTo 400,400
 End Sub
 
-Sub Open()
-FN=document.getElementById("folder_name").value
-PN=document.getElementById("project_name").value
-SC=document.getElementById("source").value
+Function ReplaceStr(str,patrn_old,patrn_new)
+Set regEx = New RegExp
+regEx.IgnoreCase = true  '匹配大小写  
+regEx.Global = true  '打开全局搜索
+regEx.Pattern = patrn_old
+ReplaceStr = regEx.Replace(str,patrn_new)
+End Function
 
-If (FN = "mediatek\custom\common\resource_overlay\roco\resandroid") Then
-    Set regEx = New RegExp
-    regEx.IgnoreCase = true  '匹配大小写  
-    regEx.Global = true  '打开全局搜索
-    regEx.Pattern = "\["
-    PN = regEx.Replace(PN,"-")
-    regEx.Pattern = "\]"
-    PN = regEx.Replace(PN,"")
-End If
+Sub OpenBinary()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+    LK=SC&"mediatek\binary\packages\"&PN
+    ws.run "explorer.exe "&LK
+End Sub
 
-LK=SC&FN&"\"&PN
+Sub OpenConfig()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+    LK=SC&"mediatek\config\"&PN
+    ws.run "explorer.exe "&LK
+End Sub
 
-If ((FN = "mediatek\custom\common\resource_overlay\roco\resandroid") AND (Not Fso.FolderExists(LK))) Then
-    If (Fso.FolderExists(SC&"mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN)) Then
-        LK = SC&"mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN
-    Else    
-        msgbox("不存在相应的overlay目录")
-        flag = 1
-    End If    
-ElseIf (Not Fso.FolderExists(LK)) Then
-    msgbox("目录不存在")
-    flag = 1
-End If
+Sub OpenCustom()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+    LK=SC&"mediatek\custom\"&PN
+    ws.run "explorer.exe "&LK
+End Sub
 
-If FN = "out\target\product" Then
+Sub OpenOverlay()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+
+    PN = ReplaceStr(PN,"\[","-")
+    PN = ReplaceStr(PN,"\]","")
+
+    LK=SC&"mediatek\custom\common\resource_overlay\roco\resandroid\"&PN
+
+    If (Not Fso.FolderExists(LK)) Then
+        If (Fso.FolderExists(SC&"mediatek\custom\common\resource_overlay\roco\reslight"&"\"&PN)) Then
+            LK = SC&"mediatek\custom\common\resource_overlay\roco\reslight\"&PN
+        Else    
+            msgbox("不存在相应的overlay目录")
+            flag = 1
+        End If    
+    End If
+
+    ws.run "explorer.exe "&LK
+End Sub
+
+Sub OpenOut()
+    PN=document.getElementById("project_name").value
+    SC=document.getElementById("source").value
+
     If Fso.FolderExists(SC&"out\target\product\") Then
         Set MyFolder_PN = Fso.GetFolder(SC&"out\target\product\")
         Set Folders = MyFolder_PN.SubFolders
@@ -72,13 +100,26 @@ If FN = "out\target\product" Then
     Else
         msgbox("不存在out目录")
     End If
-End If            
-
-If flag <> 1 Then
+   
     ws.run "explorer.exe "&LK
-End If
-
 End Sub
+
+Sub OpenFile()
+    PT=document.getElementById("path").value
+    SC=document.getElementById("source").value  
+
+    PT=ReplaceStr(PT,"/","\")
+    LK=SC&PT    
+
+    If Fso.FolderExists(LK) Then
+        ws.run "explorer.exe "&LK
+    ElseIf Fso.FileExists(LK) Then
+        ws.run "F:\tools\Sublime\Sublime_Text\sublime_text.exe "&LK
+    Else
+        msgbox("路径不存在")
+    End If
+End Sub
+
 </Script>
 
 <Body bgcolor="#9ACD32">
@@ -94,19 +135,30 @@ End Sub
 <option value="Z:\backups\8312C\alps\">BC</option>
 <option value="Z:\backups\MT8312\alps\">BM</option>
 </select>
-
-<select id="folder_name" name="Folder_name">
-<option value="mediatek\binary\packages">binary</option>
-<option value="mediatek\config">config</option>
-<option value="mediatek\custom">custom</option>
-<option value="mediatek\custom\common\resource_overlay\roco\resandroid">overlay</option>
-<option value="out\target\product">out</option>
-</select>
-<br>
-工程名: <input id="project_name" type="text" />
-<br>
-<font size="10"><input OnClick="Open()" type="submit" value="OPEN"></font>
 <br><br>
-<Button OnClick="self.close()">Exit</Button> 
+<fieldset>
+    <legend>打开工程目录</legend>
+    工程名: <input id="project_name" type="text" />
+    <br><br>
+    <input type="button" id="binary" onclick="OpenBinary()" style="width:50; height:30;" value="binary" />
+    &nbsp&nbsp
+    <input type="button" id="config" onclick="OpenConfig()" style="width:40; height:30;" value="config" />
+    &nbsp&nbsp
+    <input type="button" id="custom" onclick="OpenCustom()" style="width:50; height:30;" value="custom" />
+    &nbsp&nbsp
+    <input type="button" id="overlay" onclick="OpenOverlay()" style="width:50; height:30;" value="overlay" />
+    &nbsp&nbsp
+    <input type="button" id="out" onclick="OpenOut()" style="width:50; height:30;" value="out" />
+</fieldset> 
+<br>
+<fieldset>
+    <legend>打开文件</legend>
+    路径: <input id="path" type="text" size="50"/>
+    <br>
+    <font size="10"><input OnClick="Open()" type="submit" value="OPEN"></font>
+</fieldset>
+
+<br>
+<input type="button" OnClick="self.close()" value="Exit" />
 </Body>
 </Html>
