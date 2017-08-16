@@ -1,0 +1,49 @@
+<Html>
+<Head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<Title>QuickOpen</Title>
+</Head>
+<Script Language="VBScript">
+
+set ws=CreateObject("wscript.shell")
+
+Sub Window_OnLoad
+Window.MoveTo 1660,300
+Window.ResizeTo 200,320
+End Sub
+
+Sub Open()
+FN=document.getElementById("folder_name").value
+PN=document.getElementById("project_name").value
+LK=document.getElementById("link").value
+ws.run "explorer.exe "&LK&FN&"\"&PN
+End Sub
+</Script>
+<Body bgcolor="#9ACD32">
+
+<input type=button onclick="document.body.insertAdjacentHTML 'afterBegin','<input type=text>'" value=添加文本框>
+<!--<textarea rows="3" cols="15"></textarea>-->
+<br><br>
+<select id="link" name="link">
+<option value="Z:\8312C\alps\">C</option>
+<option value="Z:\8312D\alps\">D</option>
+<option value="Z:\alps\">M</option>
+<option value="Z:\backups\8312C\alps\">BC</option>
+<option value="Z:\backups\alps\">BM</option>
+</select>
+
+<select id="folder_name" name="Folder_name">
+<option value="mediatek\binary\packages">binary</option>
+<option value="mediatek\config">config</option>
+<option value="mediatek\custom">custom</option>
+<option value="mediatek\custom\common\resource_overlay\roco\resandroid">overlay</option>
+<option value="out\target\product">out</option>
+</select>
+<br>
+工程名: <input id="project_name" type="text" />
+<br>
+<font size="10"><input OnClick="Open()" type="submit" value="OPEN"></font>
+<br><br>
+<Button OnClick="self.close()">Exit</Button> 
+</Body>
+</Html>
