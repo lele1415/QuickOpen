@@ -34,7 +34,10 @@ End Sub
 
 Sub getAllProject(pPrjRoot)
 	Set vaProject = searchFolder(pPrjRoot, "joyasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-	If vaProject.Bound = -1 Then Exit Sub
+	If vaProject.Bound = -1 Then
+		Set vaProject = searchFolder(pPrjRoot, "jasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+		If vaProject.Bound = -1 Then Exit Sub
+	End If
 
 	Call vaProject.SortArray()
 
