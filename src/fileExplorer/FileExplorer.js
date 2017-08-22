@@ -8,7 +8,7 @@ function removeAllButton(divId) {
 }
 
 function addButtonOfFolder(divAreaId, folderName) {
-	var btn_more = input_creat("button", "", "+", function(){clickPlus(folderName)}, 0);
+	var btn_more = input_creat("button", "", " + ", function(){clickPlus(folderName)}, 0);
 	var btn_folder = input_creat("button", "", " " + folderName + " ", function(){clickFolder(folderName)}, 0);
 	var btn_br = document.createElement("br");
 
