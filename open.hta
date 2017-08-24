@@ -137,7 +137,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Body bgcolor="#272822">
 
 <fieldset>
-    <legend>当前代码路径</legend>
+    <legend>Code path</legend>
     <div class="form_codePath">
         <input type="text" id="input_code_path" 
                 onclick="showAndHide('list_code_path_select_ver','show')" 
@@ -198,7 +198,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 </fieldset>
 <br>
 <fieldset>
-    <legend>复制命令</legend>
+    <legend>Copy Commands</legend>
     <input type="radio" name="build_type" id="command_eng" >eng</input>
     <input type="radio" name="build_type" id="command_userdebug" >userdebug</input>
     <input type="radio" name="build_type" id="command_user" checked=true >user</input>
@@ -216,7 +216,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 </fieldset>
 <br>
 <fieldset>
-    <legend>打开目录或文件</legend>
+    <legend>Open File or Folder</legend>
     <div class="form_codePath">
         <input type="button" class="input_button" onclick="showAndHide('list_open_path_file','show')" value="file" />
         &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_device','show')" value="device" />
@@ -271,9 +271,10 @@ body { font-family: sans-serif; color:#f8f8f2;}
             </div>
         </div>
     </div>
-    <input type="button" class="input_button" onclick="handlePath(0)" value="打开" />
-    <input type="button" class="input_button" onclick="initNewPath(0)" value="显示目录" />
-    <input type="button" class="input_button" onclick="initNewPath(1)" value="关闭显示" />
+    <input type="button" class="input_button" onclick="handlePath(0)" value="Open" />
+    <input type="button" class="input_button" onclick="handlePath(2)" value="Copy path" />
+    <input type="button" class="input_button" onclick="initNewPath(0)" value="Show all" />
+    <input type="button" class="input_button" onclick="initNewPath(1)" value="Close all" />
     <br><br>
 <div id="exp_path">&nbsp;</div>
 <br>

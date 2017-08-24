@@ -160,6 +160,7 @@ End Sub
 
 Const DO_OPEN_PATH = 0
 Const DO_RETURN_PATH = 1
+Const DO_COPY_PATH = 2
 Function handlePath(doWhat)
 	Dim code : code = getElementValue(ID_INPUT_CODE_PATH)
 	Dim path : path = getElementValue(ID_INPUT_OPEN_PATH)
@@ -172,6 +173,7 @@ Function handlePath(doWhat)
 		Select Case doWhat
 			Case DO_OPEN_PATH : Call runOpenPath(path)
 			Case DO_RETURN_PATH : handlePath = path
+			Case DO_COPY_PATH : Call CopyString(path)
 		End Select
 		Exit Function
 	End If
@@ -192,6 +194,7 @@ Function handlePath(doWhat)
 	Select Case doWhat
 		Case DO_OPEN_PATH : Call runOpenPath(path)
 		Case DO_RETURN_PATH : handlePath = path
+		Case DO_COPY_PATH : Call CopyString(path)
 	End Select
 End Function
 
