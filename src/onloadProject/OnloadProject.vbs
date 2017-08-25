@@ -43,7 +43,7 @@ Sub getAllProject(pPrjRoot)
 
 	Dim i
 	For i = 0 To vaProject.Bound
-		Call addAfterLi(vaProject.V(i), ID_INPUT_PROJECT, ID_LIST_PROJECT, ID_UL_PROJECT)
+		Call addAfterLiForOnloadPrj(vaProject.V(i), ID_INPUT_PROJECT, ID_LIST_PROJECT, ID_UL_PROJECT)
 	Next
 	'MsgBox(vaProject.ToString())
 
@@ -58,9 +58,18 @@ Sub getAllOption(pOptRoot)
 
 	Dim i
 	For i = 0 To vaOption.Bound
-		Call addAfterLi(vaOption.V(i), ID_INPUT_OPTION, ID_LIST_OPTION, ID_UL_OPTION)
+		Call addAfterLiForOnloadPrj(vaOption.V(i), ID_INPUT_OPTION, ID_LIST_OPTION, ID_UL_OPTION)
 	Next
 	'MsgBox(vaOption.ToString())
 
 	Call setElementValue(ID_INPUT_OPTION, vaOption.V(0))
+End Sub
+
+Sub setListValueForOnloadPrj(inputId, listId, value)
+    Call showAndHide(listId, "hide")
+    Call setElementValue(inputId, value)
+
+    If inputId = ID_INPUT_PROJECT Then
+        Call onloadOpt()
+    End If
 End Sub

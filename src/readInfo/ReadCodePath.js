@@ -14,7 +14,7 @@ function showAndHide(listId, types)
     //}
 }
 
-function addAfterLi(str, inputId, listId, ulId)
+function addAfterLiForCodePath(str, inputId, listId, ulId)
 {
     var obj = document.getElementById(ulId);
     var li = document.createElement("li");

@@ -31,9 +31,9 @@ call addLiOfCodePath(vaCodePath_M0, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_M0, ID
 call addLiOfCodePath(vaCodePath_L1, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_L1, ID_UL_CODE_PATH_L1)
 
 Sub addVerForSelect()
-    Call addAfterLi("N0", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
-    Call addAfterLi("M0", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
-    Call addAfterLi("L1", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
+    Call addAfterLiForCodePath("N0", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
+    Call addAfterLiForCodePath("M0", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
+    Call addAfterLiForCodePath("L1", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
 End Sub
 
 Sub readConfigText(DictPath)
@@ -91,7 +91,7 @@ Sub addLiOfCodePath(vaObj, inputId, listId, ulId)
     If vaObj.Bound <> -1 Then
         Dim i
         For i = 0 To vaObj.Bound
-            Call addAfterLi(vaObj.V(i), inputId, listId, ulId)
+            Call addAfterLiForCodePath(vaObj.V(i), inputId, listId, ulId)
         Next
     End If
 End Sub
@@ -120,13 +120,7 @@ Sub setListValue(inputId, listId, value)
         Call showAndHide(Eval("ID_LIST_CODE_PATH_" & value), "show")
     Else
         Call setElementValue(inputId, value)
-        
-        Select Case inputId
-            Case ID_INPUT_CODE_PATH
-                Call onloadPrjAndOpt()
-            Case ID_INPUT_PROJECT
-                Call onloadOpt()
-        End Select
+        Call onloadPrjAndOpt()
     End If
 
 End Sub

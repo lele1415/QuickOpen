@@ -1,13 +1,16 @@
 Const ID_INPUT_OPEN_PATH = "input_open_path"
 
-Const ID_LIST_OPEN_PATH_FLIE = "list_open_path_file"
-Const ID_UL_OPEN_PATH_FLIE = "ul_open_path_file"
+Const ID_LIST_OPEN_PATH_SELECT_CLASS = "list_open_path_select_class"
+Const ID_UL_OPEN_PATH_SELECT_CLASS = "ul_open_path_select_class"
+
+Const ID_LIST_OPEN_PATH_FILE = "list_open_path_file"
+Const ID_UL_OPEN_PATH_FILE = "ul_open_path_file"
 
 Const ID_LIST_OPEN_PATH_DEVICE = "list_open_path_device"
 Const ID_UL_OPEN_PATH_DEVICE = "ul_open_path_device"
 
-Const ID_LIST_OPEN_PATH_FRAMEWORK = "list_open_path_framework"
-Const ID_UL_OPEN_PATH_FRAMEWORK = "ul_open_path_framework"
+Const ID_LIST_OPEN_PATH_FRAMEWORKS = "list_open_path_frameworks"
+Const ID_UL_OPEN_PATH_FRAMEWORKS = "ul_open_path_frameworks"
 
 Const ID_LIST_OPEN_PATH_KERNEL_LK = "list_open_path_kernel_lk"
 Const ID_UL_OPEN_PATH_KERNEL_LK = "ul_open_path_kernel_lk"
@@ -117,19 +120,42 @@ Dim aFUPath_out : aFUPath_out = Array( _
 		PATH_OUT_SYSTEM, _
 		PATH_OUT_TARGET_FILES)
 
-Call onloadFUPath(aFUPath_File, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_FLIE, ID_UL_OPEN_PATH_FLIE)
+Call addVerForSelect()
+Call onloadFUPath(aFUPath_File, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_FILE, ID_UL_OPEN_PATH_FILE)
 Call onloadFUPath(aFUPath_device, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_DEVICE, ID_UL_OPEN_PATH_DEVICE)
-Call onloadFUPath(aFUPath_framework, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_FRAMEWORK, ID_UL_OPEN_PATH_FRAMEWORK)
+Call onloadFUPath(aFUPath_framework, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_FRAMEWORKS, ID_UL_OPEN_PATH_FRAMEWORKS)
 Call onloadFUPath(aFUPath_kernel_lk, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_KERNEL_LK, ID_UL_OPEN_PATH_KERNEL_LK)
 Call onloadFUPath(aFUPath_packages, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_PACKAGES, ID_UL_OPEN_PATH_PACKAGES)
 Call onloadFUPath(aFUPath_vendor, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_VENDOR, ID_UL_OPEN_PATH_VENDOR)
 Call onloadFUPath(aFUPath_out, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_OUT, ID_UL_OPEN_PATH_OUT)
 Call getWholePath()
 
+
+
+Sub addVerForSelect()
+    Call addAfterLiForOpenPath("file", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
+    Call addAfterLiForOpenPath("device", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
+    Call addAfterLiForOpenPath("frameworks", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
+    Call addAfterLiForOpenPath("kernel_lk", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
+    Call addAfterLiForOpenPath("packages", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
+    Call addAfterLiForOpenPath("vendor", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
+    Call addAfterLiForOpenPath("out", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
+End Sub
+
+Sub setListValueForOpenPath(inputId, listId, value)
+    Call showAndHide(listId, "hide")
+
+    If listId = ID_LIST_OPEN_PATH_SELECT_CLASS Then
+        Call showAndHide(Eval("ID_LIST_OPEN_PATH_" & UCase(value)), "show")
+    Else
+        Call setElementValue(inputId, value)
+    End If
+End Sub
+
 Sub onloadFUPath(aFUPath, inputId, listId, ulId)
 	Dim i
 	For i = 0 To UBound(aFUPath)
-		Call addAfterLi(aFUPath(i), inputId, listId, ulId)
+		Call addAfterLiForOpenPath(aFUPath(i), inputId, listId, ulId)
 	Next
 End Sub
 

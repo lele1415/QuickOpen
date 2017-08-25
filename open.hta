@@ -218,16 +218,17 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <fieldset>
     <legend>Open File or Folder</legend>
     <div class="form_codePath">
-        <input type="button" class="input_button" onclick="showAndHide('list_open_path_file','show')" value="file" />
-        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_device','show')" value="device" />
-        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_framework','show')" value="fwk" />
-        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_kernel_lk','show')" value="k&lk" />
-        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_packages','show')" value="pkgs" />
-        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_vendor','show')" value="vendor" />
-        &nbsp;<input type="button" class="input_button" onclick="showAndHide('list_open_path_out','show')" value="out" />
-
-        <input type="text" id="input_open_path" 
-                size="50" />
+        <input
+            type="text"
+            id="input_open_path" 
+            onclick="showAndHide('list_open_path_select_class','show')"
+            size="50" />
+        <div class="Menu_codePath" id="list_open_path_select_class" onmouseleave="showAndHide('list_open_path_select_class','hide')"> 
+            <div class="Menu2"> 
+                <ul id="ul_open_path_select_class"> 
+                </ul> 
+            </div> 
+        </div>
         <div class="Menu_codePath" id="list_open_path_file" onmouseleave="showAndHide('list_open_path_file','hide')"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_file"> 
@@ -240,9 +241,9 @@ body { font-family: sans-serif; color:#f8f8f2;}
                 </ul> 
             </div>
         </div>
-        <div class="Menu_codePath" id="list_open_path_framework" onmouseleave="showAndHide('list_open_path_framework','hide')"> 
+        <div class="Menu_codePath" id="list_open_path_frameworks" onmouseleave="showAndHide('list_open_path_frameworks','hide')"> 
             <div class="Menu2"> 
-                <ul id="ul_open_path_framework"> 
+                <ul id="ul_open_path_frameworks"> 
                 </ul> 
             </div>
         </div>
@@ -287,6 +288,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="JavaScript" src="src\readInfo\ReadCodePath.js"></Script>
 <Script Language="JavaScript" src="src\onloadProject\OnloadProject.js"></Script>
 <Script Language="JavaScript" src="src\shortcut\CreatShortcutOfCodePrjOpt.js"></Script>
+<Script Language="JavaScript" src="src\openPath\OpenPath.js"></Script>
 <Script Language="JavaScript" src="src\fileExplorer\FileExplorer.js"></Script>
 
 <Script Language="VBScript" src="src\core\CoreObjAndFun.vbs"></Script>
