@@ -160,26 +160,26 @@ Sub onloadFUPath(aFUPath, inputId, listId, ulId)
 End Sub
 
 Sub getWholePath()
-	Call pathDict.Add(PATH_FILE_SYSTEM_PROP, "[code]\device\joya_sz\[projectName]\roco\[optionName]\system.prop")
-	Call pathDict.Add(PATH_FILE_ITEMS_INI, "[code]\device\joya_sz\[projectName]\roco\[optionName]\items.ini")
-	Call pathDict.Add(PATH_FILE_PROJECTCONFIG_MK, "[code]\device\joya_sz\[projectName]\ProjectConfig.mk")
-	Call pathDict.Add(PATH_FILE_DEVICE_MK, "[code]\device\mediatek\common\device.mk")
-	Call pathDict.Add(PATH_FILE_CUSTOM_CONF, "[code]\device\mediatek\common\custom.conf")
-	Call pathDict.Add(PATH_FILE_BUILD_PROP, "[code]\out\target\product\[projectName]\system\build.prop")
-	Call pathDict.Add(PATH_FILE_GMS_MK, "[code]\vendor\google\products\gms.mk")
-	Call pathDict.Add(PATH_DEVICE_PROJECT, "[code]\device\joya_sz\[projectName]")
-	Call pathDict.Add(PATH_DEVICE_OPTION, "[code]\device\joya_sz\[projectName]\roco\[optionName]")
-	Call pathDict.Add(PATH_KERNEL, "[code]\[kernelName]")
-	Call pathDict.Add(PATH_KERNEL_IMGSENSOR, "[code]\[kernelName]\drivers\misc\mediatek\imgsensor")
-	Call pathDict.Add(PATH_VENDOR_HAL, "[code]\vendor\mediatek\proprietary\custom\{getPlatformName}\hal")
-	Call pathDict.Add(PATH_KERNEL_ARM_DTS, "[code]\[kernelName]\arch\arm\boot\dts")
-	Call pathDict.Add(PATH_KERNEL_ARM64_DTS, "[code]\[kernelName]\arch\arm64\boot\dts")
+	Call pathDict.Add(PATH_FILE_SYSTEM_PROP, "device\joya_sz\[projectName]\roco\[optionName]\system.prop")
+	Call pathDict.Add(PATH_FILE_ITEMS_INI, "device\joya_sz\[projectName]\roco\[optionName]\items.ini")
+	Call pathDict.Add(PATH_FILE_PROJECTCONFIG_MK, "device\joya_sz\[projectName]\ProjectConfig.mk")
+	Call pathDict.Add(PATH_FILE_DEVICE_MK, "device\mediatek\common\device.mk")
+	Call pathDict.Add(PATH_FILE_CUSTOM_CONF, "device\mediatek\common\custom.conf")
+	Call pathDict.Add(PATH_FILE_BUILD_PROP, "out\target\product\[projectName]\system\build.prop")
+	Call pathDict.Add(PATH_FILE_GMS_MK, "vendor\google\products\gms.mk")
+	Call pathDict.Add(PATH_DEVICE_PROJECT, "device\joya_sz\[projectName]")
+	Call pathDict.Add(PATH_DEVICE_OPTION, "device\joya_sz\[projectName]\roco\[optionName]")
+	Call pathDict.Add(PATH_KERNEL, "[kernelName]")
+	Call pathDict.Add(PATH_KERNEL_IMGSENSOR, "[kernelName]\drivers\misc\mediatek\imgsensor")
+	Call pathDict.Add(PATH_VENDOR_HAL, "vendor\mediatek\proprietary\custom\{getPlatformName}\hal")
+	Call pathDict.Add(PATH_KERNEL_ARM_DTS, "[kernelName]\arch\arm\boot\dts")
+	Call pathDict.Add(PATH_KERNEL_ARM64_DTS, "[kernelName]\arch\arm64\boot\dts")
 	Call pathDict.Add(PATH_KERNEL_BATTERY, "{getBatteryPath}")
-	Call pathDict.Add(PATH_KERNEL_LCM, "[code]\[kernelName]\drivers\misc\mediatek\lcm")
+	Call pathDict.Add(PATH_KERNEL_LCM, "[kernelName]\drivers\misc\mediatek\lcm")
 	Call pathDict.Add(PATH_LK_LCM, "{getLkLcmPath}")
-	Call pathDict.Add(PATH_OUT, "[code]\out\target\product\[projectName]")
-	Call pathDict.Add(PATH_OUT_SYSTEM, "[code]\out\target\product\[projectName]\system")
-	Call pathDict.Add(PATH_OUT_TARGET_FILES, "[code]\out\target\product\[projectName]\obj\PACKAGING\target_files_intermediates")
+	Call pathDict.Add(PATH_OUT, "out\target\product\[projectName]")
+	Call pathDict.Add(PATH_OUT_SYSTEM, "out\target\product\[projectName]\system")
+	Call pathDict.Add(PATH_OUT_TARGET_FILES, "out\target\product\[projectName]\obj\PACKAGING\target_files_intermediates")
 
 
 End Sub
@@ -209,7 +209,6 @@ Function handlePath(doWhat)
 	Dim kernelName : kernelName = getKernelName(code)
 
 	path = pathDict.Item(path)
-	If InStr(path, "[code]") > 0 Then path = Replace(path, "[code]", code)
 	If InStr(path, "[projectName]") > 0 Then path = Replace(path, "[projectName]", projectName)
 	If InStr(path, "[optionName]") > 0 Then path = Replace(path, "[optionName]", optionName)
 	If InStr(path, "[kernelName]") > 0 Then path = Replace(path, "[kernelName]", kernelName)
@@ -217,6 +216,8 @@ Function handlePath(doWhat)
 	If InStr(path, "{getBatteryPath}") > 0 Then path = Replace(path, "{getBatteryPath}", getBatteryPath(code, kernelName, projectName))
 	If InStr(path, "{getLkLcmPath}") > 0 Then path = Replace(path, "{getLkLcmPath}", getLkLcmPath(code))
 
+	path = code & "\" & path
+	path = Replace(path, "/", "\")
 	Select Case doWhat
 		Case DO_OPEN_PATH : Call runOpenPath(path)
 		Case DO_RETURN_PATH : handlePath = path
@@ -252,23 +253,23 @@ End Function
 Function getBatteryPath(code, kernelName, projectName)
 	Select Case True
 		Case InStr(code, "l18127") > 0
-			getBatteryPath = code & kernelName & "\arch\arm\mach-mt8127\" & projectName & "\power"
+			getBatteryPath = kernelName & "\arch\arm\mach-mt8127\" & projectName & "\power"
 		Case InStr(code, "l18163") > 0
-			getBatteryPath = code & kernelName & "\drivers\misc\mediatek\mach\mt8163\" & projectName & "\power"
+			getBatteryPath = kernelName & "\drivers\misc\mediatek\mach\mt8163\" & projectName & "\power"
 		Case InStr(code, "8312") > 0
-			getBatteryPath = code & kernelName & "\arch\arm\mach-mt6572\" & projectName & "\power"
+			getBatteryPath = kernelName & "\arch\arm\mach-mt6572\" & projectName & "\power"
 		Case InStr(code, "l18321") > 0
-			getBatteryPath = code & kernelName & "\misc\mediatek\mach\mt6580\" & projectName & "\power"
+			getBatteryPath = kernelName & "\misc\mediatek\mach\mt6580\" & projectName & "\power"
 		Case InStr(code, "M0") > 0
-			getBatteryPath = code & kernelName & "\drivers\misc\mediatek\include\mt-plat\" & getPlatformName(code) & "\include\mach"
+			getBatteryPath = kernelName & "\drivers\misc\mediatek\include\mt-plat\" & getPlatformName(code) & "\include\mach"
 	End Select
 End Function
 
 Function getLkLcmPath(code)
 	If InStr(code, "l1") > 0 Then
-		getLkLcmPath = code & "\bootable\bootloader\lk\dev\lcm"
+		getLkLcmPath = "\bootable\bootloader\lk\dev\lcm"
 	Else
-	    getLkLcmPath = code & "\vendor\mediatek\proprietary\bootable\bootloader\lk\dev\lcm"
+	    getLkLcmPath = "\vendor\mediatek\proprietary\bootable\bootloader\lk\dev\lcm"
 	End If
 End Function
 
