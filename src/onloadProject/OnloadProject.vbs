@@ -5,13 +5,13 @@ Const ID_INPUT_OPTION = "input_option"
 Const ID_LIST_OPTION = "list_option"
 Const ID_UL_OPTION = "ul_option"
 Dim vaProject, vaOption
-Dim pPrjRoot, pOptRoot
+Dim mCodePath, pPrjRoot, pOptRoot
 
 Sub onloadPrj()
 	Call setElementValue(ID_INPUT_PROJECT, "")
 	Call removeAllChild(ID_UL_PROJECT)
 
-	pPrjRoot = getElementValue(ID_INPUT_CODE_PATH) & "\device\joya_sz"
+	pPrjRoot = mCodePath & "\device\joya_sz"
 	If Not oFso.FolderExists(pPrjRoot) Then MsgBox("Path is not exist:" & Vblf & pPrjRoot) : Exit Sub
 
 	Call getAllProject(pPrjRoot)
@@ -28,6 +28,9 @@ Sub onloadOpt()
 End Sub
 
 Sub onloadPrjAndOpt()
+	mCodePath = getElementValue(ID_INPUT_CODE_PATH)
+	If mCodePath = "" Then Exit Sub
+
 	Call onloadPrj()
 	Call onloadOpt()
 End Sub
@@ -66,7 +69,7 @@ Sub getAllOption(pOptRoot)
 End Sub
 
 Sub setListValueForOnloadPrj(inputId, listId, value)
-    Call showAndHide(listId, "hide")
+    Call showOrHidePrjList(listId, "hide")
     Call setElementValue(inputId, value)
 
     If inputId = ID_INPUT_PROJECT Then

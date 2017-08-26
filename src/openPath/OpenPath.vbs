@@ -1,5 +1,7 @@
 Const ID_INPUT_OPEN_PATH = "input_open_path"
 
+Const ID_SELECT_OPEN_PATH = "select_open_path"
+
 Const ID_LIST_OPEN_PATH_SELECT_CLASS = "list_open_path_select_class"
 Const ID_UL_OPEN_PATH_SELECT_CLASS = "ul_open_path_select_class"
 
@@ -68,6 +70,9 @@ Const PATH_OUT = "out\..\"
 Const PATH_OUT_SYSTEM = "out\..\system"
 Const PATH_OUT_TARGET_FILES = "out\..\target_files_intermediates"
 
+Const VALUE_SELECT_OPEN_PATH_SHOW = "选择路径"
+Const VALUE_SELECT_OPEN_PATH_HIDE = "收起"
+
 Dim pathDict
 Set pathDict = CreateObject("Scripting.Dictionary")
 
@@ -120,7 +125,7 @@ Dim aFUPath_out : aFUPath_out = Array( _
 		PATH_OUT_SYSTEM, _
 		PATH_OUT_TARGET_FILES)
 
-Call addVerForSelect()
+Call addClassForSelect()
 Call onloadFUPath(aFUPath_File, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_FILE, ID_UL_OPEN_PATH_FILE)
 Call onloadFUPath(aFUPath_device, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_DEVICE, ID_UL_OPEN_PATH_DEVICE)
 Call onloadFUPath(aFUPath_framework, ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_FRAMEWORKS, ID_UL_OPEN_PATH_FRAMEWORKS)
@@ -132,7 +137,7 @@ Call getWholePath()
 
 
 
-Sub addVerForSelect()
+Sub addClassForSelect()
     Call addAfterLiForOpenPath("file", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
     Call addAfterLiForOpenPath("device", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
     Call addAfterLiForOpenPath("frameworks", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
@@ -142,13 +147,27 @@ Sub addVerForSelect()
     Call addAfterLiForOpenPath("out", ID_INPUT_OPEN_PATH, ID_LIST_OPEN_PATH_SELECT_CLASS, ID_UL_OPEN_PATH_SELECT_CLASS)
 End Sub
 
+Sub selectOpenPathOnClick()
+	Dim value
+	value = getElementValue(ID_SELECT_OPEN_PATH)
+
+    If value = VALUE_SELECT_OPEN_PATH_SHOW Then
+    	Call setElementValue(ID_SELECT_OPEN_PATH, VALUE_SELECT_OPEN_PATH_HIDE)
+        Call showOrHideOpenPathList(ID_LIST_OPEN_PATH_SELECT_CLASS, "show")
+    ElseIf value = VALUE_SELECT_OPEN_PATH_HIDE Then
+    	Call setElementValue(ID_SELECT_OPEN_PATH, VALUE_SELECT_OPEN_PATH_SHOW)
+        Call HideOpenPathList()
+    End If
+End Sub
+
 Sub setListValueForOpenPath(inputId, listId, value)
-    Call showAndHide(listId, "hide")
+    Call showOrHideOpenPathList(listId, "hide")
 
     If listId = ID_LIST_OPEN_PATH_SELECT_CLASS Then
-        Call showAndHide(Eval("ID_LIST_OPEN_PATH_" & UCase(value)), "show")
+        Call showOrHideOpenPathList(Eval("ID_LIST_OPEN_PATH_" & UCase(value)), "show")
     Else
         Call setElementValue(inputId, value)
+        Call setElementValue(ID_SELECT_OPEN_PATH, VALUE_SELECT_OPEN_PATH_SHOW)
     End If
 End Sub
 

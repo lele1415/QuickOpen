@@ -14,6 +14,19 @@ function removeAllChild(parentId)
     }
 }
 
+function showOrHidePrjList(listId, types)
+{ 
+    var Layer=window.document.getElementById(listId); 
+    switch (types) { 
+        case "show": 
+            Layer.style.display="block"; 
+            break;
+        case "hide": 
+            Layer.style.display="none";
+            break; 
+    }
+}
+
 function addAfterLiForOnloadPrj(str, inputId, listId, ulId)
 {
     var obj = document.getElementById(ulId);

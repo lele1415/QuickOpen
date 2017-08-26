@@ -139,29 +139,35 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <fieldset>
     <legend>Code path</legend>
     <div class="form_codePath">
-        <input type="text" id="input_code_path" 
-                onclick="showAndHide('list_code_path_select_ver','show')" 
-                onchange="onloadPrjAndOpt()" 
-                size="50" />
-        <div class="Menu_codePath" id="list_code_path_select_ver" onmouseleave="showAndHide('list_code_path_select_ver','hide')"> 
+        <input type="button" class="input_button" id="select_code_path"
+                onclick="selectCodePathOnClick()" value="选择代码" />
+        <input
+            type="text" id="input_code_path" 
+            onchange="onloadPrjAndOpt()" 
+            size="50" />
+
+        <div class="Menu_codePath" id="list_code_path_select_ver"> 
             <div class="Menu2"> 
                 <ul id="ul_code_path_select_ver"> 
                 </ul> 
             </div> 
         </div>
-        <div class="Menu_codePath" id="list_code_path_n0" onmouseleave="showAndHide('list_code_path_n0','hide')"> 
+
+        <div class="Menu_codePath" id="list_code_path_n0"> 
             <div class="Menu2"> 
                 <ul id="ul_code_path_n0"> 
                 </ul> 
             </div> 
         </div>
-        <div class="Menu_codePath" id="list_code_path_m0" onmouseleave="showAndHide('list_code_path_m0','hide')"> 
+
+        <div class="Menu_codePath" id="list_code_path_m0"> 
             <div class="Menu2"> 
                 <ul id="ul_code_path_m0"> 
                 </ul> 
             </div> 
         </div>
-        <div class="Menu_codePath" id="list_code_path_l1" onmouseleave="showAndHide('list_code_path_l1','hide')"> 
+
+        <div class="Menu_codePath" id="list_code_path_l1"> 
             <div class="Menu2"> 
                 <ul id="ul_code_path_l1"> 
                 </ul> 
@@ -169,9 +175,9 @@ body { font-family: sans-serif; color:#f8f8f2;}
         </div>
     </div>
 
-    <div class="form_project" onmouseleave="showAndHide('list_project','hide')">
+    <div class="form_project" onmouseleave="showOrHideCodePathList('list_project','hide')">
         <input type="text" id="input_project"  
-                onclick="showAndHide('list_project','show')" 
+                onclick="showOrHideCodePathList('list_project','show')" 
                 size="20" />
         <div class="Menu_project" id="list_project"> 
             <div class="Menu2"> 
@@ -181,9 +187,9 @@ body { font-family: sans-serif; color:#f8f8f2;}
         </div>
     </div>
     
-    <div class="form_option" onmouseleave="showAndHide('list_option','hide')">
+    <div class="form_option" onmouseleave="showOrHideCodePathList('list_option','hide')">
         <input type="text" id="input_option"  
-                onclick="showAndHide('list_option','show')" 
+                onclick="showOrHideCodePathList('list_option','show')" 
                 size="10" />
         <div class="Menu_option" id="list_option"> 
             <div class="Menu2"> 
@@ -216,66 +222,73 @@ body { font-family: sans-serif; color:#f8f8f2;}
 </fieldset>
 <br>
 <fieldset>
-    <legend>Open File or Folder</legend>
+    <legend>打开文件或目录</legend>
     <div class="form_codePath">
-        <input
-            type="text"
-            id="input_open_path" 
-            onclick="showAndHide('list_open_path_select_class','show')"
-            size="50" />
-        <div class="Menu_codePath" id="list_open_path_select_class" onmouseleave="showAndHide('list_open_path_select_class','hide')"> 
+        <input type="button" class="input_button" id="select_open_path"
+                onclick="selectOpenPathOnClick()" value="选择路径" />
+
+        <input type="text" id="input_open_path" size="50" />
+
+        <div class="Menu_codePath" id="list_open_path_select_class"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_select_class"> 
                 </ul> 
             </div> 
         </div>
-        <div class="Menu_codePath" id="list_open_path_file" onmouseleave="showAndHide('list_open_path_file','hide')"> 
+
+        <div class="Menu_codePath" id="list_open_path_file"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_file"> 
                 </ul> 
             </div>
         </div>
-        <div class="Menu_codePath" id="list_open_path_device" onmouseleave="showAndHide('list_open_path_device','hide')"> 
+
+        <div class="Menu_codePath" id="list_open_path_device"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_device"> 
                 </ul> 
             </div>
         </div>
-        <div class="Menu_codePath" id="list_open_path_frameworks" onmouseleave="showAndHide('list_open_path_frameworks','hide')"> 
+
+        <div class="Menu_codePath" id="list_open_path_frameworks"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_frameworks"> 
                 </ul> 
             </div>
         </div>
-        <div class="Menu_codePath" id="list_open_path_kernel_lk" onmouseleave="showAndHide('list_open_path_kernel_lk','hide')"> 
+
+        <div class="Menu_codePath" id="list_open_path_kernel_lk"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_kernel_lk"> 
                 </ul> 
             </div>
         </div>
-        <div class="Menu_codePath" id="list_open_path_packages" onmouseleave="showAndHide('list_open_path_packages','hide')"> 
+
+        <div class="Menu_codePath" id="list_open_path_packages"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_packages"> 
                 </ul> 
             </div>
         </div>
-        <div class="Menu_codePath" id="list_open_path_vendor" onmouseleave="showAndHide('list_open_path_vendor','hide')"> 
+
+        <div class="Menu_codePath" id="list_open_path_vendor"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_vendor"> 
                 </ul> 
             </div>
         </div>
-        <div class="Menu_codePath" id="list_open_path_out" onmouseleave="showAndHide('list_open_path_out','hide')"> 
+
+        <div class="Menu_codePath" id="list_open_path_out"> 
             <div class="Menu2"> 
                 <ul id="ul_open_path_out"> 
                 </ul> 
             </div>
         </div>
     </div>
-    <input type="button" class="input_button" onclick="handlePath(0)" value="Open" />
-    <input type="button" class="input_button" onclick="handlePath(2)" value="Copy path" />
-    <input type="button" class="input_button" onclick="initNewPath(0)" value="Show all" />
-    <input type="button" class="input_button" onclick="initNewPath(1)" value="Close all" />
+    <input type="button" class="input_button" onclick="handlePath(0)" value="打开" />
+    <input type="button" class="input_button" onclick="handlePath(2)" value="拷贝路径" />
+    <input type="button" class="input_button" onclick="initNewPath(0)" value="显示目录" />
+    <input type="button" class="input_button" onclick="initNewPath(1)" value="关闭显示" />
     <br><br>
 <div id="exp_path">&nbsp;</div>
 <br>
