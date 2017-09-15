@@ -98,21 +98,6 @@ body { font-family: sans-serif; color:#f8f8f2;}
     ) 
 }
 
-.Menu2_openPath { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
-
-.Menu2_openPath ul{ margin:0; padding:0; } 
-
-.Menu2_openPath ul li{ display:inline; width:49%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
-    change:expression( 
-        this.onmouseover=function(){ 
-            this.style.background="#66d9ef"; 
-        }, 
-        this.onmouseout=function(){ 
-            this.style.background=""; 
-        } 
-    ) 
-}
-
 .form_codePath { width:335px; height:auto; }
 .form_codePath div{ position:relative; top:0; left:0; margin-bottom:5px; }
 
@@ -128,9 +113,10 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 <fieldset>
     <legend>当前代码路径</legend>
-    <div class="form_codePath" onmouseleave="showAndHide('list_code_path','hide')">
+    <div class="form_codePath">
+        <input type="button" class="input_button" id="select_code_path"
+                onclick="selectCodePathOnClick()" value="选择代码" />
         <input type="text" id="input_code_path"
-                onclick="showAndHide('list_code_path','show')"
                 size="50" />
         <div class="Menu_codePath" id="list_code_path"> 
             <div class="Menu2"> 
@@ -148,15 +134,29 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <br>
 <fieldset>
     <legend>打开目录或文件</legend>
-    <div class="form_codePath" onkeydown="showAndHide('list_open_path','hide')" onmouseleave="showAndHide('list_open_path','hide')">
+    <div class="form_codePath">
+        <input type="button" class="input_button" id="select_open_path"
+                onclick="selectOpenPathOnClick()" value="选择路径" />
         <input type="text" id="input_open_path" 
-                onclick="showAndHide('list_open_path','show')" 
                 size="50" />
-        <div class="Menu_codePath" id="list_open_path"> 
-            <div class="Menu2_openPath"> 
-                <ul id="ul_open_path"> 
+        <div class="Menu_codePath" id="list_open_path_select_class"> 
+            <div class="Menu2"> 
+                <ul id="ul_open_path_select_class"> 
                 </ul> 
             </div> 
+        </div>
+        <div class="Menu_codePath" id="list_open_path_file"> 
+            <div class="Menu2"> 
+                <ul id="ul_open_path_file"> 
+                </ul> 
+            </div>
+        </div>
+
+        <div class="Menu_codePath" id="list_open_path_folder"> 
+            <div class="Menu2"> 
+                <ul id="ul_open_path_folder"> 
+                </ul> 
+            </div>
         </div>
     </div>
     <input type="button" class="input_button" onclick="handlePath(0)" value="打开" />
@@ -180,6 +180,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="JavaScript" src="CoreFun.js"></Script>
 <Script Language="JavaScript" src="ReadCodePath.js"></Script>
 <Script Language="JavaScript" src="CreatShortcutOfCodePrjOpt.js"></Script>
+<Script Language="JavaScript" src="OpenPath.js"></Script>
 <Script Language="JavaScript" src="FileManager.js"></Script>
 
 <Script Language="VBScript" src="CoreObjAndFun.vbs"></Script>
