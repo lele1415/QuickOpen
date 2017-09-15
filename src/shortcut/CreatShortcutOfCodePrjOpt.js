@@ -8,7 +8,7 @@ function addShortcutButton(sCurrentCode, sCurrentPrj, sCurrentOpt, divId)
 	var shortcutFun = function(){applyShortcut(sCurrentCode, sCurrentPrj, sCurrentOpt)};
 	var removeFun = function(){removeShortcut(removeId, shortcutId, brId)};
 
-	var shortcutValue = " " + sCurrentOpt + "   " + sCurrentPrj + "\n" + sCurrentCode + " "
+	var shortcutValue = " " + sCurrentOpt + "   " + sCurrentPrj + "   " + sCurrentCode + " "
 
     parentNode_appendChild(divId, createRemoveBtn(removeId, removeFun));
     parentNode_appendChild(divId, createShortcutBtn(shortcutId, shortcutValue, shortcutFun));
