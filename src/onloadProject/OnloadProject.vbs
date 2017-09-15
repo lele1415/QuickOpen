@@ -11,7 +11,7 @@ Sub onloadPrj()
 	Call setElementValue(ID_INPUT_PROJECT, "")
 	Call removeAllChild(ID_UL_PROJECT)
 
-	pPrjRoot = mCodePath & "\device\joya_sz"
+	pPrjRoot = getElementValue(ID_INPUT_CODE_PATH) & "\device\joya_sz"
 	If Not oFso.FolderExists(pPrjRoot) Then MsgBox("Path is not exist:" & Vblf & pPrjRoot) : Exit Sub
 
 	Call getAllProject(pPrjRoot)
@@ -28,9 +28,6 @@ Sub onloadOpt()
 End Sub
 
 Sub onloadPrjAndOpt()
-	mCodePath = getElementValue(ID_INPUT_CODE_PATH)
-	If mCodePath = "" Then Exit Sub
-
 	Call onloadPrj()
 	Call onloadOpt()
 End Sub
