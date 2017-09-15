@@ -47,7 +47,7 @@ Sub getAllProject(pPrjRoot)
 	Next
 	'MsgBox(vaProject.ToString())
 
-	Call setElementValue(ID_INPUT_PROJECT, vaProject.V(0))
+	Call setElementValue(ID_INPUT_PROJECT, vaProject.V(vaProject.Bound))
 End Sub
 
 Sub getAllOption(pOptRoot)
