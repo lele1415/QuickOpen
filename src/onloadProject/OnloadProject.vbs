@@ -6,13 +6,20 @@ Const ID_LIST_OPTION = "list_option"
 Const ID_UL_OPTION = "ul_option"
 Dim vaProject, vaOption
 Dim mCodePath, pPrjRoot, pOptRoot
+Dim mRocoStr : mRocoStr = "roco"
+Dim mJoyaStr : mJoyaStr = "joya_sz"
 
 Sub onloadPrj()
 	Call setElementValue(ID_INPUT_PROJECT, "")
 	Call removeAllChild(ID_UL_PROJECT)
 
-	pPrjRoot = getElementValue(ID_INPUT_CODE_PATH) & "\device\joya_sz"
-	If Not oFso.FolderExists(pPrjRoot) Then MsgBox("Path is not exist:" & Vblf & pPrjRoot) : Exit Sub
+	mJoyaStr = "joya_sz"
+	pPrjRoot = getElementValue(ID_INPUT_CODE_PATH) & "\device\" & mJoyaStr
+	If Not oFso.FolderExists(pPrjRoot) Then
+		mJoyaStr = "mid"
+		pPrjRoot = Replace(pPrjRoot, "joya_sz", mJoyaStr)
+		If Not oFso.FolderExists(pPrjRoot) Then MsgBox("Path is not exist:" & Vblf & pPrjRoot) : Exit Sub
+	End If
 
 	Call getAllProject(pPrjRoot)
 End Sub
@@ -21,8 +28,13 @@ Sub onloadOpt()
 	Call setElementValue(ID_INPUT_OPTION, "")
 	Call removeAllChild(ID_UL_OPTION)
 
-	pOptRoot = pPrjRoot & "\" & getElementValue(ID_INPUT_PROJECT) & "\roco"
-	If Not oFso.FolderExists(pOptRoot) Then Exit Sub
+	mRocoStr = "roco"
+	pOptRoot = pPrjRoot & "\" & getElementValue(ID_INPUT_PROJECT) & "\" & mRocoStr
+	If Not oFso.FolderExists(pOptRoot) Then
+		mRocoStr = "mid"
+		pOptRoot = Replace(pOptRoot, "roco", mRocoStr)
+		If Not oFso.FolderExists(pOptRoot) Then Exit Sub
+	End If
 
 	Call getAllOption(pOptRoot)
 End Sub
@@ -33,10 +45,14 @@ Sub onloadPrjAndOpt()
 End Sub
 
 Sub getAllProject(pPrjRoot)
-	Set vaProject = searchFolder(pPrjRoot, "joyasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-	If vaProject.Bound = -1 Then
-		Set vaProject = searchFolder(pPrjRoot, "jasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-		If vaProject.Bound = -1 Then Exit Sub
+	if mJoyaStr = "joya_sz" Then
+		Set vaProject = searchFolder(pPrjRoot, "joyasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+		If vaProject.Bound = -1 Then
+			Set vaProject = searchFolder(pPrjRoot, "jasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+			If vaProject.Bound = -1 Then Exit Sub
+		End If
+	Else
+		Set vaProject = searchFolder(pPrjRoot, "mt", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 	End If
 
 	Call vaProject.SortArray()
