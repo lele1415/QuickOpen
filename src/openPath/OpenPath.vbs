@@ -179,15 +179,15 @@ Sub onloadFUPath(aFUPath, inputId, listId, ulId)
 End Sub
 
 Sub getWholePath()
-	Call pathDict.Add(PATH_FILE_SYSTEM_PROP, "device\" & mJoyaStr & "\[projectName]\" & mRocoStr & "\[optionName]\system.prop")
-	Call pathDict.Add(PATH_FILE_ITEMS_INI, "device\" & mJoyaStr & "\[projectName]\" & mRocoStr & "\[optionName]\items.ini")
-	Call pathDict.Add(PATH_FILE_PROJECTCONFIG_MK, "device\" & mJoyaStr & "\[projectName]\ProjectConfig.mk")
+	Call pathDict.Add(PATH_FILE_SYSTEM_PROP, "device\" & "[joya]" & "\[projectName]\" & "[roco]" & "\[optionName]\system.prop")
+	Call pathDict.Add(PATH_FILE_ITEMS_INI, "device\" & "[joya]" & "\[projectName]\" & "[roco]" & "\[optionName]\items.ini")
+	Call pathDict.Add(PATH_FILE_PROJECTCONFIG_MK, "device\" & "[joya]" & "\[projectName]\ProjectConfig.mk")
 	Call pathDict.Add(PATH_FILE_DEVICE_MK, "device\mediatek\common\device.mk")
 	Call pathDict.Add(PATH_FILE_CUSTOM_CONF, "device\mediatek\common\custom.conf")
 	Call pathDict.Add(PATH_FILE_BUILD_PROP, "out\target\product\[projectName]\system\build.prop")
 	Call pathDict.Add(PATH_FILE_GMS_MK, "vendor\google\products\gms.mk")
-	Call pathDict.Add(PATH_DEVICE_PROJECT, "device\" & mJoyaStr & "\[projectName]")
-	Call pathDict.Add(PATH_DEVICE_OPTION, "device\" & mJoyaStr & "\[projectName]\" & mRocoStr & "\[optionName]")
+	Call pathDict.Add(PATH_DEVICE_PROJECT, "device\" & "[joya]" & "\[projectName]")
+	Call pathDict.Add(PATH_DEVICE_OPTION, "device\" & "[joya]" & "\[projectName]\" & "[roco]" & "\[optionName]")
 	Call pathDict.Add(PATH_KERNEL, "[kernelName]")
 	Call pathDict.Add(PATH_KERNEL_IMGSENSOR, "[kernelName]\drivers\misc\mediatek\imgsensor")
 	Call pathDict.Add(PATH_VENDOR_HAL, "vendor\mediatek\proprietary\custom\{getPlatformName}\hal")
@@ -228,6 +228,8 @@ Function handlePath(doWhat)
 	Dim kernelName : kernelName = getKernelName(code)
 
 	path = pathDict.Item(path)
+	If InStr(path, "[joya]") > 0 Then path = Replace(path, "[joya]", mJoyaStr)
+	If InStr(path, "[roco]") > 0 Then path = Replace(path, "[roco]", mRocoStr)
 	If InStr(path, "[projectName]") > 0 Then path = Replace(path, "[projectName]", projectName)
 	If InStr(path, "[optionName]") > 0 Then path = Replace(path, "[optionName]", optionName)
 	If InStr(path, "[kernelName]") > 0 Then path = Replace(path, "[kernelName]", kernelName)
@@ -260,6 +262,8 @@ Function getPlatformName(code)
 			getPlatformName = "mt8127"
 		Case InStr(code, "8163") > 0
 			getPlatformName = "mt8163"
+		Case InStr(code, "8167") > 0
+			getPlatformName = "mt8167"
 		Case InStr(code, "8312") > 0
 			getPlatformName = "mt6572"
 		Case InStr(code, "8321") > 0

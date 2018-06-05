@@ -14,6 +14,10 @@ Const ID_UL_CODE_PATH_M0 = "ul_code_path_m0"
 Const ID_LIST_CODE_PATH_N0 = "list_code_path_n0"
 Const ID_UL_CODE_PATH_N0 = "ul_code_path_n0"
 
+Const ID_LIST_CODE_PATH_O1 = "list_code_path_o1"
+Const ID_UL_CODE_PATH_O1 = "ul_code_path_o1"
+
+Const ANDROID_VERSION_O1 = "O1"
 Const ANDROID_VERSION_N0 = "N0"
 Const ANDROID_VERSION_M0 = "M0"
 Const ANDROID_VERSION_L1 = "L1"
@@ -25,20 +29,23 @@ Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\config.ini"
 
 Dim mTextEditorPath
 
+Dim vaCodePath_O1 : Set vaCodePath_O1 = New VariableArray
 Dim vaCodePath_N0 : Set vaCodePath_N0 = New VariableArray
 Dim vaCodePath_M0 : Set vaCodePath_M0 = New VariableArray
 Dim vaCodePath_L1 : Set vaCodePath_L1 = New VariableArray
 
 Call addVerForSelect()
 Call readConfigText(pConfigText)
+call addLiOfCodePath(vaCodePath_O1, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_O1, ID_UL_CODE_PATH_O1)
 call addLiOfCodePath(vaCodePath_N0, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_N0, ID_UL_CODE_PATH_N0)
 call addLiOfCodePath(vaCodePath_M0, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_M0, ID_UL_CODE_PATH_M0)
 call addLiOfCodePath(vaCodePath_L1, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_L1, ID_UL_CODE_PATH_L1)
 
 Sub addVerForSelect()
-    Call addAfterLiForCodePath("N0", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
-    Call addAfterLiForCodePath("M0", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
-    Call addAfterLiForCodePath("L1", ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
+    Call addAfterLiForCodePath(ANDROID_VERSION_O1, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
+    Call addAfterLiForCodePath(ANDROID_VERSION_N0, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
+    Call addAfterLiForCodePath(ANDROID_VERSION_M0, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
+    Call addAfterLiForCodePath(ANDROID_VERSION_L1, ID_INPUT_CODE_PATH, ID_LIST_CODE_PATH_SELECT_VER, ID_UL_CODE_PATH_SELECT_VER)
 End Sub
 
 Sub selectCodePathOnClick()
@@ -79,6 +86,9 @@ Sub handleReadLine(oText, sReadLine, sAndroidVer)
 
     If sAndroidVer = "" Then
         Select Case Trim(sReadLine)
+            Case "O1 {"
+                sAndroidVer = ANDROID_VERSION_O1
+                sReadLine = oText.ReadLine
             Case "N0 {"
                 sAndroidVer = ANDROID_VERSION_N0
                 sReadLine = oText.ReadLine
@@ -95,6 +105,8 @@ Sub handleReadLine(oText, sReadLine, sAndroidVer)
 
     If sAndroidVer <> "" Then
         Select Case sAndroidVer
+            Case ANDROID_VERSION_O1
+                Call vaCodePath_O1.Append(sReadLine)
             Case ANDROID_VERSION_N0
                 Call vaCodePath_N0.Append(sReadLine)
             Case ANDROID_VERSION_M0

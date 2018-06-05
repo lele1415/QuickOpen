@@ -18,7 +18,11 @@ Sub onloadPrj()
 	If Not oFso.FolderExists(pPrjRoot) Then
 		mJoyaStr = "mid"
 		pPrjRoot = Replace(pPrjRoot, "joya_sz", mJoyaStr)
-		If Not oFso.FolderExists(pPrjRoot) Then MsgBox("Path is not exist:" & Vblf & pPrjRoot) : Exit Sub
+		If Not oFso.FolderExists(pPrjRoot) Then
+			mJoyaStr = "mediateksample"
+			pPrjRoot = Replace(pPrjRoot, "mid", mJoyaStr)
+			If Not oFso.FolderExists(pPrjRoot) Then MsgBox("Path is not exist:" & Vblf & pPrjRoot) : Exit Sub
+		End If
 	End If
 
 	Call getAllProject(pPrjRoot)
@@ -45,14 +49,16 @@ Sub onloadPrjAndOpt()
 End Sub
 
 Sub getAllProject(pPrjRoot)
-	if mJoyaStr = "joya_sz" Then
+	If mJoyaStr = "joya_sz" Then
 		Set vaProject = searchFolder(pPrjRoot, "joyasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 		If vaProject.Bound = -1 Then
 			Set vaProject = searchFolder(pPrjRoot, "jasz", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 			If vaProject.Bound = -1 Then Exit Sub
 		End If
-	Else
+	ElseIf mJoyaStr = "mid" Then
 		Set vaProject = searchFolder(pPrjRoot, "mt", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+	Else
+		Set vaProject = searchFolder(pPrjRoot, "tb", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 	End If
 
 	Call vaProject.SortArray()
