@@ -1,23 +1,18 @@
-Const WINDOW_WIDTH = 420
-Const WINDOW_HEIGHT = 800
-Sub Window_OnLoad
-    Dim ScreenWidth : ScreenWidth = CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
-    Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
-    Window.MoveTo ScreenWidth - WINDOW_WIDTH ,(ScreenHeight - WINDOW_HEIGHT) \ 3
-    Window.ResizeTo WINDOW_WIDTH, WINDOW_HEIGHT
-End Sub
-
-Set oWs=CreateObject("wscript.shell")
-Set oFso=CreateObject("Scripting.FileSystemObject")
-
-Const FOR_READING = 1
-Const FOR_APPENDING = 8
-
 Class VariableArray
-    Private mBound, mArray()
+    Private mPreBound, mBound, mArray()
 
     Private Sub Class_Initialize
+        mPreBound = -1
         mBound = -1
+    End Sub
+
+    Public Sub SetPreBound(sValue)
+        If isNumeric(sValue) Then
+            If sValue > mBound Then
+                ReDim Preserve mArray(sValue)
+                mPreBound = sValue
+            End If
+        End If
     End Sub
 
     Public Property Get Bound
@@ -67,7 +62,9 @@ Class VariableArray
 
     Public Sub Append(value)
         mBound = mBound + 1
-        ReDim Preserve mArray(mBound)
+        If mBound > mPreBound Then
+            ReDim Preserve mArray(mBound)
+        End If
 
         If isObject(value) Then
             Set mArray(mBound) = value
@@ -305,6 +302,17 @@ Class VariableArray
         Next
     End Sub
 
+    Public Function ToStringWithSpace()
+        If mBound = -1 Then ToStringWithSpace = "" : Exit Function
+
+        Dim i, sTmp
+        For i = 0 To mBound
+            sTmp = sTmp & " " & mArray(i)
+        Next
+
+        ToStringWithSpace = Trim(sTmp)
+    End Function
+
     Public Function ToString()
         If mBound <> -1 Then
             Dim i, sTmp
@@ -327,112 +335,46 @@ Class VariableArray
     End Function
 End Class
 
-Const SEARCH_FILE = 0
-Const SEARCH_FOLDER = 1
-Const SEARCH_ROOT = 0
-Const SEARCH_SUB = 1
-Const SEARCH_WHOLE_NAME = 0
-Const SEARCH_PART_NAME = 1
-Const SEARCH_ONE = 0
-Const SEARCH_ALL = 1
-Const SEARCH_RETURN_PATH = 0
-Const SEARCH_RETURN_NAME = 1
 
-Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode, searchTimes, returnType)
-    If Not oFso.FolderExists(pRootFolder) Then searchFolder = "" : Exit Function
-    If searchMode = SEARCH_WHOLE_NAME Then searchTimes = SEARCH_ONE
+Class WorkInfo
+    Private mWorkName, mWorkCode, mWorkPrj, mWorkOpt
 
-    Dim oRootFolder : Set oRootFolder = oFso.GetFolder(pRootFolder)
+    Private Sub Class_Initialize
+        mWorkName = ""
+        mWorkCode = ""
+        mWorkPrj = ""
+        mWorkOpt = ""
+    End Sub
 
-    Dim Folder, sTmp
-    Select Case True
-        Case searchType = SEARCH_FILE And searchWhere = SEARCH_ROOT
-            If searchTimes = SEARCH_ALL Then
-                Set searchFolder = startSearch(oRootFolder.Files, pRootFolder, str, searchMode, SEARCH_ALL, returnType)
-            Else
-                searchFolder = startSearch(oRootFolder.Files, pRootFolder, str, searchMode, SEARCH_ONE, returnType)
-            End If
+    Public Property Let WorkName(value)
+        mWorkName = value
+    End Property
 
-        Case searchType = SEARCH_FOLDER And searchWhere = SEARCH_ROOT
-            If searchTimes = SEARCH_ALL Then
-                Set searchFolder = startSearch(oRootFolder.SubFolders, pRootFolder, str, searchMode, SEARCH_ALL, returnType)
-            Else
-                searchFolder = startSearch(oRootFolder.SubFolders, pRootFolder, str, searchMode, SEARCH_ONE, returnType)
-            End If
+    Public Property Let WorkCode(value)
+        mWorkCode = value
+    End Property
 
-        Case searchType = SEARCH_FILE And searchWhere = SEARCH_SUB
-            For Each Folder In oRootFolder.SubFolders
-                sTmp = startSearch(Folder.Files, pRootFolder & "\" & Folder.Name, str, searchMode, SEARCH_ONE, returnType)
-                If sTmp <> "" Then
-                    searchFolder = sTmp
-                    Exit Function
-                End If
-            Next
-            searchFolder = ""
+    Public Property Let WorkPrj(value)
+        mWorkPrj = value
+    End Property
 
-        Case searchType = SEARCH_FILE And searchWhere = SEARCH_SUB
-            For Each Folder In oRootFolder.SubFolders
-                sTmp = startSearch(Folder.SubFolders, pRootFolder & "\" & Folder.Name, str, searchMode, SEARCH_ONE, returnType)
-                If sTmp <> "" Then
-                    searchFolder = sTmp
-                    Exit Function
-                End If
-            Next
-            searchFolder = ""
-    End Select
-End Function
+    Public Property Let WorkOpt(value)
+        mWorkOpt = value
+    End Property
 
-        Function startSearch(oAll, pRootFolder, str, searchMode, searchTimes, returnType)
-            Dim oSingle
+    Public Property Get WorkName
+        WorkName = mWorkName
+    End Property
 
-            If searchTimes = SEARCH_ALL Then
-                Dim vaStr : Set vaStr = New VariableArray
-                For Each oSingle In oAll
-                    If checkSearchName(oSingle.Name, str, searchMode) Then
-                        If returnType = SEARCH_RETURN_PATH Then
-                            vaStr.Append(pRootFolder & "\" & oSingle.Name)
-                        Else
-                            vaStr.Append(oSingle.Name)
-                        End If
-                    End If
-                Next
-                Set startSearch = vaStr
-                Exit Function
-            Else
-                For Each oSingle In oAll
-                    If checkSearchName(oSingle.Name, str, searchMode) Then
-                        If returnType = SEARCH_RETURN_PATH Then
-                            startSearch = pRootFolder & "\" & oSingle.Name
-                        Else
-                            startSearch = oSingle.Name
-                        End If
-                        Exit Function
-                    End If
-                Next
-            End If
-            startSearch = ""
-        End Function
+    Public Property Get WorkCode
+        WorkCode = mWorkCode
+    End Property
 
-        Function checkSearchName(name, str, searchMode)
-            If searchMode = SEARCH_WHOLE_NAME Then
-                If StrComp(name ,str) = 0 Then
-                    checkSearchName = True
-                Else
-                    checkSearchName = False
-                End If
-            ELseIf searchMode = SEARCH_PART_NAME Then
-                If InStr(name ,str) > 0 Then
-                    checkSearchName = True
-                Else
-                    checkSearchName = False
-                End If
-            End If
-        End Function
+    Public Property Get WorkPrj
+        WorkPrj = mWorkPrj
+    End Property
 
-Function getElementValue(elementId)
-    getElementValue = document.getElementById(elementId).value
-End Function
-
-Sub setElementValue(elementId, str)
-    document.getElementById(elementId).value = str
-End Sub
+    Public Property Get WorkOpt
+        WorkOpt = mWorkOpt
+    End Property
+End Class

@@ -68,6 +68,11 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Body bgcolor="#272822">
 
 <fieldset>
+<legend>Work name</legend>
+    <input type="text" id="work_name" size="20">
+</fieldset>
+<br>
+<fieldset>
     <legend>Code path</legend>
     <div class="form_codePath">
         <input type="button" class="input_button" id="select_code_path"
@@ -136,7 +141,8 @@ body { font-family: sans-serif; color:#f8f8f2;}
             </div> 
         </div>
     </div>
-    <input type="button" class="input_button" onclick="creatShortcut()" value="creatShortcut" />
+    <input type="button" class="input_button" onclick="creatShortcut()" value="Creat" />
+    <input type="button" class="input_button" id="show_or_hide_shortcuts" onclick="showOrHideAllShortcuts()" value="Show" />
     <br>
     <div id="div_shortcut"></div>
 </fieldset>
@@ -242,8 +248,10 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="JavaScript" src="src\openPath\OpenPath.js"></Script>
 <Script Language="JavaScript" src="src\fileExplorer\FileExplorer.js"></Script>
 
-<Script Language="VBScript" src="src\core\CoreObjAndFun.vbs"></Script>
+<Script Language="VBScript" src="src\core\CoreFun.vbs"></Script>
+<Script Language="VBScript" src="src\core\CoreClass.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadCodePath.vbs"></Script>
+<Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
 <Script Language="VBScript" src="src\onloadProject\OnloadProject.vbs"></Script>
 <Script Language="VBScript" src="src\shortcut\CreatShortcutOfCodePrjOpt.vbs"></Script>
 <Script Language="VBScript" src="src\openPath\OpenPath.vbs"></Script>

@@ -68,6 +68,13 @@ function parentNode_removeChild(parentNodeId,childNodeCount) {
     }
 }
 
+function parentNode_removeAllChilds(parentNodeId) {
+    var pathLength = parentNode_getChildNodesLength(parentNodeId);
+    for (var i = pathLength - 1; i > - 1; i--) {
+        parentNode_removeChild(parentNodeId, i);
+    }
+}
+
 function node_removeNode(nodeId) {
     var node = document.getElementById(nodeId);
     if(node){

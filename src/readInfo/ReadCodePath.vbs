@@ -64,21 +64,20 @@ End Sub
 Sub readConfigText(DictPath)
     If Not oFso.FileExists(DictPath) Then Exit Sub
     
-    Dim oText, sReadLine, sAndroidVer
+    Dim oText, sAndroidVer
     sAndroidVer = ""
     Set oText = oFso.OpenTextFile(DictPath, FOR_READING)
 
     Do Until oText.AtEndOfStream
-        Call handleReadLine(oText, sReadLine, sAndroidVer)
+        sReadLine = oText.ReadLine
+        Call handleForConfig(oText, sReadLine, sAndroidVer)
     Loop
 
     oText.Close
     Set oText = Nothing
 End Sub
 
-Sub handleReadLine(oText, sReadLine, sAndroidVer)
-    sReadLine = oText.ReadLine
-
+Sub handleForConfig(oText, sReadLine, sAndroidVer)
     If InStr(sReadLine, "TextEditorPath") > 0 Then
         mTextEditorPath = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
         Exit Sub
