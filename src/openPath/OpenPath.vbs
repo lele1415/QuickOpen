@@ -81,7 +81,8 @@ Dim aFUPath_File : aFUPath_File = Array( _
 		PATH_FILE_ITEMS_INI, _
 		PATH_FILE_PROJECTCONFIG_MK, _
 		PATH_FILE_DEVICE_MK, _
-		PATH_FILE_GMS_MK)
+		PATH_FILE_GMS_MK, _
+		PATH_FILE_BUILD_PROP)
 
 Dim aFUPath_device : aFUPath_device = Array( _
 		PATH_DEVICE, _
@@ -225,7 +226,7 @@ Function handlePath(doWhat)
 
 	Dim projectName : projectName = getElementValue(ID_INPUT_PROJECT)
 	Dim optionName : optionName = getElementValue(ID_INPUT_OPTION)
-	Dim kernelName : kernelName = getKernelName(code)
+	Dim kernelName : kernelName = getKernelName(code, projectName)
 
 	path = pathDict.Item(path)
 	If InStr(path, "[joya]") > 0 Then path = Replace(path, "[joya]", mJoyaStr)
@@ -233,7 +234,10 @@ Function handlePath(doWhat)
 	If InStr(path, "[projectName]") > 0 Then path = Replace(path, "[projectName]", projectName)
 	If InStr(path, "[optionName]") > 0 Then path = Replace(path, "[optionName]", optionName)
 	If InStr(path, "[kernelName]") > 0 Then path = Replace(path, "[kernelName]", kernelName)
-	If InStr(path, "{getPlatformName}") > 0 Then path = Replace(path, "{getPlatformName}", getPlatformName(code))
+	If InStr(path, "{getPlatformName}") > 0 Then
+		path = Replace(path, "{getPlatformName}", getPlatformName(code))
+		If InStr(code, "O18735B") > 0 Then path = path & "\" & getHalDir(projectName)
+	End If
 	If InStr(path, "{getBatteryPath}") > 0 Then path = Replace(path, "{getBatteryPath}", getBatteryPath(code, kernelName, projectName))
 	If InStr(path, "{getLkLcmPath}") > 0 Then path = Replace(path, "{getLkLcmPath}", getLkLcmPath(code))
 
@@ -246,11 +250,17 @@ Function handlePath(doWhat)
 	End Select
 End Function
 
-Function getKernelName(code)
+Function getKernelName(code, projectName)
 	If InStr(code, "l1") > 0 Or InStr(code, "8312") > 0 Then
 		getKernelName = "kernel-3.10"
 	ElseIf InStr(code, "8167") > 0 Then
 		getKernelName = "kernel-4.4"
+	ElseIf InStr(code, "O18735B") > 0 Then
+		If InStr(projectName, "8735") > 0 Then
+			getKernelName = "kernel-3.18"
+		Else
+			getKernelName = "kernel-4.4"
+		End If
 	Else
 		getKernelName = "kernel-3.18"
 	End If
@@ -270,6 +280,19 @@ Function getPlatformName(code)
 			getPlatformName = "mt6580"
 		Case InStr(code, "87") > 0
 			getPlatformName = "mt6735"
+	End Select
+End Function
+
+Function getHalDir(projectName)
+	Select Case True
+		Case InStr(projectName, "tb8735ap1") > 0
+			getHalDir = "D1"
+		Case InStr(projectName, "tb8735ba1") > 0
+			getHalDir = "D2"
+		Case InStr(projectName, "tb8735ma1") > 0
+			getHalDir = "D2"
+		Case InStr(projectName, "tb8735p1") > 0
+			getHalDir = "D1"
 	End Select
 End Function
 
