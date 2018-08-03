@@ -43,7 +43,7 @@ Sub CommandOfOut()
 	codePath = getElementValue(ID_INPUT_CODE_PATH)
 	projectName = getElementValue(ID_INPUT_PROJECT)
 
-	commandFinal = codePath & "/out/target/product/" & projectName
+	commandFinal = codePath & "\out\target\product\" & projectName
 	Call CopyString(commandFinal)
 End Sub
 
