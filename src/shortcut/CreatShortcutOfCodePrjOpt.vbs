@@ -27,20 +27,27 @@ Sub creatShortcut()
 	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateShortcutBtn()
 End Sub
 
+Sub showAllShortcuts()
+	If parentNode_getChildNodesLength(ID_DIV_SHORTCUT) = 0 Then
+		Call AddShortcut()
+	End If
+	mShortcutState = SHORTCUT_STATE_SHOW
+	Call setElementValue(ID_SHOW_OR_HIDE_SHORTCUTS, SHORTCUT_TEXT_HIDE)
+End Sub
+
+Sub hideAllShortcuts()
+	If parentNode_getChildNodesLength(ID_DIV_SHORTCUT) > 0 Then
+		Call parentNode_removeAllChilds(ID_DIV_SHORTCUT)
+	End If
+	mShortcutState = SHORTCUT_STATE_HIDE
+	Call setElementValue(ID_SHOW_OR_HIDE_SHORTCUTS, SHORTCUT_TEXT_SHOW)
+End Sub
+
 Sub showOrHideAllShortcuts()
 	If mShortcutState = SHORTCUT_STATE_HIDE Then
-		If parentNode_getChildNodesLength(ID_DIV_SHORTCUT) = 0 Then
-			Call AddShortcut()
-		End If
-		mShortcutState = SHORTCUT_STATE_SHOW
-		Call setElementValue(ID_SHOW_OR_HIDE_SHORTCUTS, SHORTCUT_TEXT_HIDE)
-
+		Call showAllShortcuts()
 	ElseIf mShortcutState = SHORTCUT_STATE_SHOW Then
-		If parentNode_getChildNodesLength(ID_DIV_SHORTCUT) > 0 Then
-			Call parentNode_removeAllChilds(ID_DIV_SHORTCUT)
-		End If
-		mShortcutState = SHORTCUT_STATE_HIDE
-		Call setElementValue(ID_SHOW_OR_HIDE_SHORTCUTS, SHORTCUT_TEXT_SHOW)
+		Call hideAllShortcuts()
 	End If
 End Sub
 
@@ -66,6 +73,8 @@ Sub removeShortcut(shortcutId)
 End Sub
 
 Sub applyShortcut(sWorkName, sWorkCode, sWorkPrj, sWorkOpt)
+	Call hideAllShortcuts()
+	
 	Call setElementValue(ID_WORK_NAME, sWorkName)
 
 	Call setElementValue(ID_INPUT_CODE_PATH, sWorkCode)
