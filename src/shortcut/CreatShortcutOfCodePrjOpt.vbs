@@ -78,12 +78,7 @@ Sub applyShortcut(sWorkName, sWorkCode, sWorkPrj, sWorkOpt)
 	Call setElementValue(ID_WORK_NAME, sWorkName)
 
 	Call setElementValue(ID_INPUT_CODE_PATH, sWorkCode)
-	Call onloadPrj()
-
-	Call setElementValue(ID_INPUT_PROJECT, sWorkPrj)
-	Call onloadOpt()
-	
-	Call setElementValue(ID_INPUT_OPTION, sWorkOpt)
+	Call onloadPrj(sWorkPrj, sWorkOpt)
 End Sub
 
 Sub saveWorkToArray(sWorkName, sWorkCode, sWorkPrj, sWorkOpt)

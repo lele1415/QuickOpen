@@ -16,7 +16,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 .Menu_project { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
 
-.Menu_option { position:relative; width:95px; height:50px; z-index:1; margin-top:0px; display:none; }
+.Menu_option { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
 
 .Menu2 { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
 
@@ -74,7 +74,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <br>
 <fieldset>
     <legend>Code path</legend>
-    <div class="form_codePath">
+    <div class="form_codePath" onmouseleave="showOrHideCodePathList('list_project','hide')">
         <input type="button" class="input_button" id="select_code_path"
                 onclick="selectCodePathOnClick()" value="选择代码" />
         <input
@@ -133,7 +133,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <div class="form_option" onmouseleave="showOrHideCodePathList('list_option','hide')">
         <input type="text" id="input_option"  
                 onclick="showOrHideCodePathList('list_option','show')" 
-                size="10" />
+                size="20" />
         <div class="Menu_option" id="list_option"> 
             <div class="Menu2"> 
                 <ul id="ul_option"> 
