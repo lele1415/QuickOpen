@@ -14,6 +14,8 @@ Const STR_ROCO_ROCO = "ROCO"
 Dim vaProject, vaOption
 Dim mCodePath, pPrjRoot, pOptRoot
 Dim mRocoStr, mJoyaStr
+Dim mPrjName, mPrjIndex
+Dim mLoadOptInAllPrj
 
 Function checkJoyaStr()
 	Dim result, path
@@ -38,24 +40,38 @@ End Function
 
 Sub onloadPrj(prj, opt)
 	If Not checkJoyaStr() Then Exit Sub
+	Call freezeAllInput()
 	idTimer = window.setTimeout( _
 			"Call getAllProject(""" & prj & """, """ & opt & """)", _
 			0, "VBScript")
 End Sub
 
-Sub setPrjElement(prj)
-	Call setElementValue(ID_INPUT_PROJECT, "")
+Sub addNewPrjLi()
 	Call removeAllChild(ID_UL_PROJECT)
 
 	Dim i
 	For i = 0 To vaProject.Bound
 		Call addAfterLiForOnloadPrj(vaProject.V(i), ID_INPUT_PROJECT, ID_LIST_PROJECT, ID_UL_PROJECT)
 	Next
+End Sub
+
+Sub findValidPrj(opt)
+	mPrjName = vaProject.V(mPrjIndex)
+	Call setElementValue(ID_INPUT_PROJECT, mPrjName)
+	mLoadOptInAllPrj = True
+	Call onloadOpt(opt)
+End Sub
+
+Sub setPrjElement(prj, opt)
+	Call setElementValue(ID_INPUT_PROJECT, "")
 
 	If prj <> "" Then
 		Call setElementValue(ID_INPUT_PROJECT, prj)
+		mPrjName = prj
+		Call onloadOpt(opt)
 	Else
-		Call setElementValue(ID_INPUT_PROJECT, vaProject.V(vaProject.Bound))
+		mPrjIndex = vaProject.Bound
+		Call findValidPrj(opt)
 	End If
 End Sub
 
@@ -82,15 +98,16 @@ Sub getAllProject(prj, opt)
 	Call vaProject.SortArray()
 	'MsgBox(vaProject.ToString())
 
-	Call setPrjElement(prj)
+	Call addNewPrjLi()
+	Call setPrjElement(prj, opt)
 
-	Call onloadOpt(opt)
+	
 End Sub
 
 Function checkRocoStr()
 	Dim result, path
 	result = True
-	path = pPrjRoot & "\" & getElementValue(ID_INPUT_PROJECT) & "\"
+	path = pPrjRoot & "\" & mPrjName & "\"
 
 	Select Case True
 		Case oFso.FolderExists(path & STR_ROCO_MID)
@@ -98,7 +115,7 @@ Function checkRocoStr()
 		Case oFso.FolderExists(path & STR_ROCO_ROCO)
 		    mRocoStr = STR_ROCO_ROCO
 		Case Else
-		    MsgBox("Roco path is not exist") : result = False
+		    result = False
 	End Select
 
 	If result Then pOptRoot = path & mRocoStr
@@ -123,7 +140,10 @@ Sub setOptElement(opt)
 End Sub
 
 Sub onloadOpt(opt)
-	If Not checkRocoStr() Then Exit Sub
+	If Not checkRocoStr() Then
+		Call findOptInNextPrj(opt)
+		Exit Sub
+	End If
 	idTimer = window.setTimeout( _
 			"getAllOption(""" & opt & """)", _
 			0, "VBScript")
@@ -133,15 +153,33 @@ Sub onloadPrjAndOpt()
 	Call onloadPrj("", "")
 End Sub
 
+Sub findOptInNextPrj(opt)
+	If mLoadOptInAllPrj And mPrjIndex > 0 Then
+		mPrjIndex = mPrjIndex - 1
+		Call findValidPrj(opt)
+	Else
+		MsgBox("No roco folder found!")
+	End If
+End Sub
+
 Sub getAllOption(opt)
 	window.clearTimeout(idTimer)
 	Set vaOption = searchFolder(pOptRoot, "", SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-	If vaOption.Bound = -1 Then MsgBox("No roco folder found!") : Exit Sub
+	If vaOption.Bound = -1 Then
+		Call findOptInNextPrj(opt)
+		Exit Sub
+	End If
 
 	Call vaOption.SortArray()
 	'MsgBox(vaOption.ToString())
 
-	Call setOptElement(opt)
+	If opt <> "" Then
+		Call setOptElement(opt)
+	Else
+		Call setOptElement(vaOption.V(0))
+	End If
+
+	Call unfreezeAllInput()
 End Sub
 
 Sub setListValueForOnloadPrj(inputId, listId, value)
@@ -149,6 +187,8 @@ Sub setListValueForOnloadPrj(inputId, listId, value)
     Call setElementValue(inputId, value)
 
     If inputId = ID_INPUT_PROJECT Then
-        Call onloadOpt()
+    	mPrjName = value
+    	mLoadOptInAllPrj = False
+        Call onloadOpt("")
     End If
 End Sub
