@@ -125,6 +125,14 @@ Sub setElementValue(elementId, str)
     document.getElementById(elementId).value = str
 End Sub
 
+Sub disableElement(inputId)
+    document.getElementById(inputId).disabled = "disabled"
+End Sub
+
+Sub enableElement(inputId)
+    document.getElementById(inputId).disabled = ""
+End Sub
+
 Function initTxtFile(FilePath)
     If oFso.FileExists(FilePath) Then
         Dim TxtFile
@@ -134,3 +142,21 @@ Function initTxtFile(FilePath)
     End If    
     oFso.CreateTextFile FilePath, True
 End Function
+
+Sub freezeAllInput()
+    Call disableElement(ID_SELECT_CODE_PATH)
+    Call disableElement(ID_INPUT_CODE_PATH)
+    Call disableElement(ID_INPUT_PROJECT)
+    Call disableElement(ID_INPUT_OPTION)
+    Call disableElement(ID_CREATE_SHORTCUTS)
+    Call disableElement(ID_SHOW_OR_HIDE_SHORTCUTS)
+End Sub
+
+Sub unfreezeAllInput()
+    Call enableElement(ID_SELECT_CODE_PATH)
+    Call enableElement(ID_INPUT_CODE_PATH)
+    Call enableElement(ID_INPUT_PROJECT)
+    Call enableElement(ID_INPUT_OPTION)
+    Call enableElement(ID_CREATE_SHORTCUTS)
+    Call enableElement(ID_SHOW_OR_HIDE_SHORTCUTS)
+End Sub

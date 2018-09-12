@@ -2,6 +2,7 @@ Const SHORTCUT_STATE_HIDE = 0
 Const SHORTCUT_STATE_SHOW = 1
 Const SHORTCUT_TEXT_HIDE = "Hide"
 Const SHORTCUT_TEXT_SHOW = "Show"
+Const ID_CREATE_SHORTCUTS = "create_shortcuts"
 Const ID_SHOW_OR_HIDE_SHORTCUTS = "show_or_hide_shortcuts"
 
 Dim mShortcutState
