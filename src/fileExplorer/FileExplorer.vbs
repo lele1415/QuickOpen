@@ -31,6 +31,7 @@ Sub clickPath(iPathLength)
 		Call openFolder(sCrtPath)
 	Else
 		Call delPath(cutLength)
+		Call updateOpenPath("")
 		Call removeFile()
 		Call addFile()
 	End If
@@ -38,6 +39,7 @@ End Sub
 
 Sub clickPlus(folderName)
 	Call addPath(folderName)
+	Call updateOpenPath("")
 	Call removeFile()
 	Call addFile()
 End Sub
@@ -47,6 +49,7 @@ Sub clickFolder(folderName)
 End Sub
 
 Sub clickFile(fileName)
+	Call updateOpenPath(fileName)
 	Call openFile(sCrtPath & "\" & fileName)
 End Sub
 
@@ -141,4 +144,16 @@ Sub getSubFolderAndFileName()
 		vaSubFileName.Append(subFile.Name)
 	Next
 	vaSubFileName.SortArray()
+End Sub
+
+Sub updateOpenPath(fileName)
+	Dim path
+	path = Replace(sCrtPath, getSdkPath() & "\", "")
+	path = Replace(path, "\", "/")
+
+	If fileName <> "" Then
+	    path = path & "/" & fileName
+	End If
+
+    Call setOpenPath(path)
 End Sub

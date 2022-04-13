@@ -1,5 +1,5 @@
 <!--
-Version: 2.4.1
+Version: 3.0
 -->
 
 <Html>
@@ -12,11 +12,11 @@ Version: 2.4.1
 <!-- 
 body { font-family: sans-serif; color:#f8f8f2;}
 
-.Menu_codePath { position:relative; width:335px; height:50px; z-index:1; margin-top:0px; display:none; }
+.Menu_codePath { position:relative; width:400px; height:50px; z-index:1; margin-top:0px; display:none; }
 
 .Menu_project { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
 
-.Menu_option { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
+.Menu_option { position:relative; width:400px; height:50px; z-index:1; margin-top:0px; display:none; }
 
 .Menu2 { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
 
@@ -48,17 +48,19 @@ body { font-family: sans-serif; color:#f8f8f2;}
     ) 
 }
 
-.form_codePath { width:335px; height:auto; }
-.form_codePath div{ position:relative; top:0; left:0; margin-bottom:5px; }
+.form_sdk_path { width:335px; height:auto; }
+.form_sdk_path div{ position:relative; top:0; left:0; margin-bottom:5px; }
 
-.form_project { width:155px; height:auto; }
+.form_product { width:155px; height:auto; }
+.form_product div{ position:relative; top:0; left:0; margin-bottom:5px; }
+
+.form_project { width:95px; height:auto; }
 .form_project div{ position:relative; top:0; left:0; margin-bottom:5px; }
-
-.form_option { width:95px; height:auto; }
-.form_option div{ position:relative; top:0; left:0; margin-bottom:5px; }
 
 .input_text{border:1px solid #aaa;}
 .input_button{border:1px solid #aaa; background:none; color:#f8f8f2;font-size:14}
+
+.textarea_text{font-family: "微软雅黑"; font-size: 12px; word-break:break-all;}
 
 -->
 </style>
@@ -73,73 +75,18 @@ body { font-family: sans-serif; color:#f8f8f2;}
 </fieldset>
 <br>
 <fieldset>
-    <legend>Code path</legend>
-    <div class="form_codePath" onmouseleave="showOrHideCodePathList('list_project','hide')">
-        <input type="button" class="input_button" id="select_code_path"
-                onclick="selectCodePathOnClick()" value="选择代码" />
+    <legend>SDK path</legend>
+    <div class="form_sdk_path" id="parent_sdk_path">
         <input
-            type="text" id="input_code_path" 
-            onchange="onloadPrjAndOpt()" 
-            size="50" />
-
-        <div class="Menu_codePath" id="list_code_path_select_ver"> 
-            <div class="Menu2"> 
-                <ul id="ul_code_path_select_ver"> 
-                </ul> 
-            </div> 
-        </div>
-
-        <div class="Menu_codePath" id="list_code_path_o1"> 
-            <div class="Menu2"> 
-                <ul id="ul_code_path_o1"> 
-                </ul> 
-            </div> 
-        </div>
-
-        <div class="Menu_codePath" id="list_code_path_n0"> 
-            <div class="Menu2"> 
-                <ul id="ul_code_path_n0"> 
-                </ul> 
-            </div> 
-        </div>
-
-        <div class="Menu_codePath" id="list_code_path_m0"> 
-            <div class="Menu2"> 
-                <ul id="ul_code_path_m0"> 
-                </ul> 
-            </div> 
-        </div>
-
-        <div class="Menu_codePath" id="list_code_path_l1"> 
-            <div class="Menu2"> 
-                <ul id="ul_code_path_l1"> 
-                </ul> 
-            </div> 
-        </div>
+            type="text" id="input_sdk_path" onchange="onSdkPathChange()" size="50" />
     </div>
 
-    <div class="form_project" onmouseleave="showOrHideCodePathList('list_project','hide')">
-        <input type="text" id="input_project"  
-                onclick="showOrHideCodePathList('list_project','show')" 
-                size="20" />
-        <div class="Menu_project" id="list_project"> 
-            <div class="Menu2"> 
-                <ul id="ul_project"> 
-                </ul> 
-            </div> 
-        </div>
+    <div class="form_product" id="parent_product">
+        <input type="text" id="input_product" onchange="onProductChange()" size="20" />
     </div>
     
-    <div class="form_option" onmouseleave="showOrHideCodePathList('list_option','hide')">
-        <input type="text" id="input_option"  
-                onclick="showOrHideCodePathList('list_option','show')" 
-                size="20" />
-        <div class="Menu_option" id="list_option"> 
-            <div class="Menu2"> 
-                <ul id="ul_option"> 
-                </ul> 
-            </div> 
-        </div>
+    <div class="form_project" id="parent_project">
+        <input type="text" id="input_project" onchange="onProjectChange()" size="60" />
     </div>
     <input type="button" class="input_button" id="create_shortcuts" onclick="creatShortcut()" value="Create" />
     <input type="button" class="input_button" id="show_or_hide_shortcuts" onclick="showOrHideAllShortcuts()" value="Show" />
@@ -163,76 +110,35 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <br>
     <br>
     <input type="button" class="input_button" onclick="CommandOfOut()" value="out path">
+    <input type="button" class="input_button" onclick="CopyCleanCommand()" value="clean">
+    <input type="button" class="input_button" onclick="CopyCommitInfo()" value="commit">
+    <br>
+    <input type="button" class="input_button" onclick="CopyWeibuFolderPath()" value="weibu">
+    <input type="button" class="input_button" onclick="CopyWeibuDriverFolderPath()" value="driver">
+    <input type="button" class="input_button" onclick="AddWeibuFolderPath()" value="add">
+    <input type="button" class="input_button" onclick="DelWeibuFolderPath()" value="del">
+    <input type="button" class="input_button" onclick="MkdirWeibuFolderPath()" value="mkdir">
 </fieldset>
 <br>
 <fieldset>
-    <legend>打开文件或目录</legend>
-    <div class="form_codePath">
-        <input type="button" class="input_button" id="select_open_path"
-                onclick="selectOpenPathOnClick()" value="选择路径" />
-
-        <input type="text" id="input_open_path" size="50" />
-
-        <div class="Menu_codePath" id="list_open_path_select_class"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_select_class"> 
-                </ul> 
-            </div> 
-        </div>
-
-        <div class="Menu_codePath" id="list_open_path_file"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_file"> 
-                </ul> 
-            </div>
-        </div>
-
-        <div class="Menu_codePath" id="list_open_path_device"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_device"> 
-                </ul> 
-            </div>
-        </div>
-
-        <div class="Menu_codePath" id="list_open_path_frameworks"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_frameworks"> 
-                </ul> 
-            </div>
-        </div>
-
-        <div class="Menu_codePath" id="list_open_path_kernel_lk"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_kernel_lk"> 
-                </ul> 
-            </div>
-        </div>
-
-        <div class="Menu_codePath" id="list_open_path_packages"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_packages"> 
-                </ul> 
-            </div>
-        </div>
-
-        <div class="Menu_codePath" id="list_open_path_vendor"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_vendor"> 
-                </ul> 
-            </div>
-        </div>
-
-        <div class="Menu_codePath" id="list_open_path_out"> 
-            <div class="Menu2"> 
-                <ul id="ul_open_path_out"> 
-                </ul> 
-            </div>
-        </div>
+    <legend>Out Infos</legend>
+    <input id="button_show_out_infos" type="button" class="input_button" onclick="getOutInfos()" value="Show">
+    <input id="button_close_out_infos" type="button" class="input_button" onclick="closeOutInfos()" value="Close" style="display:none">
+    <div class="form_sdk_path" id="parent_out_infos">
+        <textarea id="input_out_infos" class="textarea_text" onchange="onOpenPathChange()" rows="20" cols="60" style="display:none"></textarea>
     </div>
-    <input type="button" class="input_button" onclick="handlePath(0)" value="打开" />
-    <input type="button" class="input_button" onclick="handlePath(2)" value="拷贝路径" />
-    <input type="button" class="input_button" onclick="initNewPath(0)" value="显示目录" />
-    <input type="button" class="input_button" onclick="initNewPath(1)" value="关闭显示" />
+</fieldset>
+<br>
+<fieldset>
+    <legend>Open file or folder</legend>
+    <input type="button" class="input_button" onclick="handlePath(0)" value="Open" />
+    <input type="button" class="input_button" onclick="handlePath(2)" value="Copy" />
+    <input type="button" class="input_button" onclick="initNewPath(0)" value="Explorer" />
+    <input type="button" class="input_button" onclick="initNewPath(1)" value="Close" />
+    <input type="button" class="input_button" onclick="runBeyondCompare()" value="Compare" />
+    <div class="form_sdk_path" id="parent_open_path">
+        <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
+    </div>
     <br><br>
 <div id="exp_path">&nbsp;</div>
 <br>
@@ -242,14 +148,17 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 
 <Script Language="JavaScript" src="src\core\CoreFun.js"></Script>
+<Script Language="JavaScript" src="src\core\InputList.js"></Script>
 <Script Language="JavaScript" src="src\readInfo\ReadCodePath.js"></Script>
-<Script Language="JavaScript" src="src\onloadProject\OnloadProject.js"></Script>
+<!-- <Script Language="JavaScript" src="src\onloadProject\OnloadProject.js"></Script> -->
 <Script Language="JavaScript" src="src\shortcut\CreatShortcutOfCodePrjOpt.js"></Script>
-<Script Language="JavaScript" src="src\openPath\OpenPath.js"></Script>
+<!-- <Script Language="JavaScript" src="src\openPath\OpenPath.js"></Script> -->
 <Script Language="JavaScript" src="src\fileExplorer\FileExplorer.js"></Script>
 
 <Script Language="VBScript" src="src\core\CoreFun.vbs"></Script>
 <Script Language="VBScript" src="src\core\CoreClass.vbs"></Script>
+<Script Language="VBScript" src="src\core\Ids.vbs"></Script>
+<Script Language="VBScript" src="src\readInfo\ReadConfigPath.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadCodePath.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
 <Script Language="VBScript" src="src\onloadProject\OnloadProject.vbs"></Script>
@@ -257,6 +166,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="VBScript" src="src\openPath\OpenPath.vbs"></Script>
 <Script Language="VBScript" src="src\copyCommand\CopyCommand.vbs"></Script>
 <Script Language="VBScript" src="src\fileExplorer\FileExplorer.vbs"></Script>
+<Script Language="VBScript" src="src\outInfo\ReadOutInfo.vbs"></Script>
 
 </Body>
 </Html>

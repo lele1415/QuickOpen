@@ -1,3 +1,12 @@
+function isElementIdExist(id) {
+    var element = document.getElementById(id);
+    if (element) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function input_creat(inputType,inputId,inputValue,inputOnclickFun,inputSize) {
     var input = document.createElement("input");
     input.type = inputType;
@@ -58,7 +67,11 @@ function parentNode_insertBefore(newNode,oldNodeId) {
 
 function parentNode_getChildNodesLength(parentNodeId) {
     var parentNode = document.getElementById(parentNodeId);
-    return parentNode.childNodes.length;
+    if (parentNode && parentNode.childNodes) {
+        return parentNode.childNodes.length;
+    } else {
+        return 0;
+    }
 }
 
 function parentNode_removeChild(parentNodeId,childNodeCount) {
@@ -94,4 +107,12 @@ function element_setValue(elementId,elementValue) {
 function element_isChecked(elementId) {
     var isChecked = document.getElementById(elementId).checked;
     return isChecked;
+}
+
+function hideElement(elementId) {
+    document.getElementById(elementId).style.display="none";
+}
+
+function showElement(elementId) {
+    document.getElementById(elementId).style.display="block";
 }

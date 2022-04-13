@@ -1,5 +1,5 @@
-Const WINDOW_WIDTH = 420
-Const WINDOW_HEIGHT = 800
+Const WINDOW_WIDTH = 460
+Const WINDOW_HEIGHT = 850
 Sub Window_OnLoad
     Dim ScreenWidth : ScreenWidth = CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
     Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
@@ -144,19 +144,17 @@ Function initTxtFile(FilePath)
 End Function
 
 Sub freezeAllInput()
-    Call disableElement(ID_SELECT_CODE_PATH)
-    Call disableElement(ID_INPUT_CODE_PATH)
-    Call disableElement(ID_INPUT_PROJECT)
-    Call disableElement(ID_INPUT_OPTION)
+    Call disableElement(getSdkPathInputId())
+    Call disableElement(getProductInputId())
+    Call disableElement(getProjectInputId())
     Call disableElement(ID_CREATE_SHORTCUTS)
     Call disableElement(ID_SHOW_OR_HIDE_SHORTCUTS)
 End Sub
 
 Sub unfreezeAllInput()
-    Call enableElement(ID_SELECT_CODE_PATH)
-    Call enableElement(ID_INPUT_CODE_PATH)
-    Call enableElement(ID_INPUT_PROJECT)
-    Call enableElement(ID_INPUT_OPTION)
+    Call enableElement(getSdkPathInputId())
+    Call enableElement(getProductInputId())
+    Call enableElement(getProjectInputId())
     Call enableElement(ID_CREATE_SHORTCUTS)
     Call enableElement(ID_SHOW_OR_HIDE_SHORTCUTS)
 End Sub

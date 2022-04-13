@@ -9,7 +9,7 @@ function addShortcutButton(sWorkName, sWorkCode, sWorkPrj, sWorkOpt, divId)
 	var removeFun = function(){removeShortcutBtn(removeId, shortcutId, brId)};
 
 	var shortcutValue = " " + sWorkName + "\n"
-            + " " + sWorkOpt + "   " + sWorkPrj + "\n"
+            + " " + sWorkOpt + "\n" + sWorkPrj + "\n"
             + " " + sWorkCode + " ";
 
     parentNode_appendChild(divId, createShortcutBtn(removeId, " - ", removeFun));

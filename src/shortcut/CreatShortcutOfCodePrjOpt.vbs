@@ -9,21 +9,21 @@ Dim mShortcutState
 mShortcutState = SHORTCUT_STATE_HIDE
 
 Sub creatShortcut()
-	Dim sWorkName, sWorkCode, sWorkPrj, sWorkOpt
+	Dim sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject
 	sWorkName = getElementValue(ID_WORK_NAME)
-	sWorkCode = getElementValue(ID_INPUT_CODE_PATH)
-	sWorkPrj = getElementValue(ID_INPUT_PROJECT)
-	sWorkOpt = getElementValue(ID_INPUT_OPTION)
+	sWorkCode = getSdkPath()
+	sWorkTargetProduct = getProduct()
+	sWorkCustomProject = getProject()
 
 	If Trim(sWorkName) = "" _
 			Or Trim(sWorkCode) = "" _
-			Or Trim(sWorkPrj) = "" _
-			Or Trim(sWorkOpt) = "" Then
+			Or Trim(sWorkTargetProduct) = "" _
+			Or Trim(sWorkCustomProject) = "" Then
 		MsgBox("work info is not complete!")
 		Exit Sub
 	End If
 
-	Call saveWorkToArray(sWorkName, sWorkCode, sWorkPrj, sWorkOpt)
+	Call saveWorkToArray(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
 	Call updateWorkInfoTxt()
 	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateShortcutBtn()
 End Sub
@@ -54,7 +54,7 @@ End Sub
 
 Sub AddShortcut()
     Dim i, obj
-    For i = 0 To vaWorksInfo.Bound
+    For i = vaWorksInfo.Bound To 0 Step -1
         Set obj = vaWorksInfo.V(i)
         Call addShortcutButton(obj.WorkName, obj.WorkCode, obj.WorkPrj, obj.WorkOpt, ID_DIV_SHORTCUT)
     Next
@@ -73,22 +73,23 @@ Sub removeShortcut(shortcutId)
     Call updateWorkInfoTxt()
 End Sub
 
-Sub applyShortcut(sWorkName, sWorkCode, sWorkPrj, sWorkOpt)
+Sub applyShortcut(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
 	Call hideAllShortcuts()
 	
 	Call setElementValue(ID_WORK_NAME, sWorkName)
 
-	Call setElementValue(ID_INPUT_CODE_PATH, sWorkCode)
-	Call onloadPrj(sWorkPrj, sWorkOpt)
+	Call setSdkPath(sWorkCode)
+	Call setProduct(sWorkTargetProduct)
+	Call setProject(sWorkCustomProject)
 End Sub
 
-Sub saveWorkToArray(sWorkName, sWorkCode, sWorkPrj, sWorkOpt)
+Sub saveWorkToArray(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
 	Dim oWork
 	Set oWork = New WorkInfo
 	oWork.WorkName = sWorkName
 	oWork.WorkCode = sWorkCode
-	oWork.WorkPrj = sWorkPrj
-	oWork.WorkOpt = sWorkOpt
+	oWork.WorkPrj = sWorkTargetProduct
+	oWork.WorkOpt = sWorkCustomProject
 
 	vaWorksInfo.Append(oWork)
 End Sub

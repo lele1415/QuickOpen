@@ -1,10 +1,19 @@
 Class VariableArray
-    Private mPreBound, mBound, mArray()
+    Private mName, mPreBound, mBound, mArray()
 
     Private Sub Class_Initialize
+        mName = ""
         mPreBound = -1
         mBound = -1
     End Sub
+
+    Public Property Get Name
+        Name = mName
+    End Property
+
+    Public Property Let Name(sValue)
+        mName = sValue
+    End Property
 
     Public Sub SetPreBound(sValue)
         If isNumeric(sValue) Then
@@ -376,5 +385,74 @@ Class WorkInfo
 
     Public Property Get WorkOpt
         WorkOpt = mWorkOpt
+    End Property
+End Class
+
+Class InputText
+    Private mInputId
+
+    Public Default Function Constructor(inputId)
+        mInputId = inputId
+        Set Constructor = Me
+    End Function
+
+    Private Function checkElement()
+        If isElementIdExist(mInputId) Then
+            checkElement = True
+        Else
+            MsgBox("Element not exist!" & VbLf & "Id: " & mInputId)
+            checkElement = False
+        End If
+    End Function
+
+    Public Property Get Text()
+        If checkElement() Then
+            Text = document.getElementById(mInputId).value
+        Else
+            Text = ""
+        End If
+    End Property
+
+    Public Sub setText(text)
+        If checkElement() Then
+            document.getElementById(mInputId).value = text
+        End If
+    End Sub
+End Class
+
+Class InputWithOneLayerList
+    Private mInputId, mListDivId
+
+    Public Default Function Constructor(inputId, listDivId)
+        mInputId = inputId
+        mListDivId = listDivId
+        Set Constructor = Me
+    End Function
+
+    Private Function checkElement()
+        If isElementIdExist(mInputId) Then
+            checkElement = True
+        Else
+            MsgBox("Element not exist!" & VbLf & "Id: " & mInputId)
+            checkElement = False
+        End If
+    End Function
+
+    Public Property Get Text()
+        If checkElement() Then
+            Text = document.getElementById(mInputId).value
+        Else
+            Text = ""
+        End If
+    End Property
+
+    Public Sub setText(text)
+        If checkElement() Then
+            document.getElementById(mInputId).value = text
+        End If
+    End Sub
+
+    Public Property Get ListDivId()
+        ListDivId = mListDivId
     End Property
 End Class
