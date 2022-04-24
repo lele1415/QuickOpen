@@ -158,3 +158,67 @@ Sub unfreezeAllInput()
     Call enableElement(ID_CREATE_SHORTCUTS)
     Call enableElement(ID_SHOW_OR_HIDE_SHORTCUTS)
 End Sub
+
+Function readTextAndGetValue(keyStr, filePath)
+    If Not oFso.FileExists(filePath) Then Exit Function
+    
+    Dim oText, sReadLine, flag
+    flag = False
+    Set oText = oFso.OpenTextFile(filePath, FOR_READING)
+
+    Do Until oText.AtEndOfStream
+        sReadLine = oText.ReadLine
+        Do While InStr(sReadLine, "  ") > 0
+            sReadLine = Replace(sReadLine, "  ", " ")
+        Loop
+        If InStr(sReadLine, " =") > 0 Then
+            sReadLine = Replace(sReadLine, " =", "=")
+        End If
+
+        If InStr(sReadLine, keyStr) > 0 Then
+            readTextAndGetValue = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
+            flag = True
+            Exit Do
+        End If
+    Loop
+
+    oText.Close
+    Set oText = Nothing
+    If Not flag Then readTextAndGetValue = ""
+End Function
+
+Function isEndWith(str, endStr)
+    If Right(str, Len(endStr)) = endStr Then
+        isEndWith = True
+    Else
+        isEndWith = False
+    End If
+End Function
+
+Function isPictureFilePath(path)
+    If isEndWith(path, ".bmp") Then
+        isPictureFilePath = True
+    ElseIf isEndWith(path, ".png") Then
+        isPictureFilePath = True
+    ElseIf isEndWith(path, ".jpg") Then
+        isPictureFilePath = True
+    ElseIf isEndWith(path, ".jpeg") Then
+        isPictureFilePath = True
+    Else
+        isPictureFilePath = False
+    End If
+End Function
+
+Function isCompressFilePath(path)
+    If isEndWith(path, ".zip") Then
+        isCompressFilePath = True
+    ElseIf isEndWith(path, ".rar") Then
+        isCompressFilePath = True
+    ElseIf isEndWith(path, ".7z") Then
+        isCompressFilePath = True
+    ElseIf isEndWith(path, ".tar.gz") Then
+        isCompressFilePath = True
+    Else
+        isCompressFilePath = False
+    End If
+End Function

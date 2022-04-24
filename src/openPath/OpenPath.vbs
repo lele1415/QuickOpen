@@ -85,9 +85,16 @@ Sub setOpenPathListIds(category)
 End Sub
 
 Sub getWholePath()
+	'weibu
+	Call pathDict.Add("../[driver]/config", "weibu/[product]/[project-driver]/config")
+	Call pathDict.Add("../[MMI]/config", "weibu/[product]/[project]/config")
+
+	'build
 	Call pathDict.Add("../buildinfo.sh", "build/make/tools/buildinfo.sh")
 	Call pathDict.Add("../buildinfo_common.sh", "build/make/tools/buildinfo_common.sh")
 	Call pathDict.Add("../Makefile", "build/make/core/Makefile")
+
+	'device
 	Call pathDict.Add("../ProjectConfig.mk", "device/mediateksample/[product]/ProjectConfig.mk")
 	Call pathDict.Add("../SystemConfig.mk", "device/mediatek/system/[sys_target_project]/SystemConfig.mk")
 	Call pathDict.Add("../full_[product].mk", "device/mediateksample/[product]/full_[product].mk")
@@ -96,14 +103,24 @@ Sub getWholePath()
 	Call pathDict.Add("../apns-conf.xml", "device/mediatek/config/apns-conf.xml")
 	Call pathDict.Add("../system.prop", "device/mediatek/system/common/system.prop")
 	Call pathDict.Add("../custom.conf", "device/mediatek/vendor/common/custom.conf")
+
+	'frameworks
 	Call pathDict.Add("frameworks/../android", "frameworks/base/core/java/android")
 	Call pathDict.Add("frameworks/../services", "frameworks/base/services/core/java/com/android/server")
 	Call pathDict.Add("frameworks/../values", "frameworks/base/core/res/res/values")
 	Call pathDict.Add("frameworks/../config.xml", "frameworks/base/core/res/res/values/config.xml")
+
+	'vendor
+	Call pathDict.Add("../packages/apps", "vendor/mediatek/proprietary/packages/apps")
 	Call pathDict.Add("../SystemUI/../config.xml", "vendor/mediatek/proprietary/packages/apps/SystemUI/res/values/config.xml")
 	Call pathDict.Add("../SettingsProvider/../defaults.xml", "vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml")
 	Call pathDict.Add("../SettingsProvider/../DatabaseHelper.java", "vendor/mediatek/proprietary/packages/apps/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java")
+	Call pathDict.Add("../logo/../uboot.bmp", "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_uboot.bmp")
+	Call pathDict.Add("../logo/../kernel.bmp", "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_kernel.bmp")
+	Call pathDict.Add("../bootanimation.zip", "vendor/weibu_sz/media/bootanimation.zip")
 	Call pathDict.Add("../label.ini", "vendor/mediatek/proprietary/buildinfo_sys/label.ini")
+
+	'out
 	Call pathDict.Add("build.log", "build.log")
 	Call pathDict.Add("out/..", "out/target/product/[product]")
 	Call pathDict.Add("../target_files", "out/target/product/[product]/obj/PACKAGING/target_files_intermediates")
@@ -117,12 +134,27 @@ Sub replaceOpenPath()
 	Dim path : path = getOpenPath()
 	If InStr(path, "..") > 0 Then
 		path = pathDict.Item(path)
+
 		If InStr(path, "[product]") > 0 Then
 			path = Replace(path, "[product]", getProduct())
 		End If
+
+		If InStr(path, "[project]") > 0 Then
+			path = Replace(path, "[project]", getProject())
+		End If
+
+		If InStr(path, "[project-driver]") > 0 Then
+			path = Replace(path, "[project-driver]", Replace(getProject(), "-MMI", ""))
+		End If
+
+		If InStr(path, "[boot_logo]") > 0 Then
+			path = Replace(path, "[boot_logo]", getBootLogo())
+		End If
+		
 		If InStr(path, "[sys_target_project]") > 0 Then
 			path = Replace(path, "[sys_target_project]", getSysTargetProject())
 		End If
+
 		Call setOpenPath(path)
     End If
 End Sub
@@ -145,7 +177,6 @@ Function getSysTargetProject()
 
 	oText.Close
 	Set oText = Nothing
-	MsgBox("getSysTargetProject end")
 End Function
 
 Function getOpenPath()
@@ -171,80 +202,84 @@ Function handlePath(doWhat)
 	End Select
 End Function
 
-Function getKernelName(code, product)
-	If InStr(code, "l1") > 0 Or InStr(code, "8312") > 0 Then
-		getKernelName = "kernel-3.10"
-	ElseIf InStr(code, "8167") > 0 Then
-		getKernelName = "kernel-4.4"
-	ElseIf InStr(code, "O18735B") > 0 Then
-		If InStr(product, "8735") > 0 Then
-			getKernelName = "kernel-3.18"
-		Else
-			getKernelName = "kernel-4.4"
-		End If
-	Else
-		getKernelName = "kernel-3.18"
-	End If
-End Function
+' Function getKernelName(code, product)
+' 	If InStr(code, "l1") > 0 Or InStr(code, "8312") > 0 Then
+' 		getKernelName = "kernel-3.10"
+' 	ElseIf InStr(code, "8167") > 0 Then
+' 		getKernelName = "kernel-4.4"
+' 	ElseIf InStr(code, "O18735B") > 0 Then
+' 		If InStr(product, "8735") > 0 Then
+' 			getKernelName = "kernel-3.18"
+' 		Else
+' 			getKernelName = "kernel-4.4"
+' 		End If
+' 	Else
+' 		getKernelName = "kernel-3.18"
+' 	End If
+' End Function
 
-Function getPlatformName(code)
-	Select Case True
-		Case InStr(code, "8127") > 0
-			getPlatformName = "mt8127"
-		Case InStr(code, "8163") > 0
-			getPlatformName = "mt8163"
-		Case InStr(code, "8167") > 0
-			getPlatformName = "mt8167"
-		Case InStr(code, "8312") > 0
-			getPlatformName = "mt6572"
-		Case InStr(code, "8321") > 0
-			getPlatformName = "mt6580"
-		Case InStr(code, "87") > 0
-			getPlatformName = "mt6735"
-	End Select
-End Function
+' Function getPlatformName(code)
+' 	Select Case True
+' 		Case InStr(code, "8127") > 0
+' 			getPlatformName = "mt8127"
+' 		Case InStr(code, "8163") > 0
+' 			getPlatformName = "mt8163"
+' 		Case InStr(code, "8167") > 0
+' 			getPlatformName = "mt8167"
+' 		Case InStr(code, "8312") > 0
+' 			getPlatformName = "mt6572"
+' 		Case InStr(code, "8321") > 0
+' 			getPlatformName = "mt6580"
+' 		Case InStr(code, "87") > 0
+' 			getPlatformName = "mt6735"
+' 	End Select
+' End Function
 
-Function getHalDir(product)
-	Select Case True
-		Case InStr(product, "tb8735ap1") > 0
-			getHalDir = "D1"
-		Case InStr(product, "tb8735ba1") > 0
-			getHalDir = "D2"
-		Case InStr(product, "tb8735ma1") > 0
-			getHalDir = "D2"
-		Case InStr(product, "tb8735p1") > 0
-			getHalDir = "D1"
-	End Select
-End Function
+' Function getHalDir(product)
+' 	Select Case True
+' 		Case InStr(product, "tb8735ap1") > 0
+' 			getHalDir = "D1"
+' 		Case InStr(product, "tb8735ba1") > 0
+' 			getHalDir = "D2"
+' 		Case InStr(product, "tb8735ma1") > 0
+' 			getHalDir = "D2"
+' 		Case InStr(product, "tb8735p1") > 0
+' 			getHalDir = "D1"
+' 	End Select
+' End Function
 
-Function getBatteryPath(code, kernelName, product)
-	Select Case True
-		Case InStr(code, "l18127") > 0
-			getBatteryPath = kernelName & "\arch\arm\mach-mt8127\" & product & "\power"
-		Case InStr(code, "l18163") > 0
-			getBatteryPath = kernelName & "\drivers\misc\mediatek\mach\mt8163\" & product & "\power"
-		Case InStr(code, "8312") > 0
-			getBatteryPath = kernelName & "\arch\arm\mach-mt6572\" & product & "\power"
-		Case InStr(code, "l18321") > 0
-			getBatteryPath = kernelName & "\misc\mediatek\mach\mt6580\" & product & "\power"
-		Case InStr(code, "M0") > 0
-			getBatteryPath = kernelName & "\drivers\misc\mediatek\include\mt-plat\" & getPlatformName(code) & "\include\mach"
-	End Select
-End Function
+' Function getBatteryPath(code, kernelName, product)
+' 	Select Case True
+' 		Case InStr(code, "l18127") > 0
+' 			getBatteryPath = kernelName & "\arch\arm\mach-mt8127\" & product & "\power"
+' 		Case InStr(code, "l18163") > 0
+' 			getBatteryPath = kernelName & "\drivers\misc\mediatek\mach\mt8163\" & product & "\power"
+' 		Case InStr(code, "8312") > 0
+' 			getBatteryPath = kernelName & "\arch\arm\mach-mt6572\" & product & "\power"
+' 		Case InStr(code, "l18321") > 0
+' 			getBatteryPath = kernelName & "\misc\mediatek\mach\mt6580\" & product & "\power"
+' 		Case InStr(code, "M0") > 0
+' 			getBatteryPath = kernelName & "\drivers\misc\mediatek\include\mt-plat\" & getPlatformName(code) & "\include\mach"
+' 	End Select
+' End Function
 
-Function getLkLcmPath(code)
-	If InStr(code, "l1") > 0 Then
-		getLkLcmPath = "\bootable\bootloader\lk\dev\lcm"
-	Else
-	    getLkLcmPath = "\vendor\mediatek\proprietary\bootable\bootloader\lk\dev\lcm"
-	End If
-End Function
+' Function getLkLcmPath(code)
+' 	If InStr(code, "l1") > 0 Then
+' 		getLkLcmPath = "\bootable\bootloader\lk\dev\lcm"
+' 	Else
+' 	    getLkLcmPath = "\vendor\mediatek\proprietary\bootable\bootloader\lk\dev\lcm"
+' 	End If
+' End Function
 
 Sub runOpenPath(path)
 	If oFso.FolderExists(path) Then
 		oWs.Run "explorer.exe " & path
 	ElseIf oFso.FileExists(path) Then
-		oWs.Run mTextEditorPath & " " & path
+	    If isPictureFilePath(path) Or isCompressFilePath(path) Then
+	    	oWs.Run "explorer.exe " & path
+	    Else
+		    oWs.Run mTextEditorPath & " " & path
+		End If
 	Else
 		MsgBox("not found :" & Vblf & path)
 	End If

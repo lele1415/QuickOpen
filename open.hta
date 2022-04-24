@@ -121,11 +121,19 @@ body { font-family: sans-serif; color:#f8f8f2;}
 </fieldset>
 <br>
 <fieldset>
-    <legend>Out Infos</legend>
-    <input id="button_show_out_infos" type="button" class="input_button" onclick="getOutInfos()" value="Show">
+    <legend>Infos</legend>
+    <input id="button_show_project_infos" type="button" class="input_button" onclick="getProjectInfos()" value="ProjectConfig.mk">
+    <input id="button_close_project_infos" type="button" class="input_button" onclick="closeProjectInfos()" value="Close" style="display:none">
+
+    <div class="form_sdk_path" id="parent_project_infos">
+        <textarea id="input_project_infos" class="textarea_text" rows="7" cols="60" style="display:none"></textarea>
+    </div>
+
+    <input id="button_show_out_infos" type="button" class="input_button" onclick="getOutInfos()" value="build.prop">
     <input id="button_close_out_infos" type="button" class="input_button" onclick="closeOutInfos()" value="Close" style="display:none">
+
     <div class="form_sdk_path" id="parent_out_infos">
-        <textarea id="input_out_infos" class="textarea_text" onchange="onOpenPathChange()" rows="20" cols="60" style="display:none"></textarea>
+        <textarea id="input_out_infos" class="textarea_text" rows="20" cols="60" style="display:none"></textarea>
     </div>
 </fieldset>
 <br>
@@ -167,6 +175,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="VBScript" src="src\copyCommand\CopyCommand.vbs"></Script>
 <Script Language="VBScript" src="src\fileExplorer\FileExplorer.vbs"></Script>
 <Script Language="VBScript" src="src\outInfo\ReadOutInfo.vbs"></Script>
+<Script Language="VBScript" src="src\outInfo\ProjectInfo.vbs"></Script>
 
 </Body>
 </Html>

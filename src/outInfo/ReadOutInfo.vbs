@@ -9,24 +9,6 @@ Dim pVendorBuildProp
 Dim pProductBuildProp
 Dim pProjectConfigMk
 
-Function readTextAndGetValue(keyStr, filePath)
-    If Not oFso.FileExists(filePath) Then Exit Function
-    
-    Dim oText, sReadLine, exitFlag
-    Set oText = oFso.OpenTextFile(filePath, FOR_READING)
-
-    Do Until oText.AtEndOfStream
-        sReadLine = oText.ReadLine
-        If InStr(sReadLine, keyStr) > 0 Then
-            readTextAndGetValue = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
-            Exit Do
-        End If
-    Loop
-
-    oText.Close
-    Set oText = Nothing
-End Function
-
 Sub getOutInfos()
     If Not oFso.FolderExists(getOutPath()) Then
         MsgBox("Out path not exist!")
