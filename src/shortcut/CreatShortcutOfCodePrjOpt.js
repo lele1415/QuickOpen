@@ -3,17 +3,18 @@ function addShortcutButton(sWorkName, sWorkCode, sWorkPrj, sWorkOpt, divId)
 	var baseId = sWorkName + "/" + sWorkCode + "/" + sWorkPrj + "/" + sWorkOpt
 	var shortcutId = baseId + "_shortcut";
 	var brId = baseId + "_br";
+    var upId = baseId + "_up";
     var removeId = baseId + "_remove";
 
     var shortcutFun = function(){applyShortcut(sWorkName, sWorkCode, sWorkPrj, sWorkOpt)};
-	var removeFun = function(){removeShortcutBtn(removeId, shortcutId, brId)};
+    var upFun = function(){upShortcut(sWorkName)}
+	var removeFun = function(){removeShortcutBtn(upId, removeId, shortcutId, brId)};
 
-	var shortcutValue = " " + sWorkName + "\n"
-            + " " + sWorkOpt + "\n" + sWorkPrj + "\n"
-            + " " + sWorkCode + " ";
+	var shortcutValue = " " + sWorkName + " ";
 
-    parentNode_appendChild(divId, createShortcutBtn(removeId, " - ", removeFun));
+    parentNode_appendChild(divId, createShortcutBtn(upId, " ↑ ", upFun));
     parentNode_appendChild(divId, createShortcutBtn(shortcutId, shortcutValue, shortcutFun));
+    parentNode_appendChild(divId, createShortcutBtn(removeId, " × ", removeFun));
     parentNode_appendChild(divId, createBr(brId));
 }
 
@@ -29,8 +30,9 @@ function createBr(id) {
     return btn;
 }
 
-function removeShortcutBtn(removeId, shortcutId, brId)
+function removeShortcutBtn(upId, removeId, shortcutId, brId)
 {
+    node_removeNode(upId);
     node_removeNode(removeId);
     node_removeNode(shortcutId);
     node_removeNode(brId);

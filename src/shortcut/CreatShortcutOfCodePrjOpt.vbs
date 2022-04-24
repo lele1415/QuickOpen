@@ -25,7 +25,7 @@ Sub creatShortcut()
 
 	Call saveWorkToArray(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
 	Call updateWorkInfoTxt()
-	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateShortcutBtn()
+	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateNewShortcutBtn()
 End Sub
 
 Sub showAllShortcuts()
@@ -42,6 +42,11 @@ Sub hideAllShortcuts()
 	End If
 	mShortcutState = SHORTCUT_STATE_HIDE
 	Call setElementValue(ID_SHOW_OR_HIDE_SHORTCUTS, SHORTCUT_TEXT_SHOW)
+End Sub
+
+Sub updateAllShortcuts()
+	Call parentNode_removeAllChilds(ID_DIV_SHORTCUT)
+	Call AddShortcut()
 End Sub
 
 Sub showOrHideAllShortcuts()
@@ -84,14 +89,29 @@ Sub applyShortcut(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
 End Sub
 
 Sub saveWorkToArray(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
-	Dim oWork
+	Dim i, oWork
+	For i = 0 To vaWorksInfo.Bound
+		Set oWork = vaWorksInfo.V(i)
+		If oWork.WorkName = sWorkName Then
+			oWork.WorkCode = sWorkCode
+			oWork.WorkPrj = sWorkTargetProduct
+			oWork.WorkOpt = sWorkCustomProject
+			Exit Sub
+		ElseIf oWork.WorkCode = sWorkCode And _
+	    	    oWork.WorkPrj = sWorkTargetProduct And _
+	    	    oWork.WorkOpt = sWorkCustomProject Then
+	    	oWork.WorkName = sWorkName
+	    	Exit Sub
+		End If
+	Next
+
 	Set oWork = New WorkInfo
 	oWork.WorkName = sWorkName
 	oWork.WorkCode = sWorkCode
 	oWork.WorkPrj = sWorkTargetProduct
 	oWork.WorkOpt = sWorkCustomProject
 
-	vaWorksInfo.Append(oWork)
+    vaWorksInfo.Append(oWork)
 End Sub
 
 Sub updateWorkInfoTxt()
@@ -113,7 +133,23 @@ Sub updateWorkInfoTxt()
     Set oTxt = Nothing
 End Sub
 
-Sub updateShortcutBtn()
+Sub updateNewShortcutBtn()
 	Set obj = vaWorksInfo.V(vaWorksInfo.Bound)
 	Call addShortcutButton(obj.WorkName, obj.WorkCode, obj.WorkPrj, obj.WorkOpt, ID_DIV_SHORTCUT)
+End Sub
+
+Sub upShortcut(sWorkName)
+	Dim i, oWork
+	For i = 0 To vaWorksInfo.Bound
+
+		Set oWork = vaWorksInfo.V(i)
+		If oWork.WorkName = sWorkName Then
+			vaWorksInfo.MoveToEnd(i)
+			Set oWork = Nothing
+			Exit For
+		End If
+		Set oWork = Nothing
+	Next
+	Call updateAllShortcuts()
+	Call updateWorkInfoTxt()
 End Sub
