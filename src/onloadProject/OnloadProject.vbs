@@ -30,7 +30,9 @@ Sub getAllWeibuProduct()
 	Call vaTargetProduct.SortArray()
 	Call addProductLi()
 
-	Call setProduct(vaTargetProduct.V(0))
+	If vaTargetProduct.GetIndexIfExist(getProduct()) = -1 Then
+        Call setProduct(vaTargetProduct.V(0))
+    End If
 
 	Call findProject()
 End Sub
@@ -59,10 +61,11 @@ Sub getAllWeibuProject()
 	If vaCustomProject.Bound = -1 Then MsgBox("No project found!") : Exit Sub
 
 	Call vaCustomProject.SortArray()
-	'MsgBox(vaCustomProject.ToString())
-
-	Call setProject(vaCustomProject.V(0))
 	Call addProjectLi()
+
+	If vaCustomProject.GetIndexIfExist(getProject()) = -1 Then
+        Call setProject(vaCustomProject.V(0))
+    End If
 
 	Call unfreezeAllInput()
 End Sub

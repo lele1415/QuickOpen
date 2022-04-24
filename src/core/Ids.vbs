@@ -118,6 +118,7 @@ Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
 Sub onSdkPathChange()
     Dim path : path = getSdkPath()
     If oFso.FolderExists(path) Then
+        Call setSdkPath(path)
         Call findProduct()
     Else
         Call invalidSdkPath(path)
