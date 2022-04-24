@@ -97,9 +97,11 @@ Sub MkdirWeibuFolderPath()
                 mkdirCmd = "mkdir -p " & getProjectPathWithoutSdk() & "/" & folderPartPath & ";"
             End If
 
-            'If Not oFso.FileExists(getProjectPath() & "/" & filePartPath) Then
+            If Not oFso.FileExists(getProjectPath() & "/" & filePartPath) Then
                 cpCmd = "cp " & filePartPath & " " & getProjectPathWithoutSdk() & "/" & folderPartPath
-            'End If
+            Else
+                MsgBox("File exist!")
+            End If
 
             commandFinal = mkdirCmd & cpCmd
             'If commandFinal = "" Then
