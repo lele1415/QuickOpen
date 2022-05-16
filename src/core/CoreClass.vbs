@@ -446,7 +446,7 @@ Function getProjectPath(Sdk, Product, Project)
 End Function
 
 Function getProjectSdkPath(Sdk, Product, Project)
-    getProductSdkPath = Sdk & "/" & getProjectPath(Sdk, Product, Project)
+    getProjectSdkPath = Sdk & "/" & getProjectPath(Sdk, Product, Project)
 End Function
 
 Sub msgboxPathNotExist(path)
