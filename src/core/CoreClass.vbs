@@ -546,8 +546,8 @@ Class ProjectInputs
     End Property
 
     Public Property Let Work(value)
-        document.getElementById(getWorkInputId()).value = value
-        mInfos.Work = value
+        Call setElementValue(getWorkInputId(), value)
+        Call onWorkChange()
     End Property
 
     Public Property Let Sdk(value)
@@ -564,6 +564,10 @@ Class ProjectInputs
         Call setElementValue(getProjectInputId(), value)
         Call onProjectChange()
     End Property
+
+    Public Sub onWorkChange()
+        mInfos.Work = Work
+    End Sub
 
     Public Function onSdkChange()
         mInfos.Sdk = Sdk

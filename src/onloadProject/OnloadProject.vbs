@@ -15,6 +15,10 @@ Dim mLoadOptInAllPrj
 
 
 
+Sub onWorkChange()
+    Call mIp.onWorkChange()
+End Sub
+
 Sub onSdkPathChange()
     mIp.Work = ""
     If mIp.onSdkChange() Then

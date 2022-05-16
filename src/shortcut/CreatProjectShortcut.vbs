@@ -18,8 +18,8 @@ Sub creatShortcut()
 	End If
 
 	Call saveWorkToArray()
+	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateAllShortcuts()
 	Call updateWorkInfoTxt()
-	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateNewShortcutBtn()
 End Sub
 
 Sub showAllShortcuts()
@@ -84,7 +84,7 @@ End Sub
 
 Sub saveWorkToArray()
 	Dim i, oInfos
-	For i = 0 To vaWorksInfo.Bound
+	For i = vaWorksInfo.Bound To 0 Step -1
 		Set oInfos = vaWorksInfo.V(i)
 		If oInfos.Work = mIp.Infos.Work Then
 			oInfos.Sdk = mIp.Infos.Sdk
