@@ -1,7 +1,11 @@
+Const ID_BUTTON_SHOW_EXPLORER = "button_show_explorer"
+Const ID_BUTTON_UPDATE_EXPLORER = "button_update_explorer"
+Const ID_BUTTON_HIDE_EXPLORER = "button_hide_explorer"
 Const ID_DIV_EXP_FILE = "exp_file"
 Const ID_DIV_EXP_PATH = "exp_path"
 Const EXP_SHOW = 0
-Const EXP_HIDE = 1
+Const EXP_UPDATE = 1
+Const EXP_HIDE = 2
 
 Dim iCrtPathLength, sCrtPath
 iCrtPathLength = 0
@@ -10,17 +14,34 @@ sCrtPath = ""
 Dim vaSubFolderName : Set vaSubFolderName = New VariableArray
 Dim vaSubFileName : Set vaSubFileName = New VariableArray
 
-Sub initNewPath(doWhat)
-	Dim cutLength : cutLength = iCrtPathLength
-	Call delPath(cutLength)
-	Call removeFile()
+Sub initNewExplorerPath(doWhat)
+	If doWhat <> EXP_SHOW Then
+		Dim cutLength : cutLength = iCrtPathLength
+		Call delPath(cutLength)
+		Call removeFile()
+	End If
 
-	If doWhat = EXP_SHOW Then
+	If doWhat <> EXP_HIDE Then
+		Call showExplorerButtons(False)
 		Dim rootPath : rootPath = handlePath(1)
 		If isValidRootPath(rootPath) Then
 			Call addRootPath(rootPath)
 			Call addFile()
 		End If
+	Else
+	    Call showExplorerButtons(True)
+	End If
+End Sub
+
+Sub showExplorerButtons(explorer)
+	If explorer Then
+		Call hideElement(ID_BUTTON_UPDATE_EXPLORER)
+		Call hideElement(ID_BUTTON_HIDE_EXPLORER)
+		Call showElement(ID_BUTTON_SHOW_EXPLORER)
+	Else
+	    Call hideElement(ID_BUTTON_SHOW_EXPLORER)
+	    Call showElement(ID_BUTTON_UPDATE_EXPLORER)
+	    Call showElement(ID_BUTTON_HIDE_EXPLORER)
 	End If
 End Sub
 
@@ -124,8 +145,11 @@ End Sub
 Function isValidRootPath(sPath)
 	If oFso.FolderExists(sPath) Then
 		If Right(sPath, 1) = "\" Then sPath = Mid(sPath, 1, Len(sPath) - 1)
-		isValidRootPath = True
-	Else
+	    isValidRootPath = True
+	ElseIf oFso.FileExists(sPath) Then
+	    sPath = Left(sPath, InStrRev(sPath, "\"))
+	    isValidRootPath = True
+    Else
 		MsgBox("path is not exist!")
 		isValidRootPath = False
 	End If
@@ -148,7 +172,7 @@ End Sub
 
 Sub updateOpenPath(fileName)
 	Dim path
-	path = Replace(sCrtPath, getSdkPath() & "\", "")
+	path = Replace(sCrtPath, mIp.Infos.Sdk & "\", "")
 	path = Replace(path, "\", "/")
 
 	If fileName <> "" Then

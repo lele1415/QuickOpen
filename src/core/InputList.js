@@ -34,7 +34,7 @@ function removeLi(ulId) {
 
 function addListUL() {
     var div1 = document.createElement("div");
-    div1.className = "Menu_codePath";
+    div1.className = "Menu_sdkPath";
     div1.id = mDivId;
     mParent.appendChild(div1);
 

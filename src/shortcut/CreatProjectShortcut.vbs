@@ -1,7 +1,7 @@
 Const SHORTCUT_STATE_HIDE = 0
 Const SHORTCUT_STATE_SHOW = 1
-Const SHORTCUT_TEXT_HIDE = "Hide"
-Const SHORTCUT_TEXT_SHOW = "Show"
+Const SHORTCUT_TEXT_HIDE = "    Hide    "
+Const SHORTCUT_TEXT_SHOW = "    Select    "
 Const ID_CREATE_SHORTCUTS = "create_shortcuts"
 Const ID_SHOW_OR_HIDE_SHORTCUTS = "show_or_hide_shortcuts"
 
@@ -9,21 +9,15 @@ Dim mShortcutState
 mShortcutState = SHORTCUT_STATE_HIDE
 
 Sub creatShortcut()
-	Dim sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject
-	sWorkName = getElementValue(ID_WORK_NAME)
-	sWorkCode = getSdkPath()
-	sWorkTargetProduct = getProduct()
-	sWorkCustomProject = getProject()
-
-	If Trim(sWorkName) = "" _
-			Or Trim(sWorkCode) = "" _
-			Or Trim(sWorkTargetProduct) = "" _
-			Or Trim(sWorkCustomProject) = "" Then
+	If Trim(mIp.Infos.Work) = "" _
+			Or Trim(mIp.Infos.Sdk) = "" _
+			Or Trim(mIp.Infos.Product) = "" _
+			Or Trim(mIp.Infos.Project) = "" Then
 		MsgBox("work info is not complete!")
 		Exit Sub
 	End If
 
-	Call saveWorkToArray(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
+	Call saveWorkToArray()
 	Call updateWorkInfoTxt()
 	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateNewShortcutBtn()
 End Sub
@@ -61,7 +55,7 @@ Sub AddShortcut()
     Dim i, obj
     For i = vaWorksInfo.Bound To 0 Step -1
         Set obj = vaWorksInfo.V(i)
-        Call addShortcutButton(obj.WorkName, obj.WorkCode, obj.WorkPrj, obj.WorkOpt, ID_DIV_SHORTCUT)
+        Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, ID_DIV_SHORTCUT)
     Next
 End Sub
 
@@ -69,7 +63,7 @@ Sub removeShortcut(shortcutId)
 	Dim i, obj, value
     For i = 0 To vaWorksInfo.Bound
         Set obj = vaWorksInfo.V(i)
-        value = obj.WorkName + "/" + obj.WorkCode + "/" + obj.WorkPrj + "/" + obj.WorkOpt + "_shortcut"
+        value = obj.Work + "/" + obj.Sdk + "/" + obj.Product + "/" + obj.Project + "_shortcut"
         If value = shortcutId Then
         	Call vaWorksInfo.PopBySeq(i)
         	Exit For
@@ -78,54 +72,54 @@ Sub removeShortcut(shortcutId)
     Call updateWorkInfoTxt()
 End Sub
 
-Sub applyShortcut(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
+Sub applyShortcut(work, sdk, product, project)
 	Call hideAllShortcuts()
 	
-	Call setElementValue(ID_WORK_NAME, sWorkName)
-
-	Call setSdkPath(sWorkCode)
-	Call setProduct(sWorkTargetProduct)
-	Call setProject(sWorkCustomProject)
+	mIp.Work = work
+	mIp.Sdk = sdk
+	mIp.Product = product
+	mIp.Project = project
+	Call updateProductList()
 End Sub
 
-Sub saveWorkToArray(sWorkName, sWorkCode, sWorkTargetProduct, sWorkCustomProject)
-	Dim i, oWork
+Sub saveWorkToArray()
+	Dim i, oInfos
 	For i = 0 To vaWorksInfo.Bound
-		Set oWork = vaWorksInfo.V(i)
-		If oWork.WorkName = sWorkName Then
-			oWork.WorkCode = sWorkCode
-			oWork.WorkPrj = sWorkTargetProduct
-			oWork.WorkOpt = sWorkCustomProject
+		Set oInfos = vaWorksInfo.V(i)
+		If oInfos.Work = mIp.Infos.Work Then
+			oInfos.Sdk = mIp.Infos.Sdk
+			oInfos.Product = mIp.Infos.Product
+			oInfos.Project = mIp.Infos.Project
 			Exit Sub
-		ElseIf oWork.WorkCode = sWorkCode And _
-	    	    oWork.WorkPrj = sWorkTargetProduct And _
-	    	    oWork.WorkOpt = sWorkCustomProject Then
-	    	oWork.WorkName = sWorkName
+		ElseIf oInfos.Sdk = mIp.Infos.Sdk And _
+	    	    oInfos.Product = mIp.Infos.Product And _
+	    	    oInfos.Project = mIp.Infos.Project Then
+	    	oInfos.Work = mIp.Infos.Work
 	    	Exit Sub
 		End If
 	Next
 
-	Set oWork = New WorkInfo
-	oWork.WorkName = sWorkName
-	oWork.WorkCode = sWorkCode
-	oWork.WorkPrj = sWorkTargetProduct
-	oWork.WorkOpt = sWorkCustomProject
+	Set oInfos = New ProjectInfos
+	oInfos.Work = mIp.Infos.Work
+	oInfos.Sdk = mIp.Infos.Sdk
+	oInfos.Product = mIp.Infos.Product
+	oInfos.Project = mIp.Infos.Project
 
-    vaWorksInfo.Append(oWork)
+    vaWorksInfo.Append(oInfos)
 End Sub
 
 Sub updateWorkInfoTxt()
-    initTxtFile(pWorkInfoText)
+    initTxtFile(pProjectText)
     Dim oTxt, i, obj
-    Set oTxt = oFso.OpenTextFile(pWorkInfoText, FOR_APPENDING, False, True)
+    Set oTxt = oFso.OpenTextFile(pProjectText, FOR_APPENDING, False, True)
 
     For i = 0 To vaWorksInfo.Bound
         Set obj = vaWorksInfo.V(i)
         oTxt.WriteLine("########")
-        oTxt.WriteLine(obj.WorkName)
-        oTxt.WriteLine(obj.WorkCode)
-        oTxt.WriteLine(obj.WorkPrj)
-        oTxt.WriteLine(obj.WorkOpt)
+        oTxt.WriteLine(obj.Work)
+        oTxt.WriteLine(obj.Sdk)
+        oTxt.WriteLine(obj.Product)
+        oTxt.WriteLine(obj.Project)
         oTxt.WriteLine()
     Next
 
@@ -135,20 +129,20 @@ End Sub
 
 Sub updateNewShortcutBtn()
 	Set obj = vaWorksInfo.V(vaWorksInfo.Bound)
-	Call addShortcutButton(obj.WorkName, obj.WorkCode, obj.WorkPrj, obj.WorkOpt, ID_DIV_SHORTCUT)
+	Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, ID_DIV_SHORTCUT)
 End Sub
 
-Sub upShortcut(sWorkName)
-	Dim i, oWork
+Sub upShortcut(sName)
+	Dim i, oInfos
 	For i = 0 To vaWorksInfo.Bound
 
-		Set oWork = vaWorksInfo.V(i)
-		If oWork.WorkName = sWorkName Then
+		Set oInfos = vaWorksInfo.V(i)
+		If oInfos.Work = sName Then
 			vaWorksInfo.MoveToEnd(i)
-			Set oWork = Nothing
+			Set oInfos = Nothing
 			Exit For
 		End If
-		Set oWork = Nothing
+		Set oInfos = Nothing
 	Next
 	Call updateAllShortcuts()
 	Call updateWorkInfoTxt()

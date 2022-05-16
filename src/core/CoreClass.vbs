@@ -345,48 +345,6 @@ Class VariableArray
 End Class
 
 
-Class WorkInfo
-    Private mWorkName, mWorkCode, mWorkPrj, mWorkOpt
-
-    Private Sub Class_Initialize
-        mWorkName = ""
-        mWorkCode = ""
-        mWorkPrj = ""
-        mWorkOpt = ""
-    End Sub
-
-    Public Property Let WorkName(value)
-        mWorkName = value
-    End Property
-
-    Public Property Let WorkCode(value)
-        mWorkCode = value
-    End Property
-
-    Public Property Let WorkPrj(value)
-        mWorkPrj = value
-    End Property
-
-    Public Property Let WorkOpt(value)
-        mWorkOpt = value
-    End Property
-
-    Public Property Get WorkName
-        WorkName = mWorkName
-    End Property
-
-    Public Property Get WorkCode
-        WorkCode = mWorkCode
-    End Property
-
-    Public Property Get WorkPrj
-        WorkPrj = mWorkPrj
-    End Property
-
-    Public Property Get WorkOpt
-        WorkOpt = mWorkOpt
-    End Property
-End Class
 
 Class InputText
     Private mInputId
@@ -405,7 +363,7 @@ Class InputText
         End If
     End Function
 
-    Public Property Get Text()
+    Public Property Get Text
         If checkElement() Then
             Text = document.getElementById(mInputId).value
         Else
@@ -419,6 +377,8 @@ Class InputText
         End If
     End Sub
 End Class
+
+
 
 Class InputWithOneLayerList
     Private mInputId, mListDivId
@@ -438,7 +398,7 @@ Class InputWithOneLayerList
         End If
     End Function
 
-    Public Property Get Text()
+    Public Property Get Text
         If checkElement() Then
             Text = document.getElementById(mInputId).value
         Else
@@ -455,4 +415,190 @@ Class InputWithOneLayerList
     Public Property Get ListDivId()
         ListDivId = mListDivId
     End Property
+End Class
+
+
+
+Function getWeibuSdkPath(Sdk)
+    getWeibuSdkPath = Sdk & "/weibu"
+End Function
+
+Function getOutSdkPath(Sdk, Product)
+    getOutSdkPath = Sdk & "\out\target\product\" & Product
+End Function
+
+Function getProductPath(Product)
+    getProductPath = "weibu/" & Product
+End Function
+
+Function getProductSdkPath(Sdk, Product)
+    getProductSdkPath = Sdk & "/" & getProductPath(Product)
+End Function
+
+Function getProjectPath(Sdk, Product, Project)
+    Dim path
+    path = "weibu/" & Product & "/" & Project
+    If oFso.FolderExists(Sdk & "/" & path & "/alps") Then
+        getProjectPath = path & "/alps"
+    Else
+        getProjectPath = path
+    End If
+End Function
+
+Function getProjectSdkPath(Sdk, Product, Project)
+    getProductSdkPath = Sdk & "/" & getProjectPath(Sdk, Product, Project)
+End Function
+
+Sub msgboxPathNotExist(path)
+    MsgBox("path not exist! " & VbLf & path)
+End Sub
+
+Class ProjectInfos
+    Private mWork
+    Private mSdk
+    Private mProduct
+    Private mProject
+
+    Public Property Get Work
+        Work = mWork
+    End Property
+
+    Public Property Get Sdk
+        Sdk = mSdk
+    End Property
+
+    Public Property Get Product
+        Product = mProduct
+    End Property
+
+    Public Property Get Project
+        Project = mProject
+    End Property
+
+    Public Property Get WeibuSdkPath
+        WeibuSdkPath = getWeibuSdkPath(Sdk)
+    End Property
+
+    Public Property Get OutSdkPath
+        OutSdkPath = getOutSdkPath(Sdk, Product)
+    End Property
+
+    Public Property Get ProductPath
+        ProductPath = getProductPath(Product)
+    End Property
+
+    Public Property Get ProductSdkPath
+        ProductSdkPath = getProductSdkPath(Sdk, Product)
+    End Property
+
+    Public Property Get ProjectPath
+        ProjectPath = getProjectPath(Sdk, Product, Project)
+    End Property
+
+    Public Property Get ProjectSdkPath
+        ProjectSdkPath = getProjectSdkPath(Sdk, Product, Project)
+    End Property
+
+    Public Property Let Work(value)
+        mWork = value
+    End Property
+
+    Public Property Let Sdk(value)
+        mSdk = value
+    End Property
+
+    Public Property Let Product(value)
+        mProduct = value
+    End Property
+
+    Public Property Let Project(value)
+        mProject = value
+    End Property
+End Class
+
+
+
+Class ProjectInputs
+    Private mInfos
+
+    Public Sub Class_Initialize
+        Set mInfos = New ProjectInfos
+    End Sub
+
+    Public Property Get Infos
+        Set Infos = mInfos
+    End Property
+
+    Public Property Get Work
+        Work = document.getElementById(getWorkInputId()).value
+    End Property
+
+    Public Property Get Sdk
+        Sdk = document.getElementById(getSdkPathInputId()).value
+    End Property
+
+    Public Property Get Product
+        Product = document.getElementById(getProductInputId()).value
+    End Property
+
+    Public Property Get Project
+        Project = document.getElementById(getProjectInputId()).value
+    End Property
+
+    Public Property Let Work(value)
+        document.getElementById(getWorkInputId()).value = value
+        mInfos.Work = value
+    End Property
+
+    Public Property Let Sdk(value)
+        Call setElementValue(getSdkPathInputId(), value)
+        Call onSdkChange()
+    End Property
+
+    Public Property Let Product(value)
+        Call setElementValue(getProductInputId(), value)
+        Call onProductChange()
+    End Property
+
+    Public Property Let Project(value)
+        Call setElementValue(getProjectInputId(), value)
+        Call onProjectChange()
+    End Property
+
+    Public Function onSdkChange()
+        mInfos.Sdk = Sdk
+        If oFso.FolderExists(mInfos.Sdk) Then
+            onSdkChange = True
+        Else
+            msgboxPathNotExist(value)
+            Call setElementValue(getSdkPathInputId(), "")
+            mInfos.Sdk = ""
+            onSdkChange = False
+        End If
+    End Function
+
+    Public Function onProductChange()
+        mInfos.Product = Product
+        If oFso.FolderExists(mInfos.WeibuSdkPath & "/" & value) Then
+            onProductChange = True
+        Else
+            msgboxPathNotExist(value)
+            Call setElementValue(getProductInputId(), "")
+            mInfos.Product = ""
+            onProductChange = False
+        End If
+    End Function
+
+    Public Function onProjectChange()
+        mInfos.Project = Project
+        If oFso.FolderExists(mInfos.ProductSdkPath & "/" & value) Then
+            onProjectChange = True
+        Else
+            msgboxPathNotExist(value)
+            Call setElementValue(getProjectInputId(), "")
+            mInfos.Project = ""
+            onProjectChange = False
+        End If
+    End Function
+
 End Class

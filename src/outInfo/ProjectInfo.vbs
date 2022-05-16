@@ -32,9 +32,9 @@ Function getBootLogo()
 End Function
 
 Sub getProjectConfigMk()
-    pMMIProjectConfigMk = getProductPath & "/" & getProject() & "/config/ProjectConfig.mk"
-    pDriverProjectConfigMk = getProductPath & "/" & Replace(getProject(), "-MMI", "") & "/config/ProjectConfig.mk"
-    pDeviceProjectConfigMk = getSdkPath() & "/device/mediateksample/" & getProduct() & "/ProjectConfig.mk"
+    pMMIProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & mIp.Infos.Project & "/config/ProjectConfig.mk"
+    pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & Replace(mIp.Infos.Project, "-MMI", "") & "/config/ProjectConfig.mk"
+    pDeviceProjectConfigMk = mIp.Infos.Sdk & "/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
 End Sub
 
 Sub getProjectInfos()

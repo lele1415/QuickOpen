@@ -15,26 +15,47 @@ Dim mLoadOptInAllPrj
 
 
 
-Sub findProduct()
-	Call freezeAllInput()
-	idTimer = window.setTimeout( _
-			"Call getAllWeibuProduct()", 0, "VBScript")
+Sub onSdkPathChange()
+    mIp.Work = ""
+    If mIp.onSdkChange() Then
+        Call updateProductList()
+    End If
 End Sub
 
-Sub getAllWeibuProduct()
+Sub onProductChange()
+	mIp.Work = ""
+    If mIp.onProductChange() Then
+        Call updateProjectList()
+    End If
+End Sub
+
+Sub onProjectChange()
+	mIp.Work = ""
+    If mIp.onProjectChange() Then
+        Call createWorkName()
+    End If
+End Sub
+
+Sub updateProductList()
+	Call freezeAllInput()
+	idTimer = window.setTimeout( _
+			"Call findProduct()", 0, "VBScript")
+End Sub
+
+Sub findProduct()
 	window.clearTimeout(idTimer)
-	Set vaTargetProduct = searchFolder(getWeibuPath(), "_bsp", _
+	Set vaTargetProduct = searchFolder(mIp.Infos.WeibuSdkPath, "_bsp", _
 		    SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub
 
 	Call vaTargetProduct.SortArray()
 	Call addProductLi()
 
-	If vaTargetProduct.GetIndexIfExist(getProduct()) = -1 Then
-        Call setProduct(vaTargetProduct.V(0))
+    If vaTargetProduct.GetIndexIfExist(mIp.Infos.Product) = -1 Then
+        mIp.Product = vaTargetProduct.V(0)
     End If
 
-	Call findProject()
+	Call updateProjectList()
 End Sub
 
 Sub addProductLi()
@@ -49,26 +70,69 @@ Sub addProductLi()
 End Sub
 
 
-Sub findProject()
+Sub updateProjectList()
 	idTimer = window.setTimeout( _
-			"getAllWeibuProject()", 0, "VBScript")
+			"findProject()", 0, "VBScript")
 End Sub
 
-Sub getAllWeibuProject()
+Sub findProject()
 	window.clearTimeout(idTimer)
-	Set vaCustomProject = searchFolder(getProductPath(), "", _
+	Set vaCustomProject = searchFolder(mIp.Infos.ProductSdkPath, "", _
 		    SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 	If vaCustomProject.Bound = -1 Then MsgBox("No project found!") : Exit Sub
 
 	Call vaCustomProject.SortArray()
 	Call addProjectLi()
 
-	If vaCustomProject.GetIndexIfExist(getProject()) = -1 Then
-        Call setProject(vaCustomProject.V(0))
+	If vaCustomProject.GetIndexIfExist(mIp.Infos.Project) = -1 Then
+        mIp.Project = vaCustomProject.V(0)
     End If
+
+    Call createWorkName()
 
 	Call unfreezeAllInput()
 End Sub
+
+Sub createWorkName()
+	If Not checkProjectInfosExist() Then
+        mIp.Work = getProjectSimpleName() & " " & getSdkSimpleName()
+    End If
+End Sub
+
+Function checkProjectInfosExist()
+	Dim i, oInfos
+	For i = 0 To vaWorksInfo.Bound
+		Set oInfos = vaWorksInfo.V(i)
+		If oInfos.Sdk = mIp.Infos.Sdk And _
+	    	    oInfos.Product = mIp.Infos.Product And _
+	    	    oInfos.Project = mIp.Infos.Project Then
+	    	mIp.Work = oInfos.Work
+	    	checkProjectInfosExist = True
+	    	Exit Function
+		End If
+	Next
+	checkProjectInfosExist = False
+End Function
+
+Function getProjectSimpleName()
+	Dim str
+	str = Replace(mIp.Infos.Project, "-MMI", "")
+	str = Replace(str, "_MMI", "")
+	If InStr(str, "-") > 0 Then
+	    str = Replace(str, Left(str, InStr(str, "-")), "")
+	Else
+	    str = Replace(str, Left(str, InStr(str, "_")), "")
+	End If
+	getProjectSimpleName = str
+End Function
+
+Function getSdkSimpleName()
+	Dim str
+	str = Replace(mIp.Infos.Sdk, "/", "\")
+	str = Left(str, InStrRev(str, "\alps") - 1)
+	str = Replace(str, Left(str, InStrRev(str, "\")), "")
+	getSdkSimpleName = str
+End Function
 
 Sub addProjectLi()
 	Call removeLi(getProjectULId())

@@ -144,6 +144,7 @@ Function initTxtFile(FilePath)
 End Function
 
 Sub freezeAllInput()
+    Call disableElement(getWorkInputId())
     Call disableElement(getSdkPathInputId())
     Call disableElement(getProductInputId())
     Call disableElement(getProjectInputId())
@@ -152,6 +153,7 @@ Sub freezeAllInput()
 End Sub
 
 Sub unfreezeAllInput()
+    Call enableElement(getWorkInputId())
     Call enableElement(getSdkPathInputId())
     Call enableElement(getProductInputId())
     Call enableElement(getProjectInputId())

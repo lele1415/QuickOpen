@@ -3,8 +3,7 @@
 Const VALUE_SELECT_SDK_PATH_SHOW = "选择代码"
 Const VALUE_SELECT_SDK_PATH_HIDE = "收起"
 
-Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\config.ini"
-Dim pCodeText : pCodeText = oWs.CurrentDirectory & "\code.ini"
+Dim pSdkPathText : pSdkPathText = oWs.CurrentDirectory & "\res\sdk.ini"
 
 Dim mTextEditorPath
 
@@ -12,9 +11,9 @@ Dim mTextEditorPath
 Dim vaAndroidVer : Set vaAndroidVer = New VariableArray
 
 Call readConfigText(pConfigText)
-Call readCodeText(pCodeText)
+Call readSdkPathText(pSdkPathText)
 Call setSdkPathIds()
-Call addCodeList()
+Call addSdkPathList()
 
 
 
@@ -50,7 +49,7 @@ Sub getTextEditor(sReadLine)
     mTextEditorPath = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
 End Sub
 
-Sub readCodeText(DictPath)
+Sub readSdkPathText(DictPath)
     If Not oFso.FileExists(DictPath) Then Exit Sub
     
     Dim oText
@@ -60,7 +59,7 @@ Sub readCodeText(DictPath)
         sReadLine = oText.ReadLine
 
         If InStr(sReadLine, "{") > 0 Then
-            Call getAllCode(oText, sReadLine)
+            Call getAllSdkPath(oText, sReadLine)
         End If
     Loop
 
@@ -68,23 +67,23 @@ Sub readCodeText(DictPath)
     Set oText = Nothing
 End Sub
 
-Sub getAllCode(oText, sReadLine)
+Sub getAllSdkPath(oText, sReadLine)
     Dim verStr : verStr = Trim(Replace(sReadLine, "{", ""))
     if verStr <> "" Then
-        Dim vaCode : Set vaCode = New VariableArray
-        vaCode.Name = verStr
+        Dim vaSdkPath : Set vaSdkPath = New VariableArray
+        vaSdkPath.Name = verStr
 
         sReadLine = oText.ReadLine
         Do until InStr(sReadLine, "}") > 0
-            vaCode.Append(Trim(sReadLine))
+            vaSdkPath.Append(Trim(sReadLine))
             sReadLine = oText.ReadLine
         Loop
 
-        vaAndroidVer.Append(vaCode)
+        vaAndroidVer.Append(vaSdkPath)
     End If
 End Sub
 
-Sub addCodeList()
+Sub addSdkPathList()
     If vaAndroidVer.Bound <> -1 Then
         Call setSdkPathDirectoryIds()
         Call addListUL()

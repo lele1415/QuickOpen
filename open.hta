@@ -1,5 +1,5 @@
 <!--
-Version: 3.0
+Version: 3.1.0
 -->
 
 <Html>
@@ -12,7 +12,7 @@ Version: 3.0
 <!-- 
 body { font-family: sans-serif; color:#f8f8f2;}
 
-.Menu_codePath { position:relative; width:400px; height:50px; z-index:1; margin-top:0px; display:none; }
+.Menu_sdkPath { position:relative; width:400px; height:50px; z-index:1; margin-top:0px; display:none; }
 
 .Menu_project { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
 
@@ -71,7 +71,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 <fieldset>
 <legend>Work name</legend>
-    <input type="text" id="work_name" size="20">
+    <input type="text" id="work_name" size="35">
 </fieldset>
 <br>
 <fieldset>
@@ -88,8 +88,8 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <div class="form_project" id="parent_project">
         <input type="text" id="input_project" onchange="onProjectChange()" size="60" />
     </div>
-    <input type="button" class="input_button" id="create_shortcuts" onclick="creatShortcut()" value="Create" />
-    <input type="button" class="input_button" id="show_or_hide_shortcuts" onclick="showOrHideAllShortcuts()" value="Show" />
+    <input type="button" class="input_button" id="show_or_hide_shortcuts" onclick="showOrHideAllShortcuts()" value="    Select    " />
+    <input type="button" class="input_button" id="create_shortcuts" onclick="creatShortcut()" value="Add/Update" />
     <br>
     <div id="div_shortcut"></div>
 </fieldset>
@@ -115,21 +115,19 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <br>
     <input type="button" class="input_button" onclick="CopyWeibuFolderPath()" value="weibu">
     <input type="button" class="input_button" onclick="CopyWeibuDriverFolderPath()" value="driver">
-    <input type="button" class="input_button" onclick="AddWeibuFolderPath()" value="add">
-    <input type="button" class="input_button" onclick="DelWeibuFolderPath()" value="del">
     <input type="button" class="input_button" onclick="MkdirWeibuFolderPath()" value="mkdir">
 </fieldset>
 <br>
 <fieldset>
     <legend>Infos</legend>
-    <input id="button_show_project_infos" type="button" class="input_button" onclick="getProjectInfos()" value="ProjectConfig.mk">
+    <input id="button_show_project_infos" type="button" class="input_button" onclick="getProjectInfos()" value="ProjectConfig.mk infos">
     <input id="button_close_project_infos" type="button" class="input_button" onclick="closeProjectInfos()" value="Close" style="display:none">
 
     <div class="form_sdk_path" id="parent_project_infos">
         <textarea id="input_project_infos" class="textarea_text" rows="7" cols="60" style="display:none"></textarea>
     </div>
 
-    <input id="button_show_out_infos" type="button" class="input_button" onclick="getOutInfos()" value="build.prop">
+    <input id="button_show_out_infos" type="button" class="input_button" onclick="getOutInfos()" value="build.prop infos">
     <input id="button_close_out_infos" type="button" class="input_button" onclick="closeOutInfos()" value="Close" style="display:none">
 
     <div class="form_sdk_path" id="parent_out_infos">
@@ -140,26 +138,28 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <fieldset>
     <legend>Open file or folder</legend>
     <input type="button" class="input_button" onclick="handlePath(0)" value="Open" />
+    <input type="button" class="input_button" onclick="AddWeibuFolderPath()" value="Add">
+    <input type="button" class="input_button" onclick="DelWeibuFolderPath()" value="Del">
     <input type="button" class="input_button" onclick="handlePath(2)" value="Copy" />
-    <input type="button" class="input_button" onclick="initNewPath(0)" value="Explorer" />
-    <input type="button" class="input_button" onclick="initNewPath(1)" value="Close" />
     <input type="button" class="input_button" onclick="runBeyondCompare()" value="Compare" />
     <div class="form_sdk_path" id="parent_open_path">
         <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
     </div>
-    <br><br>
-<div id="exp_path">&nbsp;</div>
-<br>
-<div id="exp_file"></div>
+    <input id="button_show_explorer" type="button" class="input_button" onclick="initNewExplorerPath(0)" value="Explorer" />
+    <input id="button_update_explorer" type="button" class="input_button" onclick="initNewExplorerPath(1)" value="Update" style="display:none"/>
+    <input id="button_hide_explorer" type="button" class="input_button" onclick="initNewExplorerPath(2)" value="Close" style="display:none"/>
+    <div id="exp_path">&nbsp;</div>
+    <br>
+    <div id="exp_file"></div>
 </fieldset>
 
 
 
 <Script Language="JavaScript" src="src\core\CoreFun.js"></Script>
 <Script Language="JavaScript" src="src\core\InputList.js"></Script>
-<Script Language="JavaScript" src="src\readInfo\ReadCodePath.js"></Script>
+<Script Language="JavaScript" src="src\readInfo\ReadSdkPath.js"></Script>
 <!-- <Script Language="JavaScript" src="src\onloadProject\OnloadProject.js"></Script> -->
-<Script Language="JavaScript" src="src\shortcut\CreatShortcutOfCodePrjOpt.js"></Script>
+<Script Language="JavaScript" src="src\shortcut\CreatProjectShortcut.js"></Script>
 <!-- <Script Language="JavaScript" src="src\openPath\OpenPath.js"></Script> -->
 <Script Language="JavaScript" src="src\fileExplorer\FileExplorer.js"></Script>
 
@@ -167,10 +167,10 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="VBScript" src="src\core\CoreClass.vbs"></Script>
 <Script Language="VBScript" src="src\core\Ids.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadConfigPath.vbs"></Script>
-<Script Language="VBScript" src="src\readInfo\ReadCodePath.vbs"></Script>
+<Script Language="VBScript" src="src\readInfo\ReadSdkPath.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
 <Script Language="VBScript" src="src\onloadProject\OnloadProject.vbs"></Script>
-<Script Language="VBScript" src="src\shortcut\CreatShortcutOfCodePrjOpt.vbs"></Script>
+<Script Language="VBScript" src="src\shortcut\CreatProjectShortcut.vbs"></Script>
 <Script Language="VBScript" src="src\openPath\OpenPath.vbs"></Script>
 <Script Language="VBScript" src="src\copyCommand\CopyCommand.vbs"></Script>
 <Script Language="VBScript" src="src\fileExplorer\FileExplorer.vbs"></Script>

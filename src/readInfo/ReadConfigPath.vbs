@@ -1,4 +1,4 @@
-Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\config.ini"
+Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\res\config.ini"
 
 Dim mTextEditorPath, mBeyondComparePath
 

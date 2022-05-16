@@ -49,7 +49,7 @@ function addUL() {
     var divParent = document.getElementById(mParentId);
 
     var div1 = document.createElement("div");
-    div1.className = "Menu_codePath";
+    div1.className = "Menu_sdkPath";
     div1.id = mDivId;
     divParent.appendChild(div1);
 

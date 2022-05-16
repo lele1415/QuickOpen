@@ -10,18 +10,18 @@ Dim pProductBuildProp
 Dim pProjectConfigMk
 
 Sub getOutInfos()
-    If Not oFso.FolderExists(getOutPath()) Then
+    If Not oFso.FolderExists(mIp.Infos.OutSdkPath) Then
         MsgBox("Out path not exist!")
         Exit Sub
     End If
 
-    pSystemBuildProp = getOutPath() & "\system\build.prop"
-    pVendorBuildProp = getOutPath() & "\vendor\build.prop"
-    pProductBuildProp = getOutPath() & "\product\build.prop"
+    pSystemBuildProp = mIp.Infos.OutSdkPath & "\system\build.prop"
+    pVendorBuildProp = mIp.Infos.OutSdkPath & "\vendor\build.prop"
+    pProductBuildProp = mIp.Infos.OutSdkPath & "\product\build.prop"
     If Not oFso.FileExists(pProductBuildProp) Then
-        pProductBuildProp = getOutPath() & "\product\etc\build.prop"
+        pProductBuildProp = mIp.Infos.OutSdkPath & "\product\etc\build.prop"
     End If
-    'pProjectConfigMk = getOutPath() & "\vendor\data\misc\ProjectConfig.mk"
+    'pProjectConfigMk = mIp.Infos.OutSdkPath & "\vendor\data\misc\ProjectConfig.mk"
 
     Dim str
     str = str & "display_id=" & readTextAndGetValue("ro.build.display.id", pSystemBuildProp) & VbLf

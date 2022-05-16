@@ -1,17 +1,14 @@
-Const ID_DIV_SHORTCUT = "div_shortcut"
-Const ID_WORK_NAME = "work_name"
-
-Dim pWorkInfoText : pWorkInfoText = oWs.CurrentDirectory & "\shortcutsInfo.ini"
+Dim pProjectText : pProjectText = oWs.CurrentDirectory & "\res\project.ini"
 
 Dim vaWorksInfo : Set vaWorksInfo = New VariableArray
 
 Call readWorksInfoText()
 
 Sub readWorksInfoText()
-    If Not oFso.FileExists(pWorkInfoText) Then Exit Sub
+    If Not oFso.FileExists(pProjectText) Then Exit Sub
     
     Dim oText, sReadLine
-    Set oText = oFso.OpenTextFile(pWorkInfoText, FOR_READING, False, True)
+    Set oText = oFso.OpenTextFile(pProjectText, FOR_READING, False, True)
 
     Do Until oText.AtEndOfStream
         sReadLine = oText.ReadLine
@@ -25,12 +22,12 @@ Sub readWorksInfoText()
 End Sub
 
 Sub handleForWorksInfo(oText, sReadLine)
-    Dim oWork
-    Set oWork = New WorkInfo
-    oWork.WorkName = Trim(oText.ReadLine)
-    oWork.WorkCode = Trim(oText.ReadLine)
-    oWork.WorkPrj = Trim(oText.ReadLine)
-    oWork.WorkOpt = Trim(oText.ReadLine)
+    Dim oInfos
+    Set oInfos = New ProjectInfos
+    oInfos.Work = Trim(oText.ReadLine)
+    oInfos.Sdk = Trim(oText.ReadLine)
+    oInfos.Product = Trim(oText.ReadLine)
+    oInfos.Project = Trim(oText.ReadLine)
 
-    vaWorksInfo.Append(oWork)
+    vaWorksInfo.Append(oInfos)
 End Sub
