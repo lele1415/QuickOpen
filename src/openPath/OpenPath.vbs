@@ -281,3 +281,7 @@ Sub runBeyondCompare()
 		MsgBox("Not found :" & Vblf & wholePath)
 	End If
 End Sub
+
+Sub runWebsite(path)
+	oWs.Run mBrowserPath & " " & path
+End Sub

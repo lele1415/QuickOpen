@@ -22,12 +22,24 @@ Sub readWorksInfoText()
 End Sub
 
 Sub handleForWorksInfo(oText, sReadLine)
-    Dim oInfos
+    Dim i, sLine, oInfos
+    i = 0
+    sLine = oText.ReadLine
     Set oInfos = New ProjectInfos
-    oInfos.Work = Trim(oText.ReadLine)
-    oInfos.Sdk = Trim(oText.ReadLine)
-    oInfos.Product = Trim(oText.ReadLine)
-    oInfos.Project = Trim(oText.ReadLine)
+
+    Do Until (Trim(sLine) = "" Or i > 7)
+        i = i + 1
+        Select Case i
+            Case 1 : oInfos.Work = Trim(sLine)
+            Case 2 : oInfos.Sdk = Trim(sLine)
+            Case 3 : oInfos.Product = Trim(sLine)
+            Case 4 : oInfos.Project = Trim(sLine)
+            Case 5 : oInfos.Firmware = Trim(sLine)
+            Case 6 : oInfos.Requirements = Trim(sLine)
+            Case 7 : oInfos.Zentao = Trim(sLine)
+        End Select
+        sLine = oText.ReadLine
+    Loop
 
     vaWorksInfo.Append(oInfos)
 End Sub

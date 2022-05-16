@@ -450,7 +450,9 @@ Function getProjectSdkPath(Sdk, Product, Project)
 End Function
 
 Sub msgboxPathNotExist(path)
-    MsgBox("path not exist! " & VbLf & path)
+    If Trim(path) <> "" Then
+        MsgBox("path not exist! " & VbLf & path)
+    End If
 End Sub
 
 Class ProjectInfos
@@ -458,6 +460,9 @@ Class ProjectInfos
     Private mSdk
     Private mProduct
     Private mProject
+    Private mFirmware
+    Private mRequirements
+    Private mZentao
 
     Public Property Get Work
         Work = mWork
@@ -473,6 +478,18 @@ Class ProjectInfos
 
     Public Property Get Project
         Project = mProject
+    End Property
+
+    Public Property Get Firmware
+        Firmware = mFirmware
+    End Property
+
+    Public Property Get Requirements
+        Requirements = mRequirements
+    End Property
+
+    Public Property Get Zentao
+        Zentao = mZentao
     End Property
 
     Public Property Get WeibuSdkPath
@@ -514,6 +531,18 @@ Class ProjectInfos
     Public Property Let Project(value)
         mProject = value
     End Property
+
+    Public Property Let Firmware(value)
+        mFirmware = value
+    End Property
+
+    Public Property Let Requirements(value)
+        mRequirements = value
+    End Property
+
+    Public Property Let Zentao(value)
+        mZentao = value
+    End Property
 End Class
 
 
@@ -545,6 +574,18 @@ Class ProjectInputs
         Project = document.getElementById(getProjectInputId()).value
     End Property
 
+    Public Property Get Firmware
+        Firmware = document.getElementById(getFirmwareInputId()).value
+    End Property
+
+    Public Property Get Requirements
+        Requirements = document.getElementById(getRequirementsInputId()).value
+    End Property
+
+    Public Property Get Zentao
+        Zentao = document.getElementById(getZentaoInputId()).value
+    End Property
+
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
         Call onWorkChange()
@@ -564,6 +605,34 @@ Class ProjectInputs
         Call setElementValue(getProjectInputId(), value)
         Call onProjectChange()
     End Property
+
+    Public Property Let Firmware(value)
+        Call setElementValue(getFirmwareInputId(), value)
+        Call onFirmwareChange()
+    End Property
+
+    Public Property Let Requirements(value)
+        Call setElementValue(getRequirementsInputId(), value)
+        Call onRequirementsChange()
+    End Property
+
+    Public Property Let Zentao(value)
+        Call setElementValue(getZentaoInputId(), value)
+        Call onZentaoChange()
+    End Property
+
+    Public Sub clearWorkInfos()
+        Work = ""
+        Firmware = ""
+        Requirements = ""
+        Zentao = ""
+    End Sub
+
+    Public Sub clearSdkInfos()
+        Sdk = ""
+        Product = ""
+        Project = ""
+    End Sub
 
     Public Sub onWorkChange()
         mInfos.Work = Work
@@ -604,5 +673,17 @@ Class ProjectInputs
             onProjectChange = False
         End If
     End Function
+
+    Public Sub onFirmwareChange()
+        mInfos.Firmware = Firmware
+    End Sub
+
+    Public Sub onRequirementsChange()
+        mInfos.Requirements = Requirements
+    End Sub
+
+    Public Sub onZentaoChange()
+        mInfos.Zentao = Zentao
+    End Sub
 
 End Class

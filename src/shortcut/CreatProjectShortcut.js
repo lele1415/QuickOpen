@@ -1,4 +1,4 @@
-function addShortcutButton(sWorkName, sSdk, sProduct, sProject, divId) 
+function addShortcutButton(sWorkName, sSdk, sProduct, sProject, sFirmware, sRequirements, sZentao, divId) 
 {
 	var baseId = sWorkName + "/" + sSdk + "/" + sProduct + "/" + sProject
 	var shortcutId = baseId + "_shortcut";
@@ -6,7 +6,7 @@ function addShortcutButton(sWorkName, sSdk, sProduct, sProject, divId)
     var upId = baseId + "_up";
     var removeId = baseId + "_remove";
 
-    var shortcutFun = function(){applyShortcut(sWorkName, sSdk, sProduct, sProject)};
+    var shortcutFun = function(){applyShortcut(sWorkName, sSdk, sProduct, sProject, sFirmware, sRequirements, sZentao)};
     var upFun = function(){upShortcut(sWorkName)}
 	var removeFun = function(){removeShortcutBtn(upId, removeId, shortcutId, brId)};
 

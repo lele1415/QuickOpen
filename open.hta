@@ -1,5 +1,5 @@
 <!--
-Version: 3.1.0
+Version: 3.2
 -->
 
 <Html>
@@ -88,6 +88,13 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <div class="form_project" id="parent_project">
         <input type="text" id="input_project" onchange="onProjectChange()" size="60" />
     </div>
+    <input type="text" id="input_firmware" onchange="onFirmwareChange()" size="40" />
+    <input type="button" class="input_button" onclick="openFirmwareFolder()" value="Firmware" />
+    <input type="text" id="input_requirements" onchange="onRequirementsChange()" size="40" />
+    <input type="button" class="input_button" onclick="openRequirementsFolder()" value="Requirement" />
+    <input type="text" id="input_zentao" onchange="onZentaoChange()" size="40" />
+    <input type="button" class="input_button" onclick="openZentao()" value="Zentao" />
+    <br>
     <input type="button" class="input_button" id="show_or_hide_shortcuts" onclick="showOrHideAllShortcuts()" value="    Select    " />
     <input type="button" class="input_button" id="create_shortcuts" onclick="creatShortcut()" value="Add/Update" />
     <br>
@@ -113,7 +120,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="CopyCleanCommand()" value="clean">
     <input type="button" class="input_button" onclick="CopyCommitInfo()" value="commit">
     <br>
-    <input type="button" class="input_button" onclick="CopyWeibuFolderPath()" value="weibu">
+    <input type="button" class="input_button" onclick="CopyWeibuFolderPath()" value="mmi">
     <input type="button" class="input_button" onclick="CopyWeibuDriverFolderPath()" value="driver">
     <input type="button" class="input_button" onclick="MkdirWeibuFolderPath()" value="mkdir">
 </fieldset>

@@ -19,22 +19,34 @@ Sub onWorkChange()
     Call mIp.onWorkChange()
 End Sub
 
+Sub onFirmwareChange()
+    Call mIp.onFirmwareChange()
+End Sub
+
+Sub onRequirementsChange()
+    Call mIp.onRequirementsChange()
+End Sub
+
+Sub onZentaoChange()
+    Call mIp.onZentaoChange()
+End Sub
+
 Sub onSdkPathChange()
-    mIp.Work = ""
+    Call mIp.clearWorkInfos()
     If mIp.onSdkChange() Then
         Call updateProductList()
     End If
 End Sub
 
 Sub onProductChange()
-	mIp.Work = ""
+	Call mIp.clearWorkInfos()
     If mIp.onProductChange() Then
         Call updateProjectList()
     End If
 End Sub
 
 Sub onProjectChange()
-	mIp.Work = ""
+	Call mIp.clearWorkInfos()
     If mIp.onProjectChange() Then
         Call createWorkName()
     End If

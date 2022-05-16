@@ -55,7 +55,7 @@ Sub AddShortcut()
     Dim i, obj
     For i = vaWorksInfo.Bound To 0 Step -1
         Set obj = vaWorksInfo.V(i)
-        Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, ID_DIV_SHORTCUT)
+        Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, obj.Firmware, obj.Requirements, obj.Zentao, ID_DIV_SHORTCUT)
     Next
 End Sub
 
@@ -69,16 +69,21 @@ Sub removeShortcut(shortcutId)
         	Exit For
         End If
     Next
+    Call mIp.clearWorkInfos()
+    Call mIp.clearSdkInfos()
     Call updateWorkInfoTxt()
 End Sub
 
-Sub applyShortcut(work, sdk, product, project)
+Sub applyShortcut(work, sdk, product, project, firmware, requirements, zentao)
 	Call hideAllShortcuts()
 	
 	mIp.Work = work
 	mIp.Sdk = sdk
 	mIp.Product = product
 	mIp.Project = project
+	mIp.Firmware = firmware
+	mIp.Requirements = requirements
+	mIp.Zentao = zentao
 	Call updateProductList()
 End Sub
 
@@ -90,11 +95,17 @@ Sub saveWorkToArray()
 			oInfos.Sdk = mIp.Infos.Sdk
 			oInfos.Product = mIp.Infos.Product
 			oInfos.Project = mIp.Infos.Project
+			oInfos.Firmware = mIp.Infos.Firmware
+			oInfos.Requirements = mIp.Infos.Requirements
+			oInfos.Zentao = mIp.Infos.Zentao
 			Exit Sub
 		ElseIf oInfos.Sdk = mIp.Infos.Sdk And _
 	    	    oInfos.Product = mIp.Infos.Product And _
 	    	    oInfos.Project = mIp.Infos.Project Then
 	    	oInfos.Work = mIp.Infos.Work
+	    	oInfos.Firmware = mIp.Infos.Firmware
+	    	oInfos.Requirements = mIp.Infos.Requirements
+	    	oInfos.Zentao = mIp.Infos.Zentao
 	    	Exit Sub
 		End If
 	Next
@@ -104,6 +115,9 @@ Sub saveWorkToArray()
 	oInfos.Sdk = mIp.Infos.Sdk
 	oInfos.Product = mIp.Infos.Product
 	oInfos.Project = mIp.Infos.Project
+	oInfos.Firmware = mIp.Infos.Firmware
+	oInfos.Requirements = mIp.Infos.Requirements
+	oInfos.Zentao = mIp.Infos.Zentao
 
     vaWorksInfo.Append(oInfos)
 End Sub
@@ -120,6 +134,9 @@ Sub updateWorkInfoTxt()
         oTxt.WriteLine(obj.Sdk)
         oTxt.WriteLine(obj.Product)
         oTxt.WriteLine(obj.Project)
+        If (obj.Firmware <> "") Then oTxt.WriteLine(obj.Firmware)
+        If (obj.Requirements <> "") Then oTxt.WriteLine(obj.Requirements)
+        If (obj.Zentao <> "") Then oTxt.WriteLine(obj.Zentao)
         oTxt.WriteLine()
     Next
 
@@ -129,7 +146,7 @@ End Sub
 
 Sub updateNewShortcutBtn()
 	Set obj = vaWorksInfo.V(vaWorksInfo.Bound)
-	Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, ID_DIV_SHORTCUT)
+	Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, obj.Firmware, obj.Requirements, obj.Zentao, ID_DIV_SHORTCUT)
 End Sub
 
 Sub upShortcut(sName)
@@ -146,4 +163,16 @@ Sub upShortcut(sName)
 	Next
 	Call updateAllShortcuts()
 	Call updateWorkInfoTxt()
+End Sub
+
+Sub openFirmwareFolder()
+    Call runOpenPath(mIp.Infos.Firmware)
+End Sub
+
+Sub openRequirementsFolder()
+    Call runOpenPath(mIp.Infos.Requirements)
+End Sub
+
+Sub openZentao()
+    Call runWebsite(mIp.Infos.Zentao)
 End Sub

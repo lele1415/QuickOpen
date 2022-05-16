@@ -18,6 +18,9 @@ Const ID_UL_PROJECT = "ul_custom_project"
 
 Const ID_WORK_NAME = "work_name"
 Const ID_DIV_SHORTCUT = "div_shortcut"
+Const ID_INPUT_FIRMWARE = "input_firmware"
+Const ID_INPUT_REQUIREMENTS = "input_requirements"
+Const ID_INPUT_ZENTAO = "input_zentao"
 
 Const ID_PARENT_OPEN_PATH = "parent_open_path"
 Const ID_INPUT_OPEN_PATH = "input_open_path"
@@ -34,6 +37,18 @@ End Function
 
 Function getWorkInputId()
     getWorkInputId = ID_WORK_NAME
+End Function
+
+Function getFirmwareInputId()
+    getFirmwareInputId = ID_INPUT_FIRMWARE
+End Function
+
+Function getRequirementsInputId()
+    getRequirementsInputId = ID_INPUT_REQUIREMENTS
+End Function
+
+Function getZentaoInputId()
+    getZentaoInputId = ID_INPUT_ZENTAO
 End Function
 
 Function getSdkPathInputId()
