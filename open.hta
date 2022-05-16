@@ -1,5 +1,5 @@
 <!--
-Version: 3.2
+Version: 3.2.1
 -->
 
 <Html>
@@ -76,6 +76,12 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <br>
 <fieldset>
     <legend>SDK path</legend>
+    <input type="button" class="input_button" id="show_shortcuts" onclick="showAllShortcuts()" value="    Select    " />
+    <input type="button" class="input_button" id="hide_shortcuts" onclick="HideAllShortcuts()" value="    Close    " style="display:none"/>
+    <input type="button" class="input_button" id="create_shortcuts" onclick="creatShortcut()" value="Add / Update" />
+    <br>
+    <div id="div_shortcut"></div>
+
     <div class="form_sdk_path" id="parent_sdk_path">
         <input
             type="text" id="input_sdk_path" onchange="onSdkPathChange()" size="50" />
@@ -94,11 +100,36 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="openRequirementsFolder()" value="Requirement" />
     <input type="text" id="input_zentao" onchange="onZentaoChange()" size="40" />
     <input type="button" class="input_button" onclick="openZentao()" value="Zentao" />
-    <br>
-    <input type="button" class="input_button" id="show_or_hide_shortcuts" onclick="showOrHideAllShortcuts()" value="    Select    " />
-    <input type="button" class="input_button" id="create_shortcuts" onclick="creatShortcut()" value="Add/Update" />
-    <br>
-    <div id="div_shortcut"></div>
+    <input id="button_show_project_infos" type="button" class="input_button" onclick="getProjectInfos()" value="ProjectConfig.mk infos">
+    <input id="button_close_project_infos" type="button" class="input_button" onclick="closeProjectInfos()" value="Close" style="display:none">
+
+    <div class="form_sdk_path" id="parent_project_infos">
+        <textarea id="input_project_infos" class="textarea_text" rows="7" cols="60" style="display:none"></textarea>
+    </div>
+
+    <input id="button_show_out_infos" type="button" class="input_button" onclick="getOutInfos()" value="  build.prop infos  ">
+    <input id="button_close_out_infos" type="button" class="input_button" onclick="closeOutInfos()" value="Close" style="display:none">
+
+    <div class="form_sdk_path" id="parent_out_infos">
+        <textarea id="input_out_infos" class="textarea_text" rows="20" cols="60" style="display:none"></textarea>
+    </div>
+</fieldset>
+<br>
+<fieldset>
+    <legend>Open file or folder</legend>
+    <input type="button" class="input_button" onclick="handlePath(0)" value="Open" />
+    <input type="button" class="input_button" onclick="AddWeibuFolderPath()" value="Add">
+    <input type="button" class="input_button" onclick="DelWeibuFolderPath()" value="Del">
+    <input type="button" class="input_button" onclick="handlePath(2)" value="Copy" />
+    <input type="button" class="input_button" onclick="runBeyondCompare()" value="Compare" />
+    <div class="form_sdk_path" id="parent_open_path">
+        <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
+    </div>
+    <input id="button_show_explorer" type="button" class="input_button" onclick="initNewExplorerPath(0)" value="Explorer" />
+    <input id="button_update_explorer" type="button" class="input_button" onclick="initNewExplorerPath(1)" value="Update" style="display:none"/>
+    <input id="button_hide_explorer" type="button" class="input_button" onclick="initNewExplorerPath(2)" value="Close" style="display:none"/>
+    <div id="exp_path">&nbsp;</div>
+    <div id="exp_file"></div>
 </fieldset>
 <br>
 <fieldset>
@@ -123,41 +154,6 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="CopyWeibuFolderPath()" value="mmi">
     <input type="button" class="input_button" onclick="CopyWeibuDriverFolderPath()" value="driver">
     <input type="button" class="input_button" onclick="MkdirWeibuFolderPath()" value="mkdir">
-</fieldset>
-<br>
-<fieldset>
-    <legend>Infos</legend>
-    <input id="button_show_project_infos" type="button" class="input_button" onclick="getProjectInfos()" value="ProjectConfig.mk infos">
-    <input id="button_close_project_infos" type="button" class="input_button" onclick="closeProjectInfos()" value="Close" style="display:none">
-
-    <div class="form_sdk_path" id="parent_project_infos">
-        <textarea id="input_project_infos" class="textarea_text" rows="7" cols="60" style="display:none"></textarea>
-    </div>
-
-    <input id="button_show_out_infos" type="button" class="input_button" onclick="getOutInfos()" value="build.prop infos">
-    <input id="button_close_out_infos" type="button" class="input_button" onclick="closeOutInfos()" value="Close" style="display:none">
-
-    <div class="form_sdk_path" id="parent_out_infos">
-        <textarea id="input_out_infos" class="textarea_text" rows="20" cols="60" style="display:none"></textarea>
-    </div>
-</fieldset>
-<br>
-<fieldset>
-    <legend>Open file or folder</legend>
-    <input type="button" class="input_button" onclick="handlePath(0)" value="Open" />
-    <input type="button" class="input_button" onclick="AddWeibuFolderPath()" value="Add">
-    <input type="button" class="input_button" onclick="DelWeibuFolderPath()" value="Del">
-    <input type="button" class="input_button" onclick="handlePath(2)" value="Copy" />
-    <input type="button" class="input_button" onclick="runBeyondCompare()" value="Compare" />
-    <div class="form_sdk_path" id="parent_open_path">
-        <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
-    </div>
-    <input id="button_show_explorer" type="button" class="input_button" onclick="initNewExplorerPath(0)" value="Explorer" />
-    <input id="button_update_explorer" type="button" class="input_button" onclick="initNewExplorerPath(1)" value="Update" style="display:none"/>
-    <input id="button_hide_explorer" type="button" class="input_button" onclick="initNewExplorerPath(2)" value="Close" style="display:none"/>
-    <div id="exp_path">&nbsp;</div>
-    <br>
-    <div id="exp_file"></div>
 </fieldset>
 
 

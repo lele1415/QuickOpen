@@ -1,9 +1,10 @@
 Const SHORTCUT_STATE_HIDE = 0
 Const SHORTCUT_STATE_SHOW = 1
-Const SHORTCUT_TEXT_HIDE = "    Hide    "
+Const SHORTCUT_TEXT_HIDE = "     Hide     "
 Const SHORTCUT_TEXT_SHOW = "    Select    "
 Const ID_CREATE_SHORTCUTS = "create_shortcuts"
-Const ID_SHOW_OR_HIDE_SHORTCUTS = "show_or_hide_shortcuts"
+Const ID_SHOW_SHORTCUTS = "show_shortcuts"
+Const ID_HIDE_SHORTCUTS = "hide_shortcuts"
 
 Dim mShortcutState
 mShortcutState = SHORTCUT_STATE_HIDE
@@ -27,7 +28,8 @@ Sub showAllShortcuts()
 		Call AddShortcut()
 	End If
 	mShortcutState = SHORTCUT_STATE_SHOW
-	Call setElementValue(ID_SHOW_OR_HIDE_SHORTCUTS, SHORTCUT_TEXT_HIDE)
+	Call hideElement(ID_SHOW_SHORTCUTS)
+	Call showElement(ID_HIDE_SHORTCUTS)
 End Sub
 
 Sub hideAllShortcuts()
@@ -35,20 +37,13 @@ Sub hideAllShortcuts()
 		Call parentNode_removeAllChilds(ID_DIV_SHORTCUT)
 	End If
 	mShortcutState = SHORTCUT_STATE_HIDE
-	Call setElementValue(ID_SHOW_OR_HIDE_SHORTCUTS, SHORTCUT_TEXT_SHOW)
+	Call hideElement(ID_HIDE_SHORTCUTS)
+	Call showElement(ID_SHOW_SHORTCUTS)
 End Sub
 
 Sub updateAllShortcuts()
 	Call parentNode_removeAllChilds(ID_DIV_SHORTCUT)
 	Call AddShortcut()
-End Sub
-
-Sub showOrHideAllShortcuts()
-	If mShortcutState = SHORTCUT_STATE_HIDE Then
-		Call showAllShortcuts()
-	ElseIf mShortcutState = SHORTCUT_STATE_SHOW Then
-		Call hideAllShortcuts()
-	End If
 End Sub
 
 Sub AddShortcut()

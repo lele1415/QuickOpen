@@ -1,9 +1,9 @@
 Const WINDOW_WIDTH = 460
-Const WINDOW_HEIGHT = 850
+Const WINDOW_HEIGHT = 750
 Sub Window_OnLoad
     Dim ScreenWidth : ScreenWidth = CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
     Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
-    Window.MoveTo ScreenWidth - WINDOW_WIDTH ,(ScreenHeight - WINDOW_HEIGHT) \ 3
+    Window.MoveTo ScreenWidth - WINDOW_WIDTH ,(ScreenHeight - WINDOW_HEIGHT) \ 2
     Window.ResizeTo WINDOW_WIDTH, WINDOW_HEIGHT
 End Sub
 
@@ -149,7 +149,8 @@ Sub freezeAllInput()
     Call disableElement(getProductInputId())
     Call disableElement(getProjectInputId())
     Call disableElement(ID_CREATE_SHORTCUTS)
-    Call disableElement(ID_SHOW_OR_HIDE_SHORTCUTS)
+    Call disableElement(ID_SHOW_SHORTCUTS)
+    Call disableElement(ID_HIDE_SHORTCUTS)
 End Sub
 
 Sub unfreezeAllInput()
@@ -158,7 +159,8 @@ Sub unfreezeAllInput()
     Call enableElement(getProductInputId())
     Call enableElement(getProjectInputId())
     Call enableElement(ID_CREATE_SHORTCUTS)
-    Call enableElement(ID_SHOW_OR_HIDE_SHORTCUTS)
+    Call enableElement(ID_SHOW_SHORTCUTS)
+    Call enableElement(ID_HIDE_SHORTCUTS)
 End Sub
 
 Function readTextAndGetValue(keyStr, filePath)
