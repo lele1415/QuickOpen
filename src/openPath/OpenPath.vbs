@@ -1,10 +1,12 @@
 
 
 Dim pPathText : pPathText = oWs.CurrentDirectory & "\res\path.ini"
-Dim pathDict
+Dim pathDict, mOverlayPathDict
 Set pathDict = CreateObject("Scripting.Dictionary")
+Set mOverlayPathDict = CreateObject("Scripting.Dictionary")
 
 Dim vaPathDirectory : Set vaPathDirectory = New VariableArray
+Dim vaOpenPathList : Set vaOpenPathList = New VariableArray
 
 Call addOpenPathList()
 Call addBuildpropList()
@@ -14,7 +16,6 @@ Call addBuildpropList()
 'Open path
 Sub onOpenPathChange()
     Call replaceOpenPath()
-    Call makeOpenButton()
 End Sub
 
 Function getOpenPath()
@@ -23,7 +24,8 @@ End Function
 
 Sub setOpenPath(path)
     mOpenPathInput.setText(path)
-    If Trim(path) <> "" Then Call onOpenPathChange()
+    Call removeOpenButtonList()
+    Call makeOpenButton()
 End Sub
 
 Sub addOpenPathList()
@@ -69,68 +71,85 @@ Sub getAllPath(oText, sReadLine)
 End Sub
 
 Sub makeOpenButton()
-	If (Not oFso.FileExists(inputPath)) And (oFso.FolderExists(inputPath)) Then
-		Call removeOpenButtonList()
+	Dim inputPath
+	inputPath = getOpenPath()
+	If Trim(inputPath) = "" Or _
+	        InStr(inputPath, "weibu/") = 1 Or _
+	        InStr(inputPath, "out/") = 1 Then
 		Exit Sub
 	End If
 
-	Dim vaOpenPathList : Set vaOpenPathList = New VariableArray
-    If getOpenButtonListPath("MMI") <> "" Then vaOpenPathList.Append("MMI")
-    If getOpenButtonListPath("Driver") <> "" Then vaOpenPathList.Append("Driver")
-
-    If vaOpenPathList.Bound > -1 Then
-    	If getOpenButtonListPath("Origin") <> "" Then vaOpenPathList.Append("Origin")
-    	Call mOpenButtonList.addList(vaOpenPathList)
-    Else
-        Call removeOpenButtonList()
-    End If
-End Sub
-
-Sub removeOpenButtonList()
-	Call mOpenButtonList.removeList()
-End Sub
-
-Function getOpenButtonListPath(where)
     If mIp.hasProjectInfos() Then
-    	Dim inputPath, wholePath, isFile, fileName
-    	inputPath = getOpenPath()
-		If oFso.FileExists(mIp.Infos.ProjectSdkPath & "/" & inputPath) Then
+		Dim wholePath, isFile, fileName
+		wholePath = mIp.Infos.Sdk & "/" & inputPath
+		If oFso.FileExists(wholePath) Then
 			isFile = True
-		Else
+		ElseIf oFso.FolderExists(wholePath) Then
 		    isFile = False
+		Else
+		    Exit Sub
 		End If
+		fileName = getFileNameFromPath(inputPath)
 
-    	fileName = getFileNameFromPath(inputPath)
+		Call findOverlayPath("MMI", isFile, fileName)
+		Call findOverlayPath("Driver", isFile, fileName)
 
-    	If where = "MMI" Then
-			wholePath = mIp.Infos.getOverlaySdkPath(inputPath)
-    		If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
-    			If oFso.FileExists(mIp.Infos.ProjectSdkPath & "/config/" & fileName) Then
-    				wholePath = mIp.Infos.ProjectSdkPath & "/config/" & fileName
-    			End If
-			End If
-	    ElseIf where = "Driver" Then
-	        wholePath = mIp.Infos.getDriverOverlaySdkPath(inputPath)
-	        If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
-    			If oFso.FileExists(mIp.Infos.DriverProjectSdkPath & "/config/" & fileName) Then
-    				wholePath = mIp.Infos.DriverProjectSdkPath & "/config/" & fileName
-    			End If
-			End If
-	    ElseIf where = "Origin" Then
-	        wholePath = mIp.Infos.Sdk & "/" & inputPath
+	    If vaOpenPathList.Bound > -1 Then
+	    	Call mOverlayPathDict.Add("Origin", wholePath)
+	    	Call vaOpenPathList.Append("Origin")
+	    	Call mOpenButtonList.addList(vaOpenPathList)
 	    End If
+	End If
+End Sub
 
-	    If isFile And oFso.FileExists(wholePath) Then
-	    	getOpenButtonListPath = wholePath
-	    ElseIf (Not isFile) And oFso.FolderExists(wholePath) Then
-	    	getOpenButtonListPath = wholePath
-	    Else
-	        getOpenButtonListPath = ""
-	    End If
+Sub findOverlayPath(where, isFile, fileName)
+	path = getOverlayPath(where, isFile, fileName)
+	If path <> "" Then
+		Call mOverlayPathDict.Add(where, path)
+		Call vaOpenPathList.Append(where)
+	End If
+End Sub
+
+Function getOverlayPath(where, isFile, fileName)
+	Dim inputPath, wholePath
+	inputPath = getOpenPath()
+
+	If where = "MMI" Then
+		wholePath = mIp.Infos.getOverlaySdkPath(inputPath)
+		If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
+			If oFso.FileExists(mIp.Infos.ProjectSdkPath & "/config/" & fileName) Then
+				wholePath = mIp.Infos.ProjectSdkPath & "/config/" & fileName
+			End If
+		End If
+    ElseIf where = "Driver" Then
+        wholePath = mIp.Infos.getDriverOverlaySdkPath(inputPath)
+        If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
+			If oFso.FileExists(mIp.Infos.DriverProjectSdkPath & "/config/" & fileName) Then
+				wholePath = mIp.Infos.DriverProjectSdkPath & "/config/" & fileName
+			End If
+		End If
+    End If
+
+    If isFile And oFso.FileExists(wholePath) Then
+    	getOverlayPath = wholePath
+    ElseIf (Not isFile) And oFso.FolderExists(wholePath) Then
+    	getOverlayPath = wholePath
     Else
-        getOpenButtonListPath = ""
+        getOverlayPath = ""
     End If
 End Function
+
+Function getOpenButtonListPath(where)
+	getOpenButtonListPath = mOverlayPathDict.Item(where)
+End Function
+
+Sub removeOpenButtonList()
+	If mOverlayPathDict.Exists("MMI") Then Call mOverlayPathDict.Remove("MMI")
+	If mOverlayPathDict.Exists("Driver") Then Call mOverlayPathDict.Remove("Driver")
+	If mOverlayPathDict.Exists("Origin") Then Call mOverlayPathDict.Remove("Origin")
+	Call vaOpenPathList.ResetArray()
+	Call mOpenButtonList.removeList()
+End Sub
 
 Sub addBuildpropList()
 	Dim vaBuildprop : Set vaBuildprop = New VariableArray
@@ -230,9 +249,9 @@ Sub replaceOpenPath()
 		If InStr(path, "[sys_target_project]") > 0 Then
 			path = Replace(path, "[sys_target_project]", getSysTargetProject())
 		End If
-
-		Call setOpenPath(path)
     End If
+
+	Call setOpenPath(path)
 End Sub
 
 Function getSysTargetProject()
