@@ -32,12 +32,32 @@ Function getBootLogo()
 End Function
 
 Sub getProjectConfigMk()
-    pMMIProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & mIp.Infos.Project & "/config/ProjectConfig.mk"
-    pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & Replace(mIp.Infos.Project, "-MMI", "") & "/config/ProjectConfig.mk"
+    If mIp.hasProjectAlps() Then
+        pMMIProjectConfigMk = mIp.Infos.ProjectSdkPath & "/config/ProjectConfig.mk"
+        If Not oFso.FileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
+
+        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & Replace(mIp.Infos.Project, "-MMI", "") & "/config/ProjectConfig.mk"
+        If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
+    Else
+        pMMIProjectConfigMk = mIp.Infos.getOverlaySdkPath("/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
+        If Not oFso.FileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
+
+        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & Replace(mIp.Infos.Project, "-MMI", "") & "/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
+        If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
+    End If
+    
     pDeviceProjectConfigMk = mIp.Infos.Sdk & "/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
+    If Not oFso.FileExists(pDeviceProjectConfigMk) Then pDeviceProjectConfigMk = ""
 End Sub
 
 Sub getProjectInfos()
+    If Not mIp.hasProjectInfos() Then
+        pMMIProjectConfigMk = ""
+        pDriverProjectConfigMk = ""
+        pDeviceProjectConfigMk = ""
+        Exit Sub
+    End If
+
     Call getProjectConfigMk()
 
     Dim str

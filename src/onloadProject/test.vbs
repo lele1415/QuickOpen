@@ -24,7 +24,47 @@
 'MsgBox(resultStr)
 
 
-str = Replace("Z:\work05\mt876w6_r\mt8766_r\alps1", "/", "\")
-str = Left(str, InStrRev(str, "\alps") - 1)
-str = Replace(str, Left(str, InStrRev(str, "\")), "")
-MsgBox(str)
+'str = Replace("Z:\work05\mt876w6_r\mt8766_r\alps1", "/", "\")
+'str = Left(str, InStrRev(str, "\alps") - 1)
+'str = Replace(str, Left(str, InStrRev(str, "\")), "")
+'MsgBox(str)
+
+'path = "weibu/tb8766p1_64_bsp/M863Y_YUKE_066/config"
+'str = Replace(path, "\", "/")
+'If InStr(str, "/") > 0 Then
+'    str = Replace(str, Left(str, InStrRev(str, "/")), "")
+'Else
+'    str = path
+'End If
+'MsgBox(str)
+
+Function findStr(str, key)
+    Dim i, num
+    num = 0
+    For i = 1 To (Len(str) - Len(key) + 1)
+        If Mid(str, i, Len(key)) = key Then
+            num = num + 1
+        End If
+    Next
+    findStr = num
+End Function
+
+Function getDriverProjectName(mmiFolderName)
+    Dim str : str = mmiFolderName
+
+    'M863Y_YUKE_066-MMI
+    If InStr(str, "-MMI") > 0 And findStr(str, "-") = 1 Then
+        str = Replace(str, "-MMI", "")
+
+    'm863ur200_64-SBYH_A8005A-Nitro_8_MMI
+    ElseIf findStr(str, "-") > 1 Then
+        Do Until findStr(str, "-") = 1
+            str = Left(str, InStrRev(str, "-") - 1)
+        Loop
+    Else
+        str = ""
+    End If
+    getDriverProjectName = str
+End Function
+
+MsgBox(getDriverProjectName("m863ur200_64-SBYH_A8009_MasstelTab8Edu-apk-MMI"))

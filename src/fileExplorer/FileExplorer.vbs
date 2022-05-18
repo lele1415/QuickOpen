@@ -22,9 +22,9 @@ Sub initNewExplorerPath(doWhat)
 	End If
 
 	If doWhat <> EXP_HIDE Then
-		Call showExplorerButtons(False)
-		Dim rootPath : rootPath = handlePath(1)
+		Dim rootPath : rootPath = mIp.Infos.Sdk & "\" & getOpenPath()
 		If isValidRootPath(rootPath) Then
+		    Call showExplorerButtons(False)
 			Call addRootPath(rootPath)
 			Call addFile()
 		End If
@@ -78,6 +78,7 @@ End Sub
 
 Sub addRootPath(rootPath)
 	Dim aFileName, i
+	rootPath = Replace(rootPath, "/", "\")
 	aFileName = Split(rootPath, "\")
 	For i = 0 To UBound(aFileName)
 		If aFileName(i) <> "" Then
@@ -143,15 +144,19 @@ End Sub
 
 
 Function isValidRootPath(sPath)
-	If oFso.FolderExists(sPath) Then
-		If Right(sPath, 1) = "\" Then sPath = Mid(sPath, 1, Len(sPath) - 1)
-	    isValidRootPath = True
-	ElseIf oFso.FileExists(sPath) Then
-	    sPath = Left(sPath, InStrRev(sPath, "\"))
-	    isValidRootPath = True
-    Else
-		MsgBox("path is not exist!")
-		isValidRootPath = False
+	If mIp.hasProjectInfos() Then
+		If oFso.FolderExists(sPath) Then
+			If Right(sPath, 1) = "\" Then sPath = Mid(sPath, 1, Len(sPath) - 1)
+		    isValidRootPath = True
+		ElseIf oFso.FileExists(sPath) Then
+		    sPath = Left(sPath, InStrRev(sPath, "\"))
+		    isValidRootPath = True
+	    Else
+			MsgBox("path is not exist!")
+			isValidRootPath = False
+		End If
+	Else
+	    isValidRootPath = False
 	End If
 End Function
 

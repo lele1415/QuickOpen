@@ -65,24 +65,13 @@ Sub findProduct()
 	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub
 
 	Call vaTargetProduct.SortArray()
-	Call addProductLi()
+	Call mProductList.addList(vaTargetProduct)
 
     If vaTargetProduct.GetIndexIfExist(mIp.Infos.Product) = -1 Then
         mIp.Product = vaTargetProduct.V(0)
     End If
 
 	Call updateProjectList()
-End Sub
-
-Sub addProductLi()
-	Call removeLi(getProductULId())
-	Call setListParentAndInputIds(getProductParentId(), getProductInputId())
-	Call setListDivIds(getProductDivId(), getProductULId())
-    Call addListUL()
-
-	Dim i : For i = 0 To vaTargetProduct.Bound
-		Call addListLi(vaTargetProduct.V(i))
-	Next
 End Sub
 
 
@@ -98,7 +87,7 @@ Sub findProject()
 	If vaCustomProject.Bound = -1 Then MsgBox("No project found!") : Exit Sub
 
 	Call vaCustomProject.SortArray()
-	Call addProjectLi()
+	Call mProjectList.addList(vaCustomProject)
 
 	If vaCustomProject.GetIndexIfExist(mIp.Infos.Project) = -1 Then
         mIp.Project = vaCustomProject.V(0)
@@ -145,18 +134,7 @@ End Function
 Function getSdkSimpleName()
 	Dim str
 	str = Replace(mIp.Infos.Sdk, "/", "\")
-	str = Left(str, InStrRev(str, "\alps") - 1)
+	If InStr(str, "\alps") > 0 Then str = Left(str, InStrRev(str, "\alps") - 1)
 	str = Replace(str, Left(str, InStrRev(str, "\")), "")
 	getSdkSimpleName = str
 End Function
-
-Sub addProjectLi()
-	Call removeLi(getProjectULId())
-	Call setListParentAndInputIds(getProjectParentId(), getProjectInputId())
-	Call setListDivIds(getProjectDivId(), getProjectULId())
-    Call addListUL()
-
-	Dim i : For i = 0 To vaCustomProject.Bound
-		Call addListLi(vaCustomProject.V(i))
-	Next
-End Sub

@@ -19,6 +19,7 @@ Sub CommandOfMake()
 End Sub
 
 Sub CommandOfLunch()
+    If Not mIp.hasProjectInfos() Then Exit Sub
     Dim comboName, buildType
 
     Select Case True
@@ -37,6 +38,7 @@ Sub CommandOfLunch()
 End Sub
 
 Sub CommandOfOut()
+    If Not mIp.hasProjectInfos() Then Exit Sub
     Call CopyString(mIp.Infos.OutSdkPath)
 End Sub
 
@@ -46,39 +48,13 @@ Sub CopyCleanCommand()
 End Sub
 
 Sub CopyCommitInfo()
+    If Not mIp.hasProjectInfos() Then Exit Sub
 	commandFinal = "[" & mIp.Infos.Project & "] : "
 	Call CopyString(commandFinal)
 End Sub
 
-Sub CopyWeibuFolderPath()
-    commandFinal = mIp.Infos.ProjectPath
-    Call CopyString(commandFinal)
-    'Call setOpenPath(commandFinal)
-End Sub
-
-Sub CopyWeibuDriverFolderPath()
-    commandFinal = mIp.Infos.ProjectPath
-    If (InStr(commandFinal, "-MMI") > 0) Then
-        commandFinal = Replace(commandFinal, "-MMI", "")
-    End If
-    Call CopyString(commandFinal)
-    'Call setOpenPath(commandFinal)
-End Sub
-
-Sub AddWeibuFolderPath()
-    commandFinal = mIp.Infos.ProjectPath & "/" & getOpenPath()
-    Call setOpenPath(commandFinal)
-End Sub
-
-Sub DelWeibuFolderPath()
-    commandFinal = Replace(getOpenPath(), mIp.Infos.ProjectPath, "")
-    If InStr(commandFinal, "/") = 1 Then
-        commandFinal = Replace(commandFinal, "/", "", 1, 1)
-    End If
-    Call setOpenPath(commandFinal)
-End Sub
-
 Sub MkdirWeibuFolderPath()
+    If Not mIp.hasProjectInfos() Then Exit Sub
     Dim filePartPath : filePartPath = Replace(getOpenPath(), "\", "/")
     Dim fileWholePath : fileWholePath = Replace(mIp.Infos.Sdk, "\", "/") & "/" & filePartPath
     Dim folderPartPath, folderWholePath
@@ -92,8 +68,8 @@ Sub MkdirWeibuFolderPath()
 
         If oFso.FolderExists(folderWholePath) Then
 
-            If Not oFso.FolderExists(mIp.Infos.ProjectSdkPath & "/" & folderPartPath) Then
-                mkdirCmd = "mkdir -p " & mIp.Infos.ProjectPath & "/" & folderPartPath & ";"
+            If Not oFso.FolderExists(mIp.Infos.getOverlaySdkPath(folderPartPath)) Then
+                mkdirCmd = "mkdir -p " & mIp.Infos.getOverlayPath(folderPartPath) & ";"
             End If
 
             If Not oFso.FileExists(mIp.Infos.ProjectSdkPath & "/" & filePartPath) Then

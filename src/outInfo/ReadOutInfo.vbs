@@ -7,21 +7,23 @@ Const ID_BUTTON_CLOSE_OUT_INFOS = "button_close_out_infos"
 Dim pSystemBuildProp
 Dim pVendorBuildProp
 Dim pProductBuildProp
-Dim pProjectConfigMk
 
 Sub getOutInfos()
-    If Not oFso.FolderExists(mIp.Infos.OutSdkPath) Then
-        MsgBox("Out path not exist!")
+    If Not mIp.hasProjectInfos() Then
+        pSystemBuildProp = ""
+        pVendorBuildProp = ""
+        pProductBuildProp = ""
         Exit Sub
     End If
+    
+    Dim outProductPath : outProductPath = getOutProductPath()
 
-    pSystemBuildProp = mIp.Infos.OutSdkPath & "\system\build.prop"
-    pVendorBuildProp = mIp.Infos.OutSdkPath & "\vendor\build.prop"
-    pProductBuildProp = mIp.Infos.OutSdkPath & "\product\build.prop"
+    pSystemBuildProp = outProductPath & "/system/build.prop"
+    pVendorBuildProp = outProductPath & "/vendor/build.prop"
+    pProductBuildProp = outProductPath & "/product/build.prop"
     If Not oFso.FileExists(pProductBuildProp) Then
-        pProductBuildProp = mIp.Infos.OutSdkPath & "\product\etc\build.prop"
+        pProductBuildProp = outProductPath & "/product/etc/build.prop"
     End If
-    'pProjectConfigMk = mIp.Infos.OutSdkPath & "\vendor\data\misc\ProjectConfig.mk"
 
     Dim str
     str = str & "display_id=" & readTextAndGetValue("ro.build.display.id", pSystemBuildProp) & VbLf
@@ -30,6 +32,7 @@ Sub getOutInfos()
     str = str & "build_type=" & readTextAndGetValue("ro.build.type", pSystemBuildProp) & VbLf
     str = str & "build_date=" & readTextAndGetValue("ro.build.date", pSystemBuildProp) & VbLf
     str = str & "build_date_utc=" & readTextAndGetValue("ro.build.date.utc", pSystemBuildProp) & VbLf
+    str = str & "locale=" & readTextAndGetValue("ro.product.locale", pSystemBuildProp) & VbLf
     str = str & "brand=" & readTextAndGetValue("ro.product.system.brand", pSystemBuildProp) & VbLf
     str = str & "model=" & readTextAndGetValue("ro.product.system.model", pSystemBuildProp) & VbLf
     str = str & "device=" & readTextAndGetValue("ro.product.system.device", pSystemBuildProp) & VbLf
@@ -39,7 +42,11 @@ Sub getOutInfos()
     str = str & "base_os=" & readTextAndGetValue("ro.build.version.base_os", pSystemBuildProp) & VbLf
     str = str & "gmsversion=" & readTextAndGetValue("ro.com.google.gmsversion", pProductBuildProp) & VbLf
     str = str & "security_path=" & readTextAndGetValue("ro.build.version.security_patch", pSystemBuildProp) & VbLf
-    str = str & "client_id=" & readTextAndGetValue("ro.com.google.clientidbase", pProductBuildProp)
+    str = str & "client_id=" & readTextAndGetValue("ro.com.google.clientidbase", pProductBuildProp) & VbLf
+    str = str & "density=" & readTextAndGetValue("ro.sf.lcd_density", pVendorBuildProp) & VbLf
+    str = str & "ringtone=" & readTextAndGetValue("ro.config.ringtone", pVendorBuildProp) & VbLf
+    str = str & "notification_sound=" & readTextAndGetValue("ro.config.notification_sound", pVendorBuildProp) & VbLf
+    str = str & "alarm_alert=" & readTextAndGetValue("ro.config.alarm_alert", pVendorBuildProp)
 
     Call hideElement(ID_BUTTON_SHOW_OUT_INFOS)
     Call showElement(ID_BUTTON_CLOSE_OUT_INFOS)

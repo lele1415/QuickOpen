@@ -1,26 +1,8 @@
-var mInputId, mDirectoryDivId, mDivId, mUlId;
-var mParent;
-
-function setListParentAndInputIds(parentId, inputId) {
-    mInputId = inputId;
-    mParent = document.getElementById(parentId);
-}
-
-function setListDirectoryDivId(directoryDivId) {
-    var input = document.getElementById(mInputId);
-    input.onclick = function(){toggleListDiv(directoryDivId)};
-
-    mDirectoryDivId = directoryDivId;
-}
-
-function setListDivIds(divId, ulId) {
-    var input = document.getElementById(mInputId);
-    if (input.onclick == undefined) {
+function setInputClickFun(inputId, divId) {
+    var input = document.getElementById(inputId);
+    //if (input.onclick == undefined) {
         input.onclick = function(){toggleListDiv(divId)};
-    }
-
-    mDivId = divId;
-    mUlId = ulId;
+    //}
 }
 
 function removeLi(ulId) {
@@ -32,36 +14,47 @@ function removeLi(ulId) {
     }
 }
 
-function addListUL() {
+function resetInputOnClick(inputId) {
+    var input = document.getElementById(inputId);
+    input.onclick = function(){onInputElementClick(inputId)};
+}
+
+function addListUL(parentId, divId, ulId) {
+    var parent = document.getElementById(parentId);
+
     var div1 = document.createElement("div");
     div1.className = "Menu_sdkPath";
-    div1.id = mDivId;
-    mParent.appendChild(div1);
+    div1.id = divId;
+    parent.appendChild(div1);
 
     var div2 = document.createElement("div");
     div2.className = "Menu2";
     div1.appendChild(div2);
 
     var ul = document.createElement("ul");
-    ul.id = mUlId;
+    ul.id = ulId;
     div2.appendChild(ul);
 }
 
-function addListLi(str)
+function addListLi(inputId, divId, ulId, str, setValue)
 {
     var li = document.createElement("li");
-    var inputId = mInputId;
-    var divId = mDivId;
-    li.onmousedown = function(){onListLiClick(inputId, divId, str)};
+    li.onmousedown = function(){onListLiClick(inputId, divId, str, setValue)};
     li.innerHTML = str;
     li.style.fontSize = "x-small";
     
-    var ul = document.getElementById(mUlId);
+    var ul = document.getElementById(ulId);
     ul.appendChild(li);
 }
 
-function onListLiClick(inputId, divId, str) {
+function onListLiClick(inputId, divId, str, setValue) {
     hideListDiv(divId);
+
+    if (!setValue) {
+        onInputListClick(divId, str);
+        return;
+    }
+
     var input = document.getElementById(inputId);
     if (input.value != str) {
         input.value = str;
@@ -72,16 +65,15 @@ function onListLiClick(inputId, divId, str) {
     }
 }
 
-function addListDirectoryLi(str, secondDivId)
+function addListDirectoryLi(dirDivId, dirUlId, listDivId, str)
 {
-    var obj = document.getElementById(mUlId);
+    var ul = document.getElementById(dirUlId);
     var li = document.createElement("li");
-    var directoryDivId = mDirectoryDivId;
-    li.onmousedown = function(){onDirectoryLiClick(directoryDivId, secondDivId)};
+    li.onmousedown = function(){onDirectoryLiClick(dirDivId, listDivId)};
     li.innerHTML = str;
     li.style.fontSize = "x-small";
     
-    obj.appendChild(li);
+    ul.appendChild(li);
 }
 
 function onDirectoryLiClick(directoryDivId, secondDivId) {

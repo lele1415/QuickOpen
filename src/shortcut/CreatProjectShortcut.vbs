@@ -161,11 +161,11 @@ Sub upShortcut(sName)
 End Sub
 
 Sub openFirmwareFolder()
-    Call runOpenPath(mIp.Infos.Firmware)
+    Call runPath(mIp.Infos.Firmware)
 End Sub
 
 Sub openRequirementsFolder()
-    Call runOpenPath(mIp.Infos.Requirements)
+    Call runPath(mIp.Infos.Requirements)
 End Sub
 
 Sub openZentao()

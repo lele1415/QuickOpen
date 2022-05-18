@@ -6,15 +6,15 @@ Set pathDict = CreateObject("Scripting.Dictionary")
 
 Dim vaPathDirectory : Set vaPathDirectory = New VariableArray
 
-Call readPathText(pPathText)
-Call setOpenPathParentIds()
-Call addPathList()
+Call addOpenPathList()
+Call addBuildpropList()
 
 
 
 'Open path
 Sub onOpenPathChange()
     Call replaceOpenPath()
+    Call makeOpenButton()
 End Sub
 
 Function getOpenPath()
@@ -23,6 +23,12 @@ End Function
 
 Sub setOpenPath(path)
     mOpenPathInput.setText(path)
+    If Trim(path) <> "" Then Call onOpenPathChange()
+End Sub
+
+Sub addOpenPathList()
+	Call readPathText(pPathText)
+	Call mOpenPathList.addList(vaPathDirectory)
 End Sub
 
 Sub readPathText(DictPath)
@@ -62,44 +68,147 @@ Sub getAllPath(oText, sReadLine)
     End If
 End Sub
 
-Sub addPathList()
-    If vaPathDirectory.Bound <> -1 Then
-        Call setOpenPathDirectoryIds()
-        Call addListUL()
-        Dim i, j, category
+Sub makeOpenButton()
+	If (Not oFso.FileExists(inputPath)) And (oFso.FolderExists(inputPath)) Then
+		Call removeOpenButtonList()
+		Exit Sub
+	End If
 
-        For i = 0 To vaPathDirectory.Bound
-            category = LCase(vaPathDirectory.V(i).Name)
-            Call setOpenPathDirectoryIds()
-            Call addListDirectoryLi(category, getOpenPathDivId() & category)
+	Dim vaOpenPathList : Set vaOpenPathList = New VariableArray
+    If getOpenButtonListPath("MMI") <> "" Then vaOpenPathList.Append("MMI")
+    If getOpenButtonListPath("Driver") <> "" Then vaOpenPathList.Append("Driver")
 
-            Call setOpenPathListIds(category)
-            Call addListUL()
-
-            if vaPathDirectory.V(i).Bound <> -1 Then
-                For j = 0 To vaPathDirectory.V(i).Bound
-                    Call addListLi(vaPathDirectory.V(i).V(j))
-                Next
-            End If
-        Next
+    If vaOpenPathList.Bound > -1 Then
+    	If getOpenButtonListPath("Origin") <> "" Then vaOpenPathList.Append("Origin")
+    	Call mOpenButtonList.addList(vaOpenPathList)
+    Else
+        Call removeOpenButtonList()
     End If
 End Sub
 
-Sub setOpenPathParentIds()
-	Call setListParentAndInputIds(getParentOpenPathId(), getOpenPathInputId())
-	Call setListDirectoryDivId(getOpenPathDirectoryDivId())
+Sub removeOpenButtonList()
+	Call mOpenButtonList.removeList()
+	Call mOpenButtonList.resetOnClick()
 End Sub
 
-Sub setOpenPathDirectoryIds()
-	Call setListDivIds(getOpenPathDirectoryDivId(), getOpenPathDirectoryULId())
+Function getOpenButtonListPath(where)
+    If mIp.hasProjectInfos() Then
+    	Dim inputPath, wholePath, isFile, fileName
+    	inputPath = getOpenPath()
+		If oFso.FileExists(mIp.Infos.ProjectSdkPath & "/" & inputPath) Then
+			isFile = True
+		Else
+		    isFile = False
+		End If
+
+    	fileName = getFileNameFromPath(inputPath)
+
+    	If where = "MMI" Then
+			wholePath = mIp.Infos.getOverlaySdkPath(inputPath)
+    		If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
+    			If oFso.FileExists(mIp.Infos.ProjectSdkPath & "/config/" & fileName) Then
+    				wholePath = mIp.Infos.ProjectSdkPath & "/config/" & fileName
+    			End If
+			End If
+	    ElseIf where = "Driver" Then
+	        wholePath = mIp.Infos.getDriverOverlaySdkPath(inputPath)
+	        If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
+    			If oFso.FileExists(mIp.Infos.DriverProjectSdkPath & "/config/" & fileName) Then
+    				wholePath = mIp.Infos.DriverProjectSdkPath & "/config/" & fileName
+    			End If
+			End If
+	    ElseIf where = "Origin" Then
+	        wholePath = mIp.Infos.Sdk & "/" & inputPath
+	    End If
+
+	    If isFile And oFso.FileExists(wholePath) Then
+	    	getOpenButtonListPath = wholePath
+	    ElseIf (Not isFile) And oFso.FolderExists(wholePath) Then
+	    	getOpenButtonListPath = wholePath
+	    Else
+	        getOpenButtonListPath = ""
+	    End If
+    Else
+        getOpenButtonListPath = ""
+    End If
+End Function
+
+Sub addBuildpropList()
+	Dim vaBuildprop : Set vaBuildprop = New VariableArray
+	vaBuildprop.Append("build.log")
+	vaBuildprop.Append("out")
+	vaBuildprop.Append("target_files")
+	vaBuildprop.Append("system/build.prop")
+	vaBuildprop.Append("vendor/build.prop")
+	vaBuildprop.Append("product/build.prop")
+    Call mBuildpropList.addList(vaBuildprop)
 End Sub
 
-Sub setOpenPathListIds(category)
-	Call setListDivIds(getOpenPathDivId() & category, getOpenPathULId() & category)
-End Sub
+Function getOutProductPath()
+	If mIp.hasProjectInfos() Then
+		Dim path : path = mIp.Infos.Sdk & "/out/target/product/" & mIp.Infos.Product
+
+		If Not oFso.FolderExists(path) Then
+			If Not oFso.FolderExists(mIp.Infos.Sdk & "/out") Then
+				MsgBox("Not found out/")
+				runFolderPath(mIp.Infos.Sdk)
+				getOutProductPath = ""
+			ElseIf Not oFso.FolderExists(mIp.Infos.Sdk & "/out/target/product") Then
+				MsgBox("Not found out/target/product/")
+				runFolderPath(mIp.Infos.Sdk & "/out")
+				getOutProductPath = ""
+			Else
+			    Dim vaOutProduct : Set vaOutProduct = searchFolder(mIp.Infos.Sdk & "/out/target/product", "", _
+		                SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+			    If vaOutProduct.Bound < 0 Then
+			        MsgBox("No product folders found in out/target/product/")
+			        runFolderPath(mIp.Infos.Sdk & "/out/target/product")
+			        getOutProductPath = ""
+			    ElseIf vaOutProduct.V(0) <> mIp.Infos.Product Then
+			        MsgBox("Other product found in out/target/product/" & Vblf & vaOutProduct.V(0))
+			        getOutProductPath = mIp.Infos.Sdk & "/out/target/product/" & vaOutProduct.V(0)
+			    End If
+			End If
+		Else
+		    getOutProductPath = path
+		End If
+	Else
+	    getOutProductPath = ""
+	End If
+End Function
+
+Function getOutListPath(where)
+    Dim outProductPath : outProductPath = getOutProductPath()
+    If outProductPath = "" Then
+    	getOutListPath = ""
+    	Exit Function
+    End If
+
+    If where = "build.log" Then
+        getOutListPath = mIp.Infos.Sdk & "/build.log"
+    ElseIf where = "out" Then
+        getOutListPath = outProductPath
+    ElseIf where = "target_files" Then
+        getOutListPath = outProductPath & "/obj/PACKAGING/target_files_intermediates"
+    ElseIf where = "system/build.prop" Then
+        getOutListPath = outProductPath & "/system/build.prop"
+    ElseIf where = "vendor/build.prop" Then
+        getOutListPath = outProductPath & "/vendor/build.prop"
+    ElseIf where = "product/build.prop" Then
+        Dim product_r, pruduct_s
+        path_r = outProductPath & "/product/build.prop"
+        path_s = outProductPath & "/product/etc/build.prop"
+        If oFso.FileExists(path_r) Then
+            getOutListPath = path_r
+        Else
+            getOutListPath = path_s
+        End If
+    End If
+End Function
 
 Sub replaceOpenPath()
 	Dim path : path = getOpenPath()
+	path = Replace(path, "\", "/")
 	If InStr(path, "..") > 0 Then
 		path = pathDict.Item(path)
 
@@ -147,141 +256,49 @@ Function getSysTargetProject()
 	Set oText = Nothing
 End Function
 
-' Function getOpenPath()
-' 	getOpenPath = getElementValue(getOpenPathInputId())
-' End Function
-
-' Function setOpenPath(path)
-' 	Call setElementValue(getOpenPathInputId(), path)
-' End Function
-
-Const DO_OPEN_PATH = 0
-Const DO_RETURN_PATH = 1
-Const DO_COPY_PATH = 2
-Function handlePath(doWhat)
-	If Trim(mIp.Infos.Sdk) = "" Then Exit Function
-
-	path = mIp.Infos.Sdk & "\" & getOpenPath()
-	path = Replace(path, "/", "\")
-	Select Case doWhat
-		Case DO_OPEN_PATH : Call runOpenPath(path)
-		Case DO_RETURN_PATH : handlePath = path
-		Case DO_COPY_PATH : Call CopyString(path)
-	End Select
+Function runOpenPath()
+	If mIp.hasProjectInfos() Then Call runPath(mIp.Infos.Sdk & "\" & getOpenPath())
 End Function
 
-' Function getKernelName(sdk, product)
-' 	If InStr(sdk, "l1") > 0 Or InStr(sdk, "8312") > 0 Then
-' 		getKernelName = "kernel-3.10"
-' 	ElseIf InStr(sdk, "8167") > 0 Then
-' 		getKernelName = "kernel-4.4"
-' 	ElseIf InStr(sdk, "O18735B") > 0 Then
-' 		If InStr(product, "8735") > 0 Then
-' 			getKernelName = "kernel-3.18"
-' 		Else
-' 			getKernelName = "kernel-4.4"
-' 		End If
-' 	Else
-' 		getKernelName = "kernel-3.18"
-' 	End If
-' End Function
-
-' Function getPlatformName(sdk)
-' 	Select Case True
-' 		Case InStr(sdk, "8127") > 0
-' 			getPlatformName = "mt8127"
-' 		Case InStr(sdk, "8163") > 0
-' 			getPlatformName = "mt8163"
-' 		Case InStr(sdk, "8167") > 0
-' 			getPlatformName = "mt8167"
-' 		Case InStr(sdk, "8312") > 0
-' 			getPlatformName = "mt6572"
-' 		Case InStr(sdk, "8321") > 0
-' 			getPlatformName = "mt6580"
-' 		Case InStr(sdk, "87") > 0
-' 			getPlatformName = "mt6735"
-' 	End Select
-' End Function
-
-' Function getHalDir(product)
-' 	Select Case True
-' 		Case InStr(product, "tb8735ap1") > 0
-' 			getHalDir = "D1"
-' 		Case InStr(product, "tb8735ba1") > 0
-' 			getHalDir = "D2"
-' 		Case InStr(product, "tb8735ma1") > 0
-' 			getHalDir = "D2"
-' 		Case InStr(product, "tb8735p1") > 0
-' 			getHalDir = "D1"
-' 	End Select
-' End Function
-
-' Function getBatteryPath(sdk, kernelName, product)
-' 	Select Case True
-' 		Case InStr(sdk, "l18127") > 0
-' 			getBatteryPath = kernelName & "\arch\arm\mach-mt8127\" & product & "\power"
-' 		Case InStr(sdk, "l18163") > 0
-' 			getBatteryPath = kernelName & "\drivers\misc\mediatek\mach\mt8163\" & product & "\power"
-' 		Case InStr(sdk, "8312") > 0
-' 			getBatteryPath = kernelName & "\arch\arm\mach-mt6572\" & product & "\power"
-' 		Case InStr(sdk, "l18321") > 0
-' 			getBatteryPath = kernelName & "\misc\mediatek\mach\mt6580\" & product & "\power"
-' 		Case InStr(sdk, "M0") > 0
-' 			getBatteryPath = kernelName & "\drivers\misc\mediatek\include\mt-plat\" & getPlatformName(sdk) & "\include\mach"
-' 	End Select
-' End Function
-
-' Function getLkLcmPath(sdk)
-' 	If InStr(sdk, "l1") > 0 Then
-' 		getLkLcmPath = "\bootable\bootloader\lk\dev\lcm"
-' 	Else
-' 	    getLkLcmPath = "\vendor\mediatek\proprietary\bootable\bootloader\lk\dev\lcm"
-' 	End If
-' End Function
-
-Sub runOpenPath(path)
-	If oFso.FolderExists(path) Then
-		oWs.Run "explorer.exe " & path
-	ElseIf oFso.FileExists(path) Then
-	    If isPictureFilePath(path) Or isCompressFilePath(path) Then
-	    	oWs.Run "explorer.exe " & path
-	    Else
-		    oWs.Run mTextEditorPath & " " & path
-		End If
-	Else
-		MsgBox("not found :" & Vblf & path)
-	End If
-End Sub
-
 Sub runBeyondCompare()
-	Dim inputPath, wholePath
-	inputPath = getOpenPath()
-	wholePath = mIp.Infos.Sdk & "/" & inputPath
+	If Not mIp.hasProjectInfos() Then Exit Sub
 
-	If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
-	    Dim leftPath, rightPath, projectPath
+    Dim inputPath, wholePath
+    inputPath = getOpenPath()
+    wholePath = mIp.Infos.Sdk & "/" & inputPath
 
-		projectPath = mIp.Infos.ProjectPath
+    If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
+        Dim leftPath, rightPath, projectPath
 
-		If InStr(inputPath, projectPath) > 0 Then
-			leftPath = wholePath
-			rightPath = Replace(wholePath, projectPath, "")
-			rightPath = Replace(rightPath, "//", "/")
-		Else
-			leftPath = mIp.Infos.ProjectSdkPath & "/" & inputPath
-			rightPath = wholePath
-		End If
+        projectPath = mIp.Infos.ProjectPath
 
-		leftPath = """" & Replace(leftPath, "/", "\") & """"
-		rightPath = """" & Replace(rightPath, "/", "\") & """"
+        If InStr(inputPath, projectPath) > 0 Then
+            leftPath = wholePath
+            rightPath = Replace(wholePath, projectPath, "")
+            rightPath = Replace(rightPath, "//", "/")
+        Else
+            leftPath = mIp.Infos.getOverlaySdkPath(inputPath)
+            rightPath = wholePath
+        End If
 
-		Dim command : command = mBeyondComparePath & " " & leftPath & " " & rightPath
-		oWs.Run command
-	Else
-		MsgBox("Not found :" & Vblf & wholePath)
-	End If
+        leftPath = """" & Replace(leftPath, "/", "\") & """"
+        rightPath = """" & Replace(rightPath, "/", "\") & """"
+
+        Dim command : command = mBeyondComparePath & " " & leftPath & " " & rightPath
+        oWs.Run command
+    Else
+        MsgBox("Not found :" & Vblf & wholePath)
+    End If
 End Sub
 
-Sub runWebsite(path)
-	oWs.Run mBrowserPath & " " & path
+Sub cleanOpenPath()
+	setOpenPath("")
+End Sub
+
+Sub openMMI()
+	If mIp.hasProjectInfos() Then runFolderPath(mIp.Infos.ProjectSdkPath)
+End Sub
+
+Sub openDriver()
+	If mIp.hasProjectInfos() Then runFolderPath(mIp.Infos.DriverProjectSdkPath)
 End Sub

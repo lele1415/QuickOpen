@@ -31,9 +31,13 @@ Const ID_UL_OPEN_PATH_DIRECTORY = "ul_open_path_directory"
 Const ID_DIV_OPEN_PATH_ = "div_open_path_"
 Const ID_UL_OPEN_PATH_ = "ul_open_path_"
 
-Function getParentSdkPathId()
-    getParentSdkPathId = ID_PARENT_SDK_PATH
-End Function
+Const ID_PARENT_OUT_BUTTON = "parent_out_button"
+Const ID_INPUT_OUT_BUTTON = "input_out_button"
+
+Const ID_PARENT_OPEN_BUTTON = "parent_open_button"
+Const ID_INPUT_OPEN_BUTTON = "input_open_button"
+
+
 
 Function getWorkInputId()
     getWorkInputId = ID_WORK_NAME
@@ -49,6 +53,10 @@ End Function
 
 Function getZentaoInputId()
     getZentaoInputId = ID_INPUT_ZENTAO
+End Function
+
+Function getSdkPathParentId()
+    getSdkPathParentId = ID_PARENT_SDK_PATH
 End Function
 
 Function getSdkPathInputId()
@@ -106,8 +114,8 @@ Function getProjectULId()
 End Function
 
 'Open path
-Function getParentOpenPathId()
-    getParentOpenPathId = ID_PARENT_OPEN_PATH
+Function getOpenPathParentId()
+    getOpenPathParentId = ID_PARENT_OPEN_PATH
 End Function
 
 Function getOpenPathInputId()
@@ -130,7 +138,47 @@ Function getOpenPathULId()
     getOpenPathULId = ID_UL_OPEN_PATH_
 End Function
 
+Function getOutButtonParentId()
+    getOutButtonParentId = ID_PARENT_OUT_BUTTON
+End Function
+
+Function getOutButtonInputId()
+    getOutButtonInputId = ID_INPUT_OUT_BUTTON
+End Function
+
+Function getOpenButtonParentId()
+    getOpenButtonParentId = ID_PARENT_OPEN_BUTTON
+End Function
+
+Function getOpenButtonInputId()
+    getOpenButtonInputId = ID_INPUT_OPEN_BUTTON
+End Function
+
 
 Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
 Dim mIp : Set mIp = New ProjectInputs
 Dim mIf : Set mIf = New ProjectInfos
+Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductParentId(), getProductInputId(), "product", True)
+Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project", True)
+Dim mSdkPathList : Set mSdkPathList = (New InputWithTwoLayerList)(getSdkPathParentId(), getSdkPathInputId(), "sdk", True)
+Dim mOpenPathList : Set mOpenPathList = (New InputWithTwoLayerList)(getOpenPathParentId(), getOpenPathInputId(), "open", True)
+Dim mBuildpropList : Set mBuildpropList = (New InputWithOneLayerList)(getOutButtonParentId(), getOutButtonInputId(), "buildprop", False)
+Dim mOpenButtonList : Set mOpenButtonList = (New InputWithOneLayerList)(getOpenButtonParentId(), getOpenButtonInputId(), "openbutton", False)
+
+Sub onInputListClick(divId, str)
+    Dim path
+
+    If InStr(divId, "buildprop") > 0 Then
+        path = getOutListPath(str)
+    ElseIf InStr(divId, "openbutton") > 0 Then
+        path = getOpenButtonListPath(str)
+    End If
+
+    If path <> "" Then runPath(path)
+End Sub
+
+Sub onInputElementClick(inputId)
+    If inputId = getOpenButtonInputId() Then
+        Call runOpenPath()
+    End If
+End Sub

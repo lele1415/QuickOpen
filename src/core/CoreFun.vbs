@@ -1,5 +1,5 @@
 Const WINDOW_WIDTH = 460
-Const WINDOW_HEIGHT = 750
+Const WINDOW_HEIGHT = 850
 Sub Window_OnLoad
     Dim ScreenWidth : ScreenWidth = CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
     Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
@@ -199,6 +199,46 @@ Function isEndWith(str, endStr)
     End If
 End Function
 
+Function findStr(str, key)
+    Dim i, num
+    num = 0
+    For i = 1 To (Len(str) - Len(key) + 1)
+        If Mid(str, i, Len(key)) = key Then
+            num = num + 1
+        End If
+    Next
+    findStr = num
+End Function
+
+Function getFileNameFromPath(path)
+    Dim str
+    str = Replace(path, "\", "/")
+    If InStr(str, "/") > 0 Then
+        str = Replace(str, Left(str, InStrRev(str, "/")), "")
+    Else
+        str = path
+    End If
+    getFileNameFromPath = str
+End Function
+
+Function getDriverProjectName(mmiFolderName)
+    Dim str : str = mmiFolderName
+
+    'M863Y_YUKE_066-MMI
+    If InStr(str, "-MMI") > 0 And findStr(str, "-") = 1 Then
+        str = Replace(str, "-MMI", "")
+
+    'm863ur200_64-SBYH_A8005A-Nitro_8_MMI
+    ElseIf findStr(str, "-") > 1 Then
+        Do Until findStr(str, "-") = 1
+            str = Left(str, InStrRev(str, "-") - 1)
+        Loop
+    Else
+        str = ""
+    End If
+    getDriverProjectName = str
+End Function
+
 Function isPictureFilePath(path)
     If isEndWith(path, ".bmp") Then
         isPictureFilePath = True
@@ -226,3 +266,40 @@ Function isCompressFilePath(path)
         isCompressFilePath = False
     End If
 End Function
+
+Sub runPath(path)
+    path = Replace(path, "/", "\")
+    If oFso.FolderExists(path) Then
+        oWs.Run "explorer.exe " & path
+    ElseIf oFso.FileExists(path) Then
+        If isPictureFilePath(path) Or isCompressFilePath(path) Then
+            oWs.Run "explorer.exe " & path
+        Else
+            oWs.Run mTextEditorPath & " " & path
+        End If
+    Else
+        MsgBox("not found :" & Vblf & path)
+    End If
+End Sub
+
+Sub runTextPath(path)
+    path = Replace(path, "/", "\")
+    If oFso.FileExists(path) Then
+        oWs.Run mTextEditorPath & " " & path
+    Else
+        MsgBox("not found :" & Vblf & path)
+    End If
+End Sub
+
+Sub runFolderPath(path)
+    path = Replace(path, "/", "\")
+    If oFso.FolderExists(path) Then
+        oWs.Run "explorer.exe " & path
+    Else
+        MsgBox("not found :" & Vblf & path)
+    End If
+End Sub
+
+Sub runWebsite(path)
+    oWs.Run mBrowserPath & " " & path
+End Sub

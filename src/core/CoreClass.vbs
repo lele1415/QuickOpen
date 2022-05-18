@@ -381,40 +381,71 @@ End Class
 
 
 Class InputWithOneLayerList
-    Private mInputId, mListDivId
+    Private mParentId, mInputId, mListDivId, mListUlId, mSetValue
 
-    Public Default Function Constructor(inputId, listDivId)
+    Public Default Function Constructor(parentId, inputId, name, setValue)
+        mParentId = parentId
         mInputId = inputId
-        mListDivId = listDivId
+        mListDivId = "list_div_" & name
+        mListUlId = "list_ul_" & name
+        mSetValue = setValue
         Set Constructor = Me
     End Function
 
-    Private Function checkElement()
-        If isElementIdExist(mInputId) Then
-            checkElement = True
-        Else
-            MsgBox("Element not exist!" & VbLf & "Id: " & mInputId)
-            checkElement = False
-        End If
-    End Function
-
-    Public Property Get Text
-        If checkElement() Then
-            Text = document.getElementById(mInputId).value
-        Else
-            Text = ""
-        End If
-    End Property
-
-    Public Sub setText(text)
-        If checkElement() Then
-            document.getElementById(mInputId).value = text
-        End If
+    Public Sub addList(vaArray)
+        Call removeLi(mListUlId)
+        Call setInputClickFun(mInputId, mListDivId)
+        Call addListUL(mParentId, mListDivId, mListUlId)
+        Dim i : For i = 0 To vaArray.Bound
+            Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), mSetValue)
+        Next
     End Sub
 
-    Public Property Get ListDivId()
-        ListDivId = mListDivId
-    End Property
+    Public Sub removeList()
+        Call removeLi(mListUlId)
+    End Sub
+
+    Public Sub resetOnClick()
+        Call resetInputOnClick(mInputId)
+    End Sub
+End Class
+
+
+
+Class InputWithTwoLayerList
+    Private mParentId, mInputId, mDirDivId, mDirUlId, mListDivId, mListUlId, mSetValue
+
+    Public Default Function Constructor(parentId, inputId, name, setValue)
+        mParentId = parentId
+        mInputId = inputId
+        mDirDivId = "list_dir_div_" & name
+        mDirUlId = "list_dir_ul_" & name
+        mListDivId = "list_div_"
+        mListUlId = "list_ul_"
+        mSetValue = setValue
+        Set Constructor = Me
+    End Function
+
+    Public Sub addList(vaArray)
+        If vaArray.Bound <> -1 Then
+            Call setInputClickFun(mInputId, mDirDivId)
+            Call addListUL(mParentId, mDirDivId, mDirUlId)
+            Dim i, j, category
+
+            For i = 0 To vaArray.Bound
+                category = vaArray.V(i).Name
+                Call addListDirectoryLi(mDirDivId, mDirUlId, mListDivId & LCase(category), category)
+
+                Call addListUL(mParentId, mListDivId & LCase(category), mListUlId & LCase(category))
+
+                if vaArray.V(i).Bound <> -1 Then
+                    For j = 0 To vaArray.V(i).Bound
+                        Call addListLi(mInputId, mListDivId & LCase(category), mListUlId & LCase(category), vaArray.V(i).V(j), mSetValue)
+                    Next
+                End If
+            Next
+        End If
+    End Sub
 End Class
 
 
@@ -435,18 +466,12 @@ Function getProductSdkPath(Sdk, Product)
     getProductSdkPath = Sdk & "/" & getProductPath(Product)
 End Function
 
-Function getProjectPath(Sdk, Product, Project)
-    Dim path
-    path = "weibu/" & Product & "/" & Project
-    If oFso.FolderExists(Sdk & "/" & path & "/alps") Then
-        getProjectPath = path & "/alps"
-    Else
-        getProjectPath = path
-    End If
+Function getProjectPath(Product, Project)
+    getProjectPath = "weibu/" & Product & "/" & Project
 End Function
 
 Function getProjectSdkPath(Sdk, Product, Project)
-    getProjectSdkPath = Sdk & "/" & getProjectPath(Sdk, Product, Project)
+    getProjectSdkPath = Sdk & "/" & getProjectPath(Product, Project)
 End Function
 
 Sub msgboxPathNotExist(path)
@@ -456,13 +481,8 @@ Sub msgboxPathNotExist(path)
 End Sub
 
 Class ProjectInfos
-    Private mWork
-    Private mSdk
-    Private mProduct
-    Private mProject
-    Private mFirmware
-    Private mRequirements
-    Private mZentao
+    Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao
+    Private mProjectAlps
 
     Public Property Get Work
         Work = mWork
@@ -509,12 +529,44 @@ Class ProjectInfos
     End Property
 
     Public Property Get ProjectPath
-        ProjectPath = getProjectPath(Sdk, Product, Project)
+        ProjectPath = getProjectPath(Product, Project)
     End Property
 
     Public Property Get ProjectSdkPath
         ProjectSdkPath = getProjectSdkPath(Sdk, Product, Project)
     End Property
+
+    Public Property Get ProjectAlps
+        ProjectAlps = mProjectAlps
+    End Property
+
+    Public Property Get DriverProject
+        DriverProject = getDriverProjectName(Project)
+    End Property
+
+    Public Property Get DriverProjectPath
+        DriverProjectPath = getProjectPath(Product, DriverProject)
+    End Property
+
+    Public Property Get DriverProjectSdkPath
+        DriverProjectSdkPath = getProjectSdkPath(Sdk, Product, DriverProject)
+    End Property
+
+    Public Function getOverlayPath(path)
+        getOverlayPath = ProjectPath & ProjectAlps & "/" & path
+    End Function
+
+    Public Function getOverlaySdkPath(path)
+        getOverlaySdkPath = ProjectSdkPath & ProjectAlps & "/" & path
+    End Function
+
+    Public Function getDriverOverlayPath(path)
+        getDriverOverlayPath = DriverProjectPath & ProjectAlps & "/" & path
+    End Function
+
+    Public Function getDriverOverlaySdkPath(path)
+        getDriverOverlaySdkPath = DriverProjectSdkPath & ProjectAlps & "/" & path
+    End Function
 
     Public Property Let Work(value)
         mWork = value
@@ -542,6 +594,10 @@ Class ProjectInfos
 
     Public Property Let Zentao(value)
         mZentao = value
+    End Property
+
+    Public Property Let ProjectAlps(value)
+        mProjectAlps = value
     End Property
 End Class
 
@@ -621,6 +677,23 @@ Class ProjectInputs
         Call onZentaoChange()
     End Property
 
+    Public Function hasProjectInfos()
+        If mInfos.Sdk <> "" And mInfos.Product <> "" And mInfos.Project <> "" Then
+            hasProjectInfos = True
+        Else
+            MsgBox("No project infos!")
+            hasProjectInfos = False
+        End If
+    End Function
+
+    Public Function hasProjectAlps()
+        If mInfos.ProjectAlps = "/alps" Then
+            hasProjectAlps = True
+        Else
+            hasProjectAlps = False
+        End If
+    End Function
+
     Public Sub clearWorkInfos()
         Work = ""
         Firmware = ""
@@ -643,7 +716,7 @@ Class ProjectInputs
         If oFso.FolderExists(mInfos.Sdk) Then
             onSdkChange = True
         Else
-            msgboxPathNotExist(value)
+            msgboxPathNotExist(mInfos.Sdk)
             Call setElementValue(getSdkPathInputId(), "")
             mInfos.Sdk = ""
             onSdkChange = False
@@ -652,10 +725,10 @@ Class ProjectInputs
 
     Public Function onProductChange()
         mInfos.Product = Product
-        If oFso.FolderExists(mInfos.WeibuSdkPath & "/" & value) Then
+        If oFso.FolderExists(mInfos.ProductSdkPath) Then
             onProductChange = True
         Else
-            msgboxPathNotExist(value)
+            msgboxPathNotExist(mInfos.ProductSdkPath)
             Call setElementValue(getProductInputId(), "")
             mInfos.Product = ""
             onProductChange = False
@@ -664,10 +737,16 @@ Class ProjectInputs
 
     Public Function onProjectChange()
         mInfos.Project = Project
-        If oFso.FolderExists(mInfos.ProductSdkPath & "/" & value) Then
+        mInfos.ProjectAlps = ""
+        If oFso.FolderExists(mInfos.ProjectSdkPath) Then
+            If oFso.FolderExists(mInfos.ProjectSdkPath & "/alps") Then
+                mInfos.ProjectAlps = "/alps"
+            Else
+                mInfos.ProjectAlps = ""
+            End If
             onProjectChange = True
         Else
-            msgboxPathNotExist(value)
+            msgboxPathNotExist(mInfos.ProjectSdkPath)
             Call setElementValue(getProjectInputId(), "")
             mInfos.Project = ""
             onProjectChange = False
