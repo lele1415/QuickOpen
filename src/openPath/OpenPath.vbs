@@ -18,14 +18,22 @@ Sub onOpenPathChange()
     Call replaceOpenPath()
 End Sub
 
+Sub onOpenButtonClick()
+	Call removeOpenButtonList()
+	Call makeOpenButton()
+	If vaOpenPathList.Bound = -1 Then
+		Call runOpenPath()
+	Else
+	    Call mOpenButtonList.toggleButtonList()
+	End If
+End Sub
+
 Function getOpenPath()
     getOpenPath = mOpenPathInput.text
 End Function
 
 Sub setOpenPath(path)
     mOpenPathInput.setText(path)
-    Call removeOpenButtonList()
-    Call makeOpenButton()
 End Sub
 
 Sub addOpenPathList()

@@ -381,14 +381,13 @@ End Class
 
 
 Class InputWithOneLayerList
-    Private mParentId, mInputId, mListDivId, mListUlId, mSetValue
+    Private mParentId, mInputId, mListDivId, mListUlId
 
-    Public Default Function Constructor(parentId, inputId, name, setValue)
+    Public Default Function Constructor(parentId, inputId, name)
         mParentId = parentId
         mInputId = inputId
         mListDivId = "list_div_" & name
         mListUlId = "list_ul_" & name
-        mSetValue = setValue
         Set Constructor = Me
     End Function
 
@@ -398,30 +397,54 @@ Class InputWithOneLayerList
             Call setInputClickFun(mParentId, mInputId, mListDivId)
             Call addListUL(mParentId, mListDivId, mListUlId)
             Dim i : For i = 0 To vaArray.Bound
-                Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), mSetValue)
+                Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), True)
+            Next
+        End If
+    End Sub
+End Class
+
+Class ButtonWithOneLayerList
+    Private mParentId, mInputId, mListDivId, mListUlId
+
+    Public Default Function Constructor(parentId, inputId, name)
+        mParentId = parentId
+        mInputId = inputId
+        mListDivId = "list_div_" & name
+        mListUlId = "list_ul_" & name
+        Set Constructor = Me
+    End Function
+
+    Public Sub addList(vaArray)
+        If vaArray.Bound <> -1 Then
+            Call removeLi(mListUlId)
+            Call addListUL(mParentId, mListDivId, mListUlId)
+            Dim i : For i = 0 To vaArray.Bound
+                Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), False)
             Next
         End If
     End Sub
 
     Public Sub removeList()
         Call removeLi(mListUlId)
-        Call resetInputOnClick(mInputId)
+    End Sub
+
+    Public Sub toggleButtonList()
+        Call toggleListDiv(mParentId, mListDivId)
     End Sub
 End Class
 
 
 
 Class InputWithTwoLayerList
-    Private mParentId, mInputId, mDirDivId, mDirUlId, mListDivId, mListUlId, mSetValue
+    Private mParentId, mInputId, mDirDivId, mDirUlId, mListDivId, mListUlId
 
-    Public Default Function Constructor(parentId, inputId, name, setValue)
+    Public Default Function Constructor(parentId, inputId, name)
         mParentId = parentId
         mInputId = inputId
         mDirDivId = "list_dir_div_" & name
         mDirUlId = "list_dir_ul_" & name
         mListDivId = "list_div_"
         mListUlId = "list_ul_"
-        mSetValue = setValue
         Set Constructor = Me
     End Function
 
@@ -439,7 +462,7 @@ Class InputWithTwoLayerList
 
                 if vaArray.V(i).Bound <> -1 Then
                     For j = 0 To vaArray.V(i).Bound
-                        Call addListLi(mInputId, mListDivId & LCase(category), mListUlId & LCase(category), vaArray.V(i).V(j), mSetValue)
+                        Call addListLi(mInputId, mListDivId & LCase(category), mListUlId & LCase(category), vaArray.V(i).V(j), True)
                     Next
                 End If
             Next

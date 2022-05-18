@@ -14,11 +14,6 @@ function removeLi(ulId) {
     }
 }
 
-function resetInputOnClick(inputId) {
-    var input = document.getElementById(inputId);
-    input.onclick = function(){onInputElementClick(inputId)};
-}
-
 function addListUL(parentId, divId, ulId) {
     var parent = document.getElementById(parentId);
 
