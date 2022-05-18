@@ -88,7 +88,6 @@ End Sub
 
 Sub removeOpenButtonList()
 	Call mOpenButtonList.removeList()
-	Call mOpenButtonList.resetOnClick()
 End Sub
 
 Function getOpenButtonListPath(where)

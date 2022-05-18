@@ -1,7 +1,7 @@
-function setInputClickFun(inputId, divId) {
+function setInputClickFun(parentId, inputId, divId) {
     var input = document.getElementById(inputId);
     //if (input.onclick == undefined) {
-        input.onclick = function(){toggleListDiv(divId)};
+        input.onclick = function(){toggleListDiv(parentId, divId)};
     //}
 }
 
@@ -65,25 +65,25 @@ function onListLiClick(inputId, divId, str, setValue) {
     }
 }
 
-function addListDirectoryLi(dirDivId, dirUlId, listDivId, str)
+function addListDirectoryLi(parentId, dirDivId, dirUlId, listDivId, str)
 {
     var ul = document.getElementById(dirUlId);
     var li = document.createElement("li");
-    li.onmousedown = function(){onDirectoryLiClick(dirDivId, listDivId)};
+    li.onmousedown = function(){onDirectoryLiClick(parentId, dirDivId, listDivId)};
     li.innerHTML = str;
     li.style.fontSize = "x-small";
     
     ul.appendChild(li);
 }
 
-function onDirectoryLiClick(directoryDivId, secondDivId) {
+function onDirectoryLiClick(parentId, directoryDivId, secondDivId) {
     hideListDiv(directoryDivId)
-    showListDiv(secondDivId);
+    showListDiv(parentId, secondDivId);
 }
 
-function showListDiv(divId) {
-    var div = document.getElementById(divId);
-    div.onmouseleave = function(){hideListDiv(divId)};
+function showListDiv(parentId, divId) {
+    var parent = document.getElementById(parentId);
+    parent.onmouseleave = function(){hideListDiv(divId)};
 
     var layer=window.document.getElementById(divId);
     layer.style.display="block";
@@ -94,11 +94,11 @@ function hideListDiv(divId) {
     layer.style.display="none";
 }
 
-function toggleListDiv(divId) {
+function toggleListDiv(parentId, divId) {
     var layer=window.document.getElementById(divId);
     if (layer.style.display == "block") {
         hideListDiv(divId);
     } else {
-        showListDiv(divId);
+        showListDiv(parentId, divId);
     }
 }

@@ -393,19 +393,18 @@ Class InputWithOneLayerList
     End Function
 
     Public Sub addList(vaArray)
-        Call removeLi(mListUlId)
-        Call setInputClickFun(mInputId, mListDivId)
-        Call addListUL(mParentId, mListDivId, mListUlId)
-        Dim i : For i = 0 To vaArray.Bound
-            Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), mSetValue)
-        Next
+        If vaArray.Bound <> -1 Then
+            Call removeLi(mListUlId)
+            Call setInputClickFun(mParentId, mInputId, mListDivId)
+            Call addListUL(mParentId, mListDivId, mListUlId)
+            Dim i : For i = 0 To vaArray.Bound
+                Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), mSetValue)
+            Next
+        End If
     End Sub
 
     Public Sub removeList()
         Call removeLi(mListUlId)
-    End Sub
-
-    Public Sub resetOnClick()
         Call resetInputOnClick(mInputId)
     End Sub
 End Class
@@ -428,13 +427,13 @@ Class InputWithTwoLayerList
 
     Public Sub addList(vaArray)
         If vaArray.Bound <> -1 Then
-            Call setInputClickFun(mInputId, mDirDivId)
+            Call setInputClickFun(mParentId, mInputId, mDirDivId)
             Call addListUL(mParentId, mDirDivId, mDirUlId)
             Dim i, j, category
 
             For i = 0 To vaArray.Bound
                 category = vaArray.V(i).Name
-                Call addListDirectoryLi(mDirDivId, mDirUlId, mListDivId & LCase(category), category)
+                Call addListDirectoryLi(mParentId, mDirDivId, mDirUlId, mListDivId & LCase(category), category)
 
                 Call addListUL(mParentId, mListDivId & LCase(category), mListUlId & LCase(category))
 
