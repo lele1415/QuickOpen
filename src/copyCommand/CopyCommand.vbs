@@ -72,8 +72,8 @@ Sub MkdirWeibuFolderPath()
                 mkdirCmd = "mkdir -p " & mIp.Infos.getOverlayPath(folderPartPath) & ";"
             End If
 
-            If Not oFso.FileExists(mIp.Infos.ProjectSdkPath & "/" & filePartPath) Then
-                cpCmd = "cp " & filePartPath & " " & mIp.Infos.ProjectPath & "/" & folderPartPath
+            If Not oFso.FileExists(mIp.Infos.getOverlaySdkPath(filePartPath)) Then
+                cpCmd = "cp " & filePartPath & " " & mIp.Infos.getOverlayPath(folderPartPath)
             Else
                 MsgBox("File exist!")
             End If
