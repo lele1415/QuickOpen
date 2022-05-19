@@ -1,11 +1,11 @@
 <!--
-Version: 3.3.4
+Version: 3.3.5
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>Quick Open v3.3.4</Title>
+<Title>Quick Open v3.3.5</Title>
 
 <style type="text/css">
 
@@ -82,18 +82,15 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <br>
     <div id="div_shortcut"></div>
 
-    <div class="form_sdk_path" id="parent_sdk_path">
-        <input
-            type="text" id="input_sdk_path" onchange="onSdkPathChange()" size="50" />
-    </div>
+    <input type="text" id="input_sdk_path" onchange="onSdkPathChange()"  onclick="onSdkPathInputClick()"size="50" />
+    <div class="form_sdk_path" id="parent_sdk_path" style="display:none"></div>
 
-    <div class="form_product" id="parent_product">
-        <input type="text" id="input_product" onchange="onProductChange()" size="20" />
-    </div>
+    <input type="text" id="input_product" onchange="onProductChange()" size="20" />
+    <div class="form_product" id="parent_product" style="display:none"></div>
     
-    <div class="form_project" id="parent_project">
-        <input type="text" id="input_project" onchange="onProjectChange()" size="60" />
-    </div>
+    <input type="text" id="input_project" onchange="onProjectChange()" size="60" />
+    <div class="form_project" id="parent_project" style="display:none"></div>
+
     <input type="text" id="input_firmware" onchange="onFirmwareChange()" size="40" />
     <input type="button" class="input_button" onclick="openFirmwareFolder()" value="Firmware" />
     <input type="text" id="input_requirements" onchange="onRequirementsChange()" size="40" />
@@ -112,7 +109,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
         <textarea id="input_out_infos" class="textarea_text" rows="22" cols="60" style="display:none"></textarea>
     </div>
 
-    <input id="input_out_button" type="button" class="input_button" value="     out     ">&nbsp;
+    <input id="input_out_button" type="button" class="input_button" onclick="onOutButtonClick()" value="     out     ">&nbsp;
     <input type="button" class="input_button" onclick="openMMI()" value="     MMI     ">&nbsp;
     <input type="button" class="input_button" onclick="openDriver()" value="     Driver     ">
     <div class="form_product" id="parent_out_button"></div>
@@ -121,14 +118,15 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <fieldset>
     <legend>Open file or folder</legend>
 
-    <div class="form_sdk_path" id="parent_open_path">
-        <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
-    </div>
+    <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
 
     <input id="input_open_button" type="button" class="input_button" onclick="onOpenButtonClick()" value="Open" />
+    <input type="button" class="input_button" onclick="onOpenListClick()" value=" List " />
     <input type="button" class="input_button" onclick="cleanOpenPath()" value="Clean" />
     <input type="button" class="input_button" onclick="runBeyondCompare()" value="Compare" />
-    <div class="form_product" id="parent_open_button"></div>
+
+    <div class="form_product" id="parent_open_button" style="display:none"></div>
+    <div class="form_sdk_path" id="parent_open_path"></div>
 </fieldset>
 <br>
 <fieldset>

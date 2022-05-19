@@ -9,13 +9,17 @@ Dim vaPathDirectory : Set vaPathDirectory = New VariableArray
 Dim vaOpenPathList : Set vaOpenPathList = New VariableArray
 
 Call addOpenPathList()
-Call addBuildpropList()
+Call addOutFileList()
 
 
 
 'Open path
 Sub onOpenPathChange()
     Call replaceOpenPath()
+End Sub
+
+Sub onOpenListClick()
+	Call mOpenPathList.toggleList()
 End Sub
 
 Sub onOpenButtonClick()
@@ -26,6 +30,10 @@ Sub onOpenButtonClick()
 	Else
 	    Call mOpenButtonList.toggleButtonList()
 	End If
+End Sub
+
+Sub onOutButtonClick()
+	Call mOutFileList.toggleButtonList()
 End Sub
 
 Function getOpenPath()
@@ -159,15 +167,15 @@ Sub removeOpenButtonList()
 	Call mOpenButtonList.removeList()
 End Sub
 
-Sub addBuildpropList()
-	Dim vaBuildprop : Set vaBuildprop = New VariableArray
-	vaBuildprop.Append("build.log")
-	vaBuildprop.Append("out")
-	vaBuildprop.Append("target_files")
-	vaBuildprop.Append("system/build.prop")
-	vaBuildprop.Append("vendor/build.prop")
-	vaBuildprop.Append("product/build.prop")
-    Call mBuildpropList.addList(vaBuildprop)
+Sub addOutFileList()
+	Dim vaOutFile : Set vaOutFile = New VariableArray
+	vaOutFile.Append("build.log")
+	vaOutFile.Append("out")
+	vaOutFile.Append("target_files")
+	vaOutFile.Append("system/build.prop")
+	vaOutFile.Append("vendor/build.prop")
+	vaOutFile.Append("product/build.prop")
+    Call mOutFileList.addList(vaOutFile)
 End Sub
 
 Function getOutProductPath()

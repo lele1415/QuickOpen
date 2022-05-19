@@ -11,6 +11,10 @@ Call mSdkPathList.addList(vaAndroidVer)
 
 
 
+Sub onSdkPathInputClick()
+    Call mSdkPathList.toggleList()
+End Sub
+
 Sub readConfigText(DictPath)
     If Not oFso.FileExists(DictPath) Then Exit Sub
     

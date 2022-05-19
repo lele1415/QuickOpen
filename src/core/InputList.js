@@ -31,10 +31,10 @@ function addListUL(parentId, divId, ulId) {
     div2.appendChild(ul);
 }
 
-function addListLi(inputId, divId, ulId, str, setValue)
+function addListLi(parentId, inputId, divId, ulId, str, setValue)
 {
     var li = document.createElement("li");
-    li.onmousedown = function(){onListLiClick(inputId, divId, str, setValue)};
+    li.onmousedown = function(){onListLiClick(parentId, inputId, divId, str, setValue)};
     li.innerHTML = str;
     li.style.fontSize = "x-small";
     
@@ -42,8 +42,8 @@ function addListLi(inputId, divId, ulId, str, setValue)
     ul.appendChild(li);
 }
 
-function onListLiClick(inputId, divId, str, setValue) {
-    hideListDiv(divId);
+function onListLiClick(parentId, inputId, divId, str, setValue) {
+    hideListDiv(parentId, divId);
 
     if (!setValue) {
         onInputListClick(divId, str);
@@ -71,20 +71,28 @@ function addListDirectoryLi(parentId, dirDivId, dirUlId, listDivId, str)
     ul.appendChild(li);
 }
 
-function onDirectoryLiClick(parentId, directoryDivId, secondDivId) {
-    hideListDiv(directoryDivId)
-    showListDiv(parentId, secondDivId);
+function onDirectoryLiClick(parentId, dirDivId, listDivId) {
+    hideListDiv(parentId, dirDivId)
+    showListDiv(parentId, listDivId);
+}
+
+function isDivShowing(divId) {
+    var layer = window.document.getElementById(divId);
+    return layer.style.display == "block";
 }
 
 function showListDiv(parentId, divId) {
     var parent = document.getElementById(parentId);
-    parent.onmouseleave = function(){hideListDiv(divId)};
+    //parent.onmouseleave = function(){hideListDiv(parentId, divId)};
+    parent.style.display="block";
 
     var layer=window.document.getElementById(divId);
     layer.style.display="block";
 }
 
-function hideListDiv(divId) {
+function hideListDiv(parentId, divId) {
+    var parent = document.getElementById(parentId);
+    parent.style.display="none";
     var layer=window.document.getElementById(divId); 
     layer.style.display="none";
 }
@@ -92,7 +100,7 @@ function hideListDiv(divId) {
 function toggleListDiv(parentId, divId) {
     var layer=window.document.getElementById(divId);
     if (layer.style.display == "block") {
-        hideListDiv(divId);
+        hideListDiv(parentId, divId);
     } else {
         showListDiv(parentId, divId);
     }

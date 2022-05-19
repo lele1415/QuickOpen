@@ -397,7 +397,7 @@ Class InputWithOneLayerList
             Call setInputClickFun(mParentId, mInputId, mListDivId)
             Call addListUL(mParentId, mListDivId, mListUlId)
             Dim i : For i = 0 To vaArray.Bound
-                Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), True)
+                Call addListLi(mParentId, mInputId, mListDivId, mListUlId, vaArray.V(i), True)
             Next
         End If
     End Sub
@@ -419,7 +419,7 @@ Class ButtonWithOneLayerList
             Call removeLi(mListUlId)
             Call addListUL(mParentId, mListDivId, mListUlId)
             Dim i : For i = 0 To vaArray.Bound
-                Call addListLi(mInputId, mListDivId, mListUlId, vaArray.V(i), False)
+                Call addListLi(mParentId, mInputId, mListDivId, mListUlId, vaArray.V(i), False)
             Next
         End If
     End Sub
@@ -436,7 +436,7 @@ End Class
 
 
 Class InputWithTwoLayerList
-    Private mParentId, mInputId, mDirDivId, mDirUlId, mListDivId, mListUlId
+    Private mParentId, mInputId, mDirDivId, mDirUlId, mListDivId, mListUlId, mVaArray
 
     Public Default Function Constructor(parentId, inputId, name)
         mParentId = parentId
@@ -449,8 +449,8 @@ Class InputWithTwoLayerList
     End Function
 
     Public Sub addList(vaArray)
+        Set mVaArray = vaArray
         If vaArray.Bound <> -1 Then
-            Call setInputClickFun(mParentId, mInputId, mDirDivId)
             Call addListUL(mParentId, mDirDivId, mDirUlId)
             Dim i, j, category
 
@@ -462,10 +462,31 @@ Class InputWithTwoLayerList
 
                 if vaArray.V(i).Bound <> -1 Then
                     For j = 0 To vaArray.V(i).Bound
-                        Call addListLi(mInputId, mListDivId & LCase(category), mListUlId & LCase(category), vaArray.V(i).V(j), True)
+                        Call addListLi(mParentId, mInputId, mListDivId & LCase(category), mListUlId & LCase(category), vaArray.V(i).V(j), True)
                     Next
                 End If
             Next
+        End If
+    End Sub
+
+    Public Sub toggleList()
+        If isDivShowing(mDirDivId) Then
+            Call hideListDiv(mParentId, mDirDivId)
+        Else
+            Dim i, category, isShow
+            isShow = False
+            For i = 0 To mVaArray.Bound
+                category = mVaArray.V(i).Name
+                If isDivShowing(mListDivId & LCase(category)) Then
+                    isShow = True
+                    Exit For
+                End If
+            Next
+            If isShow Then
+                Call hideListDiv(mParentId, mListDivId & LCase(category))
+            Else
+                Call showListDiv(mParentId, mDirDivId)
+            End If
         End If
     End Sub
 End Class

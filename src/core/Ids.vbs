@@ -160,15 +160,15 @@ Dim mIp : Set mIp = New ProjectInputs
 Dim mIf : Set mIf = New ProjectInfos
 Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductParentId(), getProductInputId(), "product")
 Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project")
-Dim mSdkPathList : Set mSdkPathList = (New InputWithTwoLayerList)(getSdkPathParentId(), getSdkPathInputId(), "sdk")
-Dim mOpenPathList : Set mOpenPathList = (New InputWithTwoLayerList)(getOpenPathParentId(), getOpenPathInputId(), "open")
-Dim mBuildpropList : Set mBuildpropList = (New InputWithOneLayerList)(getOutButtonParentId(), getOutButtonInputId(), "buildprop")
+Dim mSdkPathList : Set mSdkPathList = (New InputWithTwoLayerList)(getSdkPathParentId(), getSdkPathInputId(), "sdkpath")
+Dim mOpenPathList : Set mOpenPathList = (New InputWithTwoLayerList)(getOpenPathParentId(), getOpenPathInputId(), "openpath")
+Dim mOutFileList : Set mOutFileList = (New ButtonWithOneLayerList)(getOutButtonParentId(), getOutButtonInputId(), "outfile")
 Dim mOpenButtonList : Set mOpenButtonList = (New ButtonWithOneLayerList)(getOpenButtonParentId(), getOpenButtonInputId(), "openbutton")
 
 Sub onInputListClick(divId, str)
     Dim path
 
-    If InStr(divId, "buildprop") > 0 Then
+    If InStr(divId, "outfile") > 0 Then
         path = getOutListPath(str)
     ElseIf InStr(divId, "openbutton") > 0 Then
         path = getOpenButtonListPath(str)
