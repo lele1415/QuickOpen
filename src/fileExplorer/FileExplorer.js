@@ -22,11 +22,14 @@ function addButtonOfFolder(divAreaId, folderName) {
 
 function addButtonOfFile(divAreaId, fileName) {
 	var btn_file = input_creat("button", "", " " + fileName + " ", function(){clickFile(fileName)}, 0);
+	var btn_paste = input_creat("button", "", " ^ ", function(){clickPaste(fileName)}, 0);
 	var btn_br = document.createElement("br");
 
 	btn_file = setButtonStyle(btn_file);
+	btn_paste = setButtonStyle(btn_paste);
 
     parentNode_appendChild(divAreaId, btn_file);
+    parentNode_appendChild(divAreaId, btn_paste);
     parentNode_appendChild(divAreaId, btn_br);
 }
 

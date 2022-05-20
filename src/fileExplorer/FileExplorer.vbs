@@ -65,6 +65,10 @@ Sub clickPlus(folderName)
 	Call addFile()
 End Sub
 
+Sub clickPaste(fileName)
+	Call updateOpenPath(fileName)
+End Sub
+
 Sub clickFolder(folderName)
 	Call openFolder(sCrtPath & "\" & folderName)
 End Sub
@@ -78,7 +82,6 @@ End Sub
 
 Sub addRootPath(rootPath)
 	Dim aFileName, i
-	rootPath = Replace(rootPath, "/", "\")
 	aFileName = Split(rootPath, "\")
 	For i = 0 To UBound(aFileName)
 		If aFileName(i) <> "" Then
@@ -143,13 +146,14 @@ End Sub
 
 
 
-Function isValidRootPath(sPath)
+Function isValidRootPath(rootPath)
 	If mIp.hasProjectInfos() Then
-		If oFso.FolderExists(sPath) Then
-			If Right(sPath, 1) = "\" Then sPath = Mid(sPath, 1, Len(sPath) - 1)
+	    rootPath = Replace(rootPath, "/", "\")
+		If oFso.FolderExists(rootPath) Then
+			If Right(rootPath, 1) = "\" Then rootPath = Mid(rootPath, 1, Len(rootPath) - 1)
 		    isValidRootPath = True
-		ElseIf oFso.FileExists(sPath) Then
-		    sPath = Left(sPath, InStrRev(sPath, "\"))
+		ElseIf oFso.FileExists(rootPath) Then
+		    rootPath = Left(rootPath, InStrRev(rootPath, "\"))
 		    isValidRootPath = True
 	    Else
 			MsgBox("path is not exist!")
