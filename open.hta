@@ -1,11 +1,11 @@
 <!--
-Version: 3.3.5
+Version: 3.3.6
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>Quick Open v3.3.5</Title>
+<Title>Quick Open v3.3.6</Title>
 
 <style type="text/css">
 
@@ -117,12 +117,17 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <br>
 <fieldset>
     <legend>Open file or folder</legend>
+    <input type="button" class="input_button" onclick="cleanOpenPath()" value="Clean" />
+    <input type="button" class="input_button" onclick="replaceSlash()" value=" / " />
+    <input type="button" class="input_button" onclick="addProjectPath()" value=" addP " />
+    <input type="button" class="input_button" onclick="addDriverProjectPath()" value=" addD " />
+    <input type="button" class="input_button" onclick="cutSdkPath()" value=" cutS " />
+    <input type="button" class="input_button" onclick="cutProjectPath()" value=" cutP " />
 
     <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
 
     <input id="input_open_button" type="button" class="input_button" onclick="onOpenButtonClick()" value="Open" />
     <input type="button" class="input_button" onclick="onOpenListClick()" value=" List " />
-    <input type="button" class="input_button" onclick="cleanOpenPath()" value="Clean" />
     <input type="button" class="input_button" onclick="runBeyondCompare()" value="Compare" />
 
     <div class="form_product" id="parent_open_button" style="display:none"></div>

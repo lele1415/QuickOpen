@@ -302,14 +302,17 @@ Sub runBeyondCompare()
     wholePath = mIp.Infos.Sdk & "/" & inputPath
 
     If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
-        Dim leftPath, rightPath, projectPath
+        Dim leftPath, rightPath, projectPath, driverPath
 
-        projectPath = mIp.Infos.ProjectPath
+        projectPath = mIp.Infos.ProjectPath & mIp.Infos.ProjectAlps
+        driverPath = mIp.Infos.DriverProjectPath & mIp.Infos.ProjectAlps
 
         If InStr(inputPath, projectPath) > 0 Then
             leftPath = wholePath
-            rightPath = Replace(wholePath, projectPath, "")
-            rightPath = Replace(rightPath, "//", "/")
+            rightPath = Replace(wholePath, projectPath & "/", "")
+        ElseIf InStr(inputPath, driverPath) > 0 Then
+            leftPath = wholePath
+            rightPath = Replace(wholePath, driverPath & "/", "")
         Else
             leftPath = mIp.Infos.getOverlaySdkPath(inputPath)
             rightPath = wholePath
@@ -335,4 +338,32 @@ End Sub
 
 Sub openDriver()
 	If mIp.hasProjectInfos() Then runFolderPath(mIp.Infos.DriverProjectSdkPath)
+End Sub
+
+Sub replaceSlash()
+	Call setOpenPath(Replace(getOpenPath(), "\", "/"))
+End Sub
+
+Sub addProjectPath()
+	Call setOpenPath(mIp.Infos.ProjectPath & "/" & getOpenPath())
+End Sub
+
+Sub addDriverProjectPath()
+	Call setOpenPath(mIp.Infos.DriverProjectPath & "/" & getOpenPath())
+End Sub
+
+Sub cutSdkPath()
+	Call replaceSlash()
+	If mIp.hasProjectInfos() Then
+	    Call setOpenPath(Replace(getOpenPath(), Replace(mIp.Infos.Sdk, "\", "/") & "/", ""))
+	End If
+End Sub
+
+Sub cutProjectPath()
+	Call replaceSlash()
+	If mIp.hasProjectInfos() Then
+		Call setOpenPath(Replace(getOpenPath(), Replace(mIp.Infos.Sdk, "\", "/") & "/", ""))
+	    Call setOpenPath(Replace(getOpenPath(), mIp.Infos.ProjectPath & mIp.Infos.ProjectAlps & "/", ""))
+	    Call setOpenPath(Replace(getOpenPath(), mIp.Infos.DriverProjectPath & mIp.Infos.ProjectAlps & "/", ""))
+	End If
 End Sub
