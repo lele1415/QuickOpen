@@ -404,11 +404,10 @@ Class InputWithOneLayerList
 End Class
 
 Class ButtonWithOneLayerList
-    Private mParentId, mInputId, mListDivId, mListUlId
+    Private mParentId, mListDivId, mListUlId
 
-    Public Default Function Constructor(parentId, inputId, name)
+    Public Default Function Constructor(parentId, name)
         mParentId = parentId
-        mInputId = inputId
         mListDivId = "list_div_" & name
         mListUlId = "list_ul_" & name
         Set Constructor = Me
@@ -419,7 +418,7 @@ Class ButtonWithOneLayerList
             Call removeLi(mListUlId)
             Call addListUL(mParentId, mListDivId, mListUlId)
             Dim i : For i = 0 To vaArray.Bound
-                Call addListLi(mParentId, mInputId, mListDivId, mListUlId, vaArray.V(i), False)
+                Call addListLi(mParentId, "", mListDivId, mListUlId, vaArray.V(i), False)
             Next
         End If
     End Sub
@@ -494,7 +493,7 @@ End Class
 
 
 Function getWeibuSdkPath(Sdk)
-    getWeibuSdkPath = Sdk & "/weibu"
+    getWeibuSdkPath = Sdk & "\weibu"
 End Function
 
 Function getOutSdkPath(Sdk, Product)
@@ -724,7 +723,7 @@ Class ProjectInputs
         If mInfos.Sdk <> "" And mInfos.Product <> "" And mInfos.Project <> "" Then
             hasProjectInfos = True
         Else
-            MsgBox("No project infos!")
+            'MsgBox("No project infos!")
             hasProjectInfos = False
         End If
     End Function
@@ -750,11 +749,30 @@ Class ProjectInputs
         Project = ""
     End Sub
 
+    Public Sub cutSdkInOpenPath()
+        If Trim(getOpenPath()) = "" Then Exit Sub
+        If hasProjectInfos() Then
+            Call replaceSlash()
+            Call setOpenPath(Replace(getOpenPath(), Replace(mInfos.Sdk, "\", "/") & "/", ""))
+        End If
+    End Sub
+
+    Public Sub cutProjectInOpenPath()
+        If Trim(getOpenPath()) = "" Then Exit Sub
+        Call cutSdkInOpenPath()
+        If hasProjectInfos() Then
+            Call setOpenPath(Replace(getOpenPath(), mInfos.ProjectPath & mInfos.ProjectAlps & "/", ""))
+            Call setOpenPath(Replace(getOpenPath(), mInfos.DriverProjectPath & mInfos.ProjectAlps & "/", ""))
+        End If
+    End Sub
+
     Public Sub onWorkChange()
         mInfos.Work = Work
     End Sub
 
     Public Function onSdkChange()
+        Call mIp.cutSdkInOpenPath()
+
         mInfos.Sdk = Sdk
         If oFso.FolderExists(mInfos.Sdk) Then
             onSdkChange = True
@@ -779,6 +797,8 @@ Class ProjectInputs
     End Function
 
     Public Function onProjectChange()
+        Call mIp.cutProjectInOpenPath()
+
         mInfos.Project = Project
         mInfos.ProjectAlps = ""
         If oFso.FolderExists(mInfos.ProjectSdkPath) Then

@@ -60,6 +60,10 @@ End Sub
 
 Sub findProduct()
 	window.clearTimeout(idTimer)
+	If Not oFso.FolderExists(mIp.Infos.WeibuSdkPath) Then
+		MsgBox "Not found: " & mIp.Infos.WeibuSdkPath
+		Exit Sub
+	End If
 	Set vaTargetProduct = searchFolder(mIp.Infos.WeibuSdkPath, "_bsp", _
 		    SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub

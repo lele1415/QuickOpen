@@ -303,3 +303,7 @@ End Sub
 Sub runWebsite(path)
     oWs.Run mBrowserPath & " " & path
 End Sub
+
+Sub runBeyondCompare(leftPath, rightPath)
+    oWs.Run mBeyondComparePath & " " & leftPath & " " & rightPath
+End Sub

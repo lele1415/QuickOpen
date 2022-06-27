@@ -32,10 +32,13 @@ Const ID_DIV_OPEN_PATH_ = "div_open_path_"
 Const ID_UL_OPEN_PATH_ = "ul_open_path_"
 
 Const ID_PARENT_OUT_BUTTON = "parent_out_button"
-Const ID_INPUT_OUT_BUTTON = "input_out_button"
 
 Const ID_PARENT_OPEN_BUTTON = "parent_open_button"
-Const ID_INPUT_OPEN_BUTTON = "input_open_button"
+
+Const ID_PARENT_FILE_BUTTON = "parent_file_button"
+
+Const ID_SELECT_FOR_COMPARE = "select_for_compare"
+Const ID_COMPARE_TO = "compare_to"
 
 
 
@@ -142,16 +145,12 @@ Function getOutButtonParentId()
     getOutButtonParentId = ID_PARENT_OUT_BUTTON
 End Function
 
-Function getOutButtonInputId()
-    getOutButtonInputId = ID_INPUT_OUT_BUTTON
-End Function
-
 Function getOpenButtonParentId()
     getOpenButtonParentId = ID_PARENT_OPEN_BUTTON
 End Function
 
-Function getOpenButtonInputId()
-    getOpenButtonInputId = ID_INPUT_OPEN_BUTTON
+Function getFileButtonParentId()
+    getFileButtonParentId = ID_PARENT_FILE_BUTTON
 End Function
 
 
@@ -162,17 +161,23 @@ Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductPare
 Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project")
 Dim mSdkPathList : Set mSdkPathList = (New InputWithTwoLayerList)(getSdkPathParentId(), getSdkPathInputId(), "sdkpath")
 Dim mOpenPathList : Set mOpenPathList = (New InputWithTwoLayerList)(getOpenPathParentId(), getOpenPathInputId(), "openpath")
-Dim mOutFileList : Set mOutFileList = (New ButtonWithOneLayerList)(getOutButtonParentId(), getOutButtonInputId(), "outfile")
-Dim mOpenButtonList : Set mOpenButtonList = (New ButtonWithOneLayerList)(getOpenButtonParentId(), getOpenButtonInputId(), "openbutton")
+Dim mOutFileList : Set mOutFileList = (New ButtonWithOneLayerList)(getOutButtonParentId(), "outfile")
+Dim mOpenButtonList : Set mOpenButtonList = (New ButtonWithOneLayerList)(getOpenButtonParentId(), "openbutton")
+Dim mFileButtonList : Set mFileButtonList = (New ButtonWithOneLayerList)(getFileButtonParentId(), "filebutton")
 
 Sub onInputListClick(divId, str)
     Dim path
-
     If InStr(divId, "outfile") > 0 Then
         path = getOutListPath(str)
+        If path <> "" Then runPath(path)
+
     ElseIf InStr(divId, "openbutton") > 0 Then
         path = getOpenButtonListPath(str)
-    End If
+        If path <> "" Then runPath(path)
 
-    If path <> "" Then runPath(path)
+    ElseIf InStr(divId, "filebutton") > 0 Then
+        Call vaFilePathList.ResetArray()
+        Call mFileButtonList.removeList()
+        Call setOpenPath(str)
+    End If
 End Sub

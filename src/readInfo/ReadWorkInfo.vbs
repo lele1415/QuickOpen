@@ -3,6 +3,7 @@ Dim pProjectText : pProjectText = oWs.CurrentDirectory & "\res\project.ini"
 Dim vaWorksInfo : Set vaWorksInfo = New VariableArray
 
 Call readWorksInfoText()
+Call applyWorkInfo()
 
 Sub readWorksInfoText()
     If Not oFso.FileExists(pProjectText) Then Exit Sub
@@ -19,6 +20,21 @@ Sub readWorksInfoText()
 
     oText.Close
     Set oText = Nothing
+End Sub
+
+Sub applyWorkInfo()
+    Dim oInfos
+    If vaWorksInfo.Bound > -1 Then
+        Set oInfos = vaWorksInfo.V(vaWorksInfo.Bound)
+        mIp.Work = oInfos.Work
+        mIp.Sdk = oInfos.Sdk
+        mIp.Product = oInfos.Product
+        mIp.Project = oInfos.Project
+        mIp.Firmware = oInfos.Firmware
+        mIp.Requirements = oInfos.Requirements
+        mIp.Zentao = oInfos.Zentao
+        Call updateProductList()
+    End If
 End Sub
 
 Sub handleForWorksInfo(oText, sReadLine)

@@ -1,4 +1,4 @@
-
+Option Explicit
 
 Dim pPathText : pPathText = oWs.CurrentDirectory & "\res\path.ini"
 Dim pathDict, mOverlayPathDict
@@ -7,6 +7,9 @@ Set mOverlayPathDict = CreateObject("Scripting.Dictionary")
 
 Dim vaPathDirectory : Set vaPathDirectory = New VariableArray
 Dim vaOpenPathList : Set vaOpenPathList = New VariableArray
+Dim vaFilePathList : Set vaFilePathList = New VariableArray
+
+Dim mLeftComparePath, mRightComparePath
 
 Call addOpenPathList()
 Call addOutFileList()
@@ -55,6 +58,7 @@ Sub readPathText(DictPath)
     Dim oText
     Set oText = oFso.OpenTextFile(DictPath, FOR_READING)
 
+    Dim sReadLine
     Do Until oText.AtEndOfStream
         sReadLine = oText.ReadLine
 
@@ -294,7 +298,7 @@ Function runOpenPath()
 	If mIp.hasProjectInfos() Then Call runPath(mIp.Infos.Sdk & "\" & getOpenPath())
 End Function
 
-Sub runBeyondCompare()
+Sub compareForProject()
 	If Not mIp.hasProjectInfos() Then Exit Sub
 
     Dim inputPath, wholePath
@@ -302,27 +306,55 @@ Sub runBeyondCompare()
     wholePath = mIp.Infos.Sdk & "/" & inputPath
 
     If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
-        Dim leftPath, rightPath, projectPath, driverPath
+        Dim projectPath, driverPath
 
         projectPath = mIp.Infos.ProjectPath & mIp.Infos.ProjectAlps
         driverPath = mIp.Infos.DriverProjectPath & mIp.Infos.ProjectAlps
 
         If InStr(inputPath, projectPath) > 0 Then
-            leftPath = wholePath
-            rightPath = Replace(wholePath, projectPath & "/", "")
+            mLeftComparePath = wholePath
+            mRightComparePath = Replace(wholePath, projectPath & "/", "")
         ElseIf InStr(inputPath, driverPath) > 0 Then
-            leftPath = wholePath
-            rightPath = Replace(wholePath, driverPath & "/", "")
+            mLeftComparePath = wholePath
+            mRightComparePath = Replace(wholePath, driverPath & "/", "")
         Else
-            leftPath = mIp.Infos.getOverlaySdkPath(inputPath)
-            rightPath = wholePath
+            mLeftComparePath = mIp.Infos.getOverlaySdkPath(inputPath)
+            mRightComparePath = wholePath
         End If
 
-        leftPath = """" & Replace(leftPath, "/", "\") & """"
-        rightPath = """" & Replace(rightPath, "/", "\") & """"
+        mLeftComparePath = """" & Replace(mLeftComparePath, "/", "\") & """"
+        mRightComparePath = """" & Replace(mRightComparePath, "/", "\") & """"
 
-        Dim command : command = mBeyondComparePath & " " & leftPath & " " & rightPath
-        oWs.Run command
+        Call runBeyondCompare(mLeftComparePath, mRightComparePath)
+    Else
+        MsgBox("Not found :" & Vblf & wholePath)
+    End If
+End Sub
+
+Sub selectForCompare()
+    Dim inputPath, wholePath
+    inputPath = getOpenPath()
+    wholePath = mIp.Infos.Sdk & "/" & inputPath
+
+    If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
+    	mLeftComparePath = """" & Replace(wholePath, "/", "\") & """"
+    	Call hideElement(ID_SELECT_FOR_COMPARE)
+    	Call showElement(ID_COMPARE_TO)
+    Else
+        MsgBox("Not found :" & Vblf & wholePath)
+    End If
+End Sub
+
+Sub compareTo()
+    Dim inputPath, wholePath
+    inputPath = getOpenPath()
+    wholePath = mIp.Infos.Sdk & "/" & inputPath
+
+    If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
+    	mRightComparePath = """" & Replace(wholePath, "/", "\") & """"
+    	Call hideElement(ID_COMPARE_TO)
+    	Call showElement(ID_SELECT_FOR_COMPARE)
+    	Call runBeyondCompare(mLeftComparePath, mRightComparePath)
     Else
         MsgBox("Not found :" & Vblf & wholePath)
     End If
@@ -345,25 +377,151 @@ Sub replaceSlash()
 End Sub
 
 Sub addProjectPath()
-	Call setOpenPath(mIp.Infos.ProjectPath & "/" & getOpenPath())
+	Call setOpenPath(mIp.Infos.ProjectPath & mIp.Infos.ProjectAlps & "/" & getOpenPath())
 End Sub
 
 Sub addDriverProjectPath()
-	Call setOpenPath(mIp.Infos.DriverProjectPath & "/" & getOpenPath())
+	Call setOpenPath(mIp.Infos.DriverProjectPath & mIp.Infos.ProjectAlps & "/" & getOpenPath())
 End Sub
 
 Sub cutSdkPath()
-	Call replaceSlash()
-	If mIp.hasProjectInfos() Then
-	    Call setOpenPath(Replace(getOpenPath(), Replace(mIp.Infos.Sdk, "\", "/") & "/", ""))
-	End If
+	Call mIp.cutSdkInOpenPath()
 End Sub
 
 Sub cutProjectPath()
-	Call replaceSlash()
-	If mIp.hasProjectInfos() Then
-		Call setOpenPath(Replace(getOpenPath(), Replace(mIp.Infos.Sdk, "\", "/") & "/", ""))
-	    Call setOpenPath(Replace(getOpenPath(), mIp.Infos.ProjectPath & mIp.Infos.ProjectAlps & "/", ""))
-	    Call setOpenPath(Replace(getOpenPath(), mIp.Infos.DriverProjectPath & mIp.Infos.ProjectAlps & "/", ""))
+	Call mIp.cutProjectInOpenPath()
+End Sub
+
+Dim pJavaFileText : pJavaFileText = oWs.CurrentDirectory & "\res\file_list_all_java.txt"
+Dim pFrameworksJavaFileText : pFrameworksJavaFileText = oWs.CurrentDirectory & "\res\file_list_frameworks_java.txt"
+Dim pAndroidmkFileText : pAndroidmkFileText = oWs.CurrentDirectory & "\res\file_list_androidmk.txt"
+
+Sub addFileList()
+	If vaFilePathList.Bound = 0 Then
+        Call setOpenPath(vaFilePathList.V(0))
+        Call vaFilePathList.ResetArray()
+    ElseIf vaFilePathList.Bound > 0 Then
+        Call mFileButtonList.addList(vaFilePathList)
+        Call mFileButtonList.toggleButtonList()
+    End If
+End Sub
+
+Function getFileListPathFromRes(name)
+	getFileListPathFromRes = oWs.CurrentDirectory & "\res\filelist\" & getSdkSimpleName() & "\" & name
+End Function
+
+Sub findJavaFile()
+	Dim fileListPath : fileListPath = getFileListPathFromRes("java.txt")
+	If oFso.FileExists(fileListPath) Then
+		Call makeFileList(fileListPath, ".java")
+	Else
+		Call CopyString("find -type f -name ""*.java"" > java.txt")
+		MsgBox("java.txt not exist!")
 	End If
+End Sub
+
+Sub findFrameworksJavaFile()
+	Dim fileListPath : fileListPath = getFileListPathFromRes("f-java.txt")
+	If oFso.FileExists(fileListPath) Then
+		Call makeFileList(getFileListPathFromRes("f-java.txt"), ".java")
+	Else
+		Call CopyString("find frameworks/ -type f -name ""*.java"" > f-java.txt")
+		MsgBox("f-java.txt not exist!")
+	End If
+End Sub
+
+Sub findXmlFile()
+	Dim fileListPath : fileListPath = getFileListPathFromRes("xml.txt")
+	If oFso.FileExists(fileListPath) Then
+		Call makeFileList(getFileListPathFromRes("xml.txt"), ".xml")
+	Else
+		Call CopyString("find -type f -name ""*.xml"" > xml.txt")
+		MsgBox("xml.txt not exist!")
+	End If
+End Sub
+
+Sub findAppFolder()
+	Dim fileListPath : fileListPath = getFileListPathFromRes("app.txt")
+	If oFso.FileExists(fileListPath) Then
+		Call makeFileList(getFileListPathFromRes("app.txt"), "app")
+	Else
+		Call CopyString("find -type f -name ""Android.*"" > app.txt")
+		MsgBox("app.txt not exist!")
+	End If
+End Sub
+
+Sub findPackageFile()
+	If Not mIp.hasProjectInfos() Or Trim(getOpenPath()) = "" Then Exit Sub
+	
+	If Not oFso.FileExists(mIp.Infos.Sdk & "\pkg.txt") Then
+		If Not oFso.FolderExists(mIp.Infos.Sdk & "\" & getOpenPath()) Then
+			MsgBox("Path not exist!" & VbLf & mIp.Infos.Sdk & "\" & getOpenPath())
+		    Exit Sub
+		End If
+		Call replaceSlash()
+		Call CopyString("find " & getOpenPath() & " -type f -name *.java > pkg.txt")
+		MsgBox("pkg.txt not exist!")
+	Else
+	    Call makeFileList(mIp.Infos.Sdk & "\pkg.txt", ".java")
+	End If
+End Sub
+
+Sub makeFileList(fileListPath, suffix)
+	If vaFilePathList.Bound > -1 Then
+		Call vaFilePathList.ResetArray()
+		Call mFileButtonList.removeList()
+		Call mFileButtonList.toggleButtonList()
+		Exit Sub
+	End If
+
+	If Trim(getOpenPath()) = "" Or InStr(getOpenPath(), "/") > 0 Or InStr(getOpenPath(), "\") > 0 Then Exit Sub
+
+	If suffix <> "app" Then
+        Call findFileInListText(getOpenPath(), suffix, fileListPath)
+    Else
+        Call findAppFolderInListText(getOpenPath(), fileListPath)
+    End If
+
+    Call addFileList()
+End Sub
+
+Sub findFileInListText(input, suffix, path)
+	Dim oText, sReadLine, keyStr, count
+	If Not InStr(input, ".") > 0 Then
+		keyStr = input & suffix
+	Else
+	    keyStr = input
+	End If
+	keyStr = "/" & keyStr
+	Set oText = oFso.OpenTextFile(path, FOR_READING)
+	count = 0
+
+	Do Until oText.AtEndOfStream
+	    sReadLine = oText.ReadLine
+	    If count > 10 Then Exit Do
+	    If Right(sReadLine, Len(keyStr)) = keyStr Then
+	        Call vaFilePathList.Append(Replace(sReadLine, "./", ""))
+	        count = count + 1
+	    End If
+	Loop
+
+	oText.Close
+	Set oText = Nothing
+End Sub
+
+Sub findAppFolderInListText(input, path)
+	Dim oText, sReadLine, keyStr, count
+	keyStr = "/" & input & "/Android."
+	Set oText = oFso.OpenTextFile(path, FOR_READING)
+	count = 0
+
+	Do Until oText.AtEndOfStream
+	    If count > 10 Then Exit Do
+	    sReadLine = oText.ReadLine
+	    If InStr(sReadLine, keyStr) > 0 Then
+	    	path = Left(sReadLine, InStr(sReadLine, keyStr) + Len(input))
+	        Call vaFilePathList.Append(Replace(path, "./", ""))
+	        count = count + 1
+	    End If
+	Loop
 End Sub

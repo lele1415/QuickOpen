@@ -42,8 +42,10 @@ Sub hideAllShortcuts()
 End Sub
 
 Sub updateAllShortcuts()
-	Call parentNode_removeAllChilds(ID_DIV_SHORTCUT)
-	Call AddShortcut()
+	If parentNode_getChildNodesLength(ID_DIV_SHORTCUT) > 0 Then
+		Call parentNode_removeAllChilds(ID_DIV_SHORTCUT)
+		Call AddShortcut()
+	End If
 End Sub
 
 Sub AddShortcut()
@@ -79,6 +81,7 @@ Sub applyShortcut(work, sdk, product, project, firmware, requirements, zentao)
 	mIp.Firmware = firmware
 	mIp.Requirements = requirements
 	mIp.Zentao = zentao
+	Call upShortcut(work)
 	Call updateProductList()
 End Sub
 

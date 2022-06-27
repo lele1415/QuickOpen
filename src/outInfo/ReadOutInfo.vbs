@@ -41,7 +41,7 @@ Sub getOutInfos()
     str = str & "platform=" & readTextAndGetValue("ro.board.platform", pVendorBuildProp) & VbLf
     str = str & "base_os=" & readTextAndGetValue("ro.build.version.base_os", pSystemBuildProp) & VbLf
     str = str & "gmsversion=" & readTextAndGetValue("ro.com.google.gmsversion", pProductBuildProp) & VbLf
-    str = str & "security_path=" & readTextAndGetValue("ro.build.version.security_patch", pSystemBuildProp) & VbLf
+    str = str & "security_patch=" & readTextAndGetValue("ro.build.version.security_patch", pSystemBuildProp) & VbLf
     str = str & "client_id=" & readTextAndGetValue("ro.com.google.clientidbase", pProductBuildProp) & VbLf
     str = str & "density=" & readTextAndGetValue("ro.sf.lcd_density", pVendorBuildProp) & VbLf
     str = str & "ringtone=" & readTextAndGetValue("ro.config.ringtone", pVendorBuildProp) & VbLf

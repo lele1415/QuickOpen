@@ -1,11 +1,11 @@
 <!--
-Version: 3.3.7
+Version: 3.4
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>Quick Open v3.3.7</Title>
+<Title>Quick Open v3.4</Title>
 
 <style type="text/css">
 
@@ -67,6 +67,10 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 </Head>
 
+<HTA:APPLICATION 
+    SysMenu="no"
+>
+
 <Body bgcolor="#272822">
 
 <fieldset>
@@ -77,7 +81,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <fieldset>
     <legend>SDK path</legend>
     <input type="button" class="input_button" id="show_shortcuts" onclick="showAllShortcuts()" value="    Select    " />
-    <input type="button" class="input_button" id="hide_shortcuts" onclick="HideAllShortcuts()" value="    Close    " style="display:none"/>
+    <input type="button" class="input_button" id="hide_shortcuts" onclick="hideAllShortcuts()" value="    Close    " style="display:none"/>
     <input type="button" class="input_button" id="create_shortcuts" onclick="creatShortcut()" value="Add / Update" />
     <br>
     <div id="div_shortcut"></div>
@@ -117,6 +121,14 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <br>
 <fieldset>
     <legend>Open file or folder</legend>
+    <input type="button" class="input_button" onclick="findFrameworksJavaFile()" value=" f-java " />
+    <input type="button" class="input_button" onclick="findJavaFile()" value=" java " />
+    <input type="button" class="input_button" onclick="findXmlFile()" value=" xml " />
+    <input type="button" class="input_button" onclick="findAppFolder()" value=" app " />
+    <input type="button" class="input_button" onclick="findPackageFile()" value=" pkg " />
+    <div class="form_product" id="parent_file_button" style="display:none"></div>
+    <br>
+
     <input type="button" class="input_button" onclick="cleanOpenPath()" value="Clean" />
     <input type="button" class="input_button" onclick="replaceSlash()" value=" / " />
     <input type="button" class="input_button" onclick="addProjectPath()" value=" addP " />
@@ -128,7 +140,9 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
     <input id="input_open_button" type="button" class="input_button" onclick="onOpenButtonClick()" value="Open" />
     <input type="button" class="input_button" onclick="onOpenListClick()" value=" List " />
-    <input type="button" class="input_button" onclick="runBeyondCompare()" value="Compare" />
+    <input type="button" class="input_button" onclick="compareForProject()" value="Compare" />
+    <input id="select_for_compare" type="button" class="input_button" onclick="selectForCompare()" value="Select for Compare" />
+    <input id="compare_to" type="button" class="input_button" onclick="compareTo()" value="Compare to"  style="display:none"/>
 
     <div class="form_product" id="parent_open_button" style="display:none"></div>
     <div class="form_sdk_path" id="parent_open_path"></div>
@@ -153,7 +167,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="CommandOfLunch()" value="lunch command">
     <br>
     <br>
-    <input type="checkbox" id="command_rm_out" checked=true >rm out</input>
+    <input type="checkbox" id="command_rm_out" >rm out</input>
     <input type="checkbox" id="command_build_ota" >ota</input>
     <br>
     <input type="button" class="input_button" onclick="CommandOfMake()" value="make command">
@@ -180,7 +194,6 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="VBScript" src="src\core\Ids.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadConfigPath.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadSdkPath.vbs"></Script>
-<Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
 <Script Language="VBScript" src="src\onloadProject\OnloadProject.vbs"></Script>
 <Script Language="VBScript" src="src\shortcut\CreatProjectShortcut.vbs"></Script>
 <Script Language="VBScript" src="src\openPath\OpenPath.vbs"></Script>
@@ -188,6 +201,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="VBScript" src="src\fileExplorer\FileExplorer.vbs"></Script>
 <Script Language="VBScript" src="src\outInfo\ReadOutInfo.vbs"></Script>
 <Script Language="VBScript" src="src\outInfo\ProjectInfo.vbs"></Script>
+<Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
 
 </Body>
 </Html>
