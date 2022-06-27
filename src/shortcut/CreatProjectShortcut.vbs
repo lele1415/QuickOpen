@@ -59,17 +59,17 @@ Sub AddShortcut()
 End Sub
 
 Sub removeShortcut(shortcutId)
-	Dim i, obj, value
+	Dim i, obj, value, work
     For i = 0 To vaWorksInfo.Bound
         Set obj = vaWorksInfo.V(i)
         value = obj.Work + "/" + obj.Sdk + "/" + obj.Product + "/" + obj.Project + "_shortcut"
         If value = shortcutId Then
+        	work = obj.Work
         	Call vaWorksInfo.PopBySeq(i)
         	Exit For
         End If
     Next
-    Call mIp.clearWorkInfos()
-    Call mIp.clearSdkInfos()
+    If mIp.Work = work Then Call applyLastWorkInfo()
     Call updateWorkInfoTxt()
 End Sub
 

@@ -5,7 +5,7 @@ Dim mTextEditorPath, mBeyondComparePath, mBrowserPath
 Sub readConfigText(DictPath)
     If Not oFso.FileExists(DictPath) Then Exit Sub
     
-    Dim oText
+    Dim oText, sReadLine
     Set oText = oFso.OpenTextFile(DictPath, FOR_READING)
 
     Do Until oText.AtEndOfStream

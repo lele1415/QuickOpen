@@ -1,3 +1,4 @@
+Option Explicit
 
 'Dim str, resultStr
 'projectName = Array("m863ur200_64-SBYH_A8005A_Call-Nitro_8_MMI", _

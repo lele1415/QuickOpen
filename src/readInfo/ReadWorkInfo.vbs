@@ -21,7 +21,7 @@ Sub readWorksInfoText()
     Set oText = Nothing
 End Sub
 
-Sub applyWorkInfo()
+Sub applyLastWorkInfo()
     Dim oInfos
     If vaWorksInfo.Bound > -1 Then
         Set oInfos = vaWorksInfo.V(vaWorksInfo.Bound)
