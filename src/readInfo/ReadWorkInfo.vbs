@@ -1,9 +1,8 @@
+Option Explicit
+
 Dim pProjectText : pProjectText = oWs.CurrentDirectory & "\res\project.ini"
 
 Dim vaWorksInfo : Set vaWorksInfo = New VariableArray
-
-Call readWorksInfoText()
-Call applyWorkInfo()
 
 Sub readWorksInfoText()
     If Not oFso.FileExists(pProjectText) Then Exit Sub

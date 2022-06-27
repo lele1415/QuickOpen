@@ -1,11 +1,11 @@
 <!--
-Version: 3.4
+Version: 3.4.1
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>Quick Open v3.4</Title>
+<Title>Quick Open v3.4.1</Title>
 
 <style type="text/css">
 
@@ -168,6 +168,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <br>
     <br>
     <input type="checkbox" id="command_rm_out" >rm out</input>
+    <input type="checkbox" id="command_rm_buildprop" >rm build.prop</input>
     <input type="checkbox" id="command_build_ota" >ota</input>
     <br>
     <input type="button" class="input_button" onclick="CommandOfMake()" value="make command">
@@ -189,11 +190,12 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <!-- <Script Language="JavaScript" src="src\openPath\OpenPath.js"></Script> -->
 <Script Language="JavaScript" src="src\fileExplorer\FileExplorer.js"></Script>
 
+<Script Language="VBScript" src="src\core\Ids.vbs"></Script>
 <Script Language="VBScript" src="src\core\CoreFun.vbs"></Script>
 <Script Language="VBScript" src="src\core\CoreClass.vbs"></Script>
-<Script Language="VBScript" src="src\core\Ids.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadConfigPath.vbs"></Script>
 <Script Language="VBScript" src="src\readInfo\ReadSdkPath.vbs"></Script>
+<Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
 <Script Language="VBScript" src="src\onloadProject\OnloadProject.vbs"></Script>
 <Script Language="VBScript" src="src\shortcut\CreatProjectShortcut.vbs"></Script>
 <Script Language="VBScript" src="src\openPath\OpenPath.vbs"></Script>
@@ -201,7 +203,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="VBScript" src="src\fileExplorer\FileExplorer.vbs"></Script>
 <Script Language="VBScript" src="src\outInfo\ReadOutInfo.vbs"></Script>
 <Script Language="VBScript" src="src\outInfo\ProjectInfo.vbs"></Script>
-<Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
+<Script Language="VBScript" src="src\core\Main.vbs"></Script>
 
 </Body>
 </Html>

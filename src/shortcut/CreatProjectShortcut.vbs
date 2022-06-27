@@ -1,3 +1,5 @@
+Option Explicit
+
 Const SHORTCUT_STATE_HIDE = 0
 Const SHORTCUT_STATE_SHOW = 1
 Const SHORTCUT_TEXT_HIDE = "     Hide     "

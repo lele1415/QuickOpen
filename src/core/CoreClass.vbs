@@ -1,3 +1,18 @@
+Option Explicit
+
+Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
+Dim mIp : Set mIp = New ProjectInputs
+Dim mIf : Set mIf = New ProjectInfos
+Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductParentId(), getProductInputId(), "product")
+Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project")
+Dim mSdkPathList : Set mSdkPathList = (New InputWithTwoLayerList)(getSdkPathParentId(), getSdkPathInputId(), "sdkpath")
+Dim mOpenPathList : Set mOpenPathList = (New InputWithTwoLayerList)(getOpenPathParentId(), getOpenPathInputId(), "openpath")
+Dim mOutFileList : Set mOutFileList = (New ButtonWithOneLayerList)(getOutButtonParentId(), "outfile")
+Dim mOpenButtonList : Set mOpenButtonList = (New ButtonWithOneLayerList)(getOpenButtonParentId(), "openbutton")
+Dim mFileButtonList : Set mFileButtonList = (New ButtonWithOneLayerList)(getFileButtonParentId(), "filebutton")
+
+
+
 Class VariableArray
     Private mName, mPreBound, mBound, mArray()
 
@@ -496,6 +511,10 @@ Function getWeibuSdkPath(Sdk)
     getWeibuSdkPath = Sdk & "\weibu"
 End Function
 
+Function getOutPath(Sdk, Product)
+    getOutPath = "out/target/product/" & Product
+End Function
+
 Function getOutSdkPath(Sdk, Product)
     getOutSdkPath = Sdk & "\out\target\product\" & Product
 End Function
@@ -556,6 +575,10 @@ Class ProjectInfos
 
     Public Property Get WeibuSdkPath
         WeibuSdkPath = getWeibuSdkPath(Sdk)
+    End Property
+
+    Public Property Get OutPath
+        OutPath = getOutPath(Sdk, Product)
     End Property
 
     Public Property Get OutSdkPath

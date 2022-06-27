@@ -1,5 +1,4 @@
-
-
+Option Explicit
 
 Const STR_JOYA_O1 = "mediateksample"
 Const STR_JOYA_MID = "mid"
@@ -12,6 +11,7 @@ Dim mPdtPath, mPjtPath
 Dim mRocoStr, mJoyaStr
 Dim mProductName, mProductIndex
 Dim mLoadOptInAllPrj
+Dim idTimer
 
 
 

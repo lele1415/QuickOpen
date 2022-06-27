@@ -1,8 +1,6 @@
-Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\res\config.ini"
+Option Explicit
 
 Dim mTextEditorPath, mBeyondComparePath, mBrowserPath
-
-Call readConfigText(pConfigText)
 
 Sub readConfigText(DictPath)
     If Not oFso.FileExists(DictPath) Then Exit Sub

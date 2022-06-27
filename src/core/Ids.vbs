@@ -1,3 +1,17 @@
+Option Explicit
+
+Const FOR_READING = 1
+Const FOR_APPENDING = 8
+
+Dim oWs, oFso
+Set oWs=CreateObject("wscript.shell")
+Set oFso=CreateObject("Scripting.FileSystemObject")
+
+Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\res\config.ini"
+Dim pSdkPathText : pSdkPathText = oWs.CurrentDirectory & "\res\sdk.ini"
+
+
+
 Const ID_PARENT_SDK_PATH = "parent_sdk_path"
 Const ID_INPUT_SDK_PATH = "input_sdk_path"
 
@@ -152,32 +166,3 @@ End Function
 Function getFileButtonParentId()
     getFileButtonParentId = ID_PARENT_FILE_BUTTON
 End Function
-
-
-Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
-Dim mIp : Set mIp = New ProjectInputs
-Dim mIf : Set mIf = New ProjectInfos
-Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductParentId(), getProductInputId(), "product")
-Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project")
-Dim mSdkPathList : Set mSdkPathList = (New InputWithTwoLayerList)(getSdkPathParentId(), getSdkPathInputId(), "sdkpath")
-Dim mOpenPathList : Set mOpenPathList = (New InputWithTwoLayerList)(getOpenPathParentId(), getOpenPathInputId(), "openpath")
-Dim mOutFileList : Set mOutFileList = (New ButtonWithOneLayerList)(getOutButtonParentId(), "outfile")
-Dim mOpenButtonList : Set mOpenButtonList = (New ButtonWithOneLayerList)(getOpenButtonParentId(), "openbutton")
-Dim mFileButtonList : Set mFileButtonList = (New ButtonWithOneLayerList)(getFileButtonParentId(), "filebutton")
-
-Sub onInputListClick(divId, str)
-    Dim path
-    If InStr(divId, "outfile") > 0 Then
-        path = getOutListPath(str)
-        If path <> "" Then runPath(path)
-
-    ElseIf InStr(divId, "openbutton") > 0 Then
-        path = getOpenButtonListPath(str)
-        If path <> "" Then runPath(path)
-
-    ElseIf InStr(divId, "filebutton") > 0 Then
-        Call vaFilePathList.ResetArray()
-        Call mFileButtonList.removeList()
-        Call setOpenPath(str)
-    End If
-End Sub

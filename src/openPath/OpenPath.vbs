@@ -11,9 +11,6 @@ Dim vaFilePathList : Set vaFilePathList = New VariableArray
 
 Dim mLeftComparePath, mRightComparePath
 
-Call addOpenPathList()
-Call addOutFileList()
-
 
 
 'Open path
@@ -233,7 +230,7 @@ Function getOutListPath(where)
     ElseIf where = "vendor/build.prop" Then
         getOutListPath = outProductPath & "/vendor/build.prop"
     ElseIf where = "product/build.prop" Then
-        Dim product_r, pruduct_s
+        Dim path_r, path_s
         path_r = outProductPath & "/product/build.prop"
         path_s = outProductPath & "/product/etc/build.prop"
         If oFso.FileExists(path_r) Then

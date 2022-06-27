@@ -1,4 +1,4 @@
-
+Option Explicit
 
 Const ID_INPUT_OUT_INFOS = "input_out_infos"
 Const ID_BUTTON_SHOW_OUT_INFOS = "button_show_out_infos"

@@ -1,8 +1,11 @@
+Option Explicit
+
 Const ID_COMMAND_ENG = "command_eng"
 Const ID_COMMAND_USERDEBUG = "command_userdebug"
 Const ID_COMMAND_USER = "command_user"
 
 Const ID_COMMAND_RM_OUT = "command_rm_out"
+Const ID_COMMAND_RM_BUILDPROP = "command_rm_buildprop"
 Const ID_COMMAND_BUILD_OTA = "command_build_ota"
 
 Dim commandFinal
@@ -12,7 +15,12 @@ Sub CommandOfMake()
     commandFinal = "make -j36 2>&1 | tee build.log"
     commandOta = "make -j36 otapackage 2>&1 | tee build_ota.log"
 
-    If element_isChecked(ID_COMMAND_RM_OUT) Then commandFinal = "rm -rf out/ && " & commandFinal
+    If element_isChecked(ID_COMMAND_RM_OUT) Then
+        commandFinal = "rm -rf out/ && " & commandFinal
+    ElseIf element_isChecked(ID_COMMAND_RM_BUILDPROP) Then
+        commandFinal = "find " & mIp.Infos.OutPath & " -type f -name build*.prop | xargs rm && " & commandFinal
+    End If
+
     If element_isChecked(ID_COMMAND_BUILD_OTA) Then commandFinal = commandFinal & " && " & commandOta
 
     Call CopyString(commandFinal)
@@ -89,6 +97,5 @@ Sub MkdirWeibuFolderPath()
 End Sub
 
 Sub CopyString(str)
-    Clipboard="MsHta vbscript:ClipBoardData.setData(""Text"","""&str&""")(Window.Close)"  
-    oWs.Run(Clipboard)
+    oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(Window.Close)"
 End Sub

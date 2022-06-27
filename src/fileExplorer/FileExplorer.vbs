@@ -1,3 +1,5 @@
+Option Explicit
+
 Const ID_BUTTON_SHOW_EXPLORER = "button_show_explorer"
 Const ID_BUTTON_UPDATE_EXPLORER = "button_update_explorer"
 Const ID_BUTTON_HIDE_EXPLORER = "button_hide_explorer"

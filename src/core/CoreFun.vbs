@@ -1,19 +1,4 @@
-Const WINDOW_WIDTH = 460
-Const WINDOW_HEIGHT = 850
-Sub Window_OnLoad
-    Dim ScreenWidth : ScreenWidth = CreateObject("HtmlFile").ParentWindow.Screen.AvailWidth
-    Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
-    Window.MoveTo ScreenWidth - WINDOW_WIDTH ,(ScreenHeight - WINDOW_HEIGHT) \ 2
-    Window.ResizeTo WINDOW_WIDTH, WINDOW_HEIGHT
-End Sub
-
-Const FOR_READING = 1
-Const FOR_APPENDING = 8
-
-Set oWs=CreateObject("wscript.shell")
-Set oFso=CreateObject("Scripting.FileSystemObject")
-
-
+Option Explicit
 
 Const SEARCH_FILE = 0
 Const SEARCH_FOLDER = 1
@@ -306,4 +291,21 @@ End Sub
 
 Sub runBeyondCompare(leftPath, rightPath)
     oWs.Run mBeyondComparePath & " " & leftPath & " " & rightPath
+End Sub
+
+Sub onInputListClick(divId, str)
+    Dim path
+    If InStr(divId, "outfile") > 0 Then
+        path = getOutListPath(str)
+        If path <> "" Then runPath(path)
+
+    ElseIf InStr(divId, "openbutton") > 0 Then
+        path = getOpenButtonListPath(str)
+        If path <> "" Then runPath(path)
+
+    ElseIf InStr(divId, "filebutton") > 0 Then
+        Call vaFilePathList.ResetArray()
+        Call mFileButtonList.removeList()
+        Call setOpenPath(str)
+    End If
 End Sub
