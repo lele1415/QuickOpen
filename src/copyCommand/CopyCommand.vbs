@@ -95,7 +95,3 @@ Sub MkdirWeibuFolderPath()
     commandFinal = Replace(commandFinal, "\", "/")
     Call CopyString(commandFinal)
 End Sub
-
-Sub CopyString(str)
-    oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(Window.Close)"
-End Sub

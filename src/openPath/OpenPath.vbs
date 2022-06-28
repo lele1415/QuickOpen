@@ -120,7 +120,7 @@ Sub makeOpenButton()
 End Sub
 
 Sub findOverlayPath(where, isFile, fileName)
-	path = getOverlayPath(where, isFile, fileName)
+	Dim path : path = getOverlayPath(where, isFile, fileName)
 	If path <> "" Then
 		Call mOverlayPathDict.Add(where, path)
 		Call vaOpenPathList.Append(where)
@@ -521,4 +521,11 @@ Sub findAppFolderInListText(input, path)
 	        count = count + 1
 	    End If
 	Loop
+End Sub
+
+Sub pasteAndOpenPath()
+    Call setElementValue(ID_INPUT_OPEN_PATH, "")
+    Call focusElement(ID_INPUT_OPEN_PATH)
+    oWs.SendKeys "^v"
+    oWs.SendKeys "{ENTER}"
 End Sub

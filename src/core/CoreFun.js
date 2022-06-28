@@ -116,3 +116,30 @@ function hideElement(elementId) {
 function showElement(elementId) {
     document.getElementById(elementId).style.display="";
 }
+
+document.onkeydown=documentKeydown;
+document.getElementById("input_open_path").onkeydown=inputKeydown;
+
+function documentKeydown(e) {
+    var currKey = 0, e = e || event;
+    currKey = e.keyCode || e.which || e.charCode;
+    //alert(currKey)
+    if (currKey == 32) { //Space
+        pasteAndOpenPath();
+        return false;
+    }
+}
+
+function inputKeydown(e) {
+    var currKey = 0, e = e || event;
+    currKey = e.keyCode || e.which || e.charCode;
+    //alert(currKey)
+    if (currKey == 13) { //Enter
+        onOpenButtonClick();
+        return false;
+    }
+}
+
+function focusElement(elementId) {
+    document.getElementById(elementId).focus();
+}

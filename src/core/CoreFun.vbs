@@ -293,6 +293,10 @@ Sub runBeyondCompare(leftPath, rightPath)
     oWs.Run mBeyondComparePath & " " & leftPath & " " & rightPath
 End Sub
 
+Sub CopyString(str)
+    oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(Window.Close)"
+End Sub
+
 Sub onInputListClick(divId, str)
     Dim path
     If InStr(divId, "outfile") > 0 Then

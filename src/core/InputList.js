@@ -58,6 +58,8 @@ function onListLiClick(parentId, inputId, divId, str, setValue) {
     if (input.onchange != undefined) {
         input.onchange();
     }
+
+    input.focus();
 }
 
 function addListDirectoryLi(parentId, dirDivId, dirUlId, listDivId, str)
