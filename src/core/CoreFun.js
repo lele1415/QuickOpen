@@ -118,26 +118,12 @@ function showElement(elementId) {
 }
 
 document.onkeydown=documentKeydown;
-document.getElementById("input_open_path").onkeydown=inputKeydown;
 
 function documentKeydown(e) {
     var currKey = 0, e = e || event;
     currKey = e.keyCode || e.which || e.charCode;
     //alert(currKey)
-    if (currKey == 32) { //Space
-        pasteAndOpenPath();
-        return false;
-    }
-}
-
-function inputKeydown(e) {
-    var currKey = 0, e = e || event;
-    currKey = e.keyCode || e.which || e.charCode;
-    //alert(currKey)
-    if (currKey == 13) { //Enter
-        onOpenButtonClick();
-        return false;
-    }
+    return onKeyDown(currKey);
 }
 
 function focusElement(elementId) {

@@ -396,7 +396,7 @@ End Class
 
 
 Class InputWithOneLayerList
-    Private mParentId, mInputId, mListDivId, mListUlId
+    Private mParentId, mInputId, mListDivId, mListUlId, mVaArray
 
     Public Default Function Constructor(parentId, inputId, name)
         mParentId = parentId
@@ -407,19 +407,20 @@ Class InputWithOneLayerList
     End Function
 
     Public Sub addList(vaArray)
-        If vaArray.Bound <> -1 Then
-            Call removeLi(mListUlId)
-            Call setInputClickFun(mParentId, mInputId, mListDivId)
-            Call addListUL(mParentId, mListDivId, mListUlId)
-            Dim i : For i = 0 To vaArray.Bound
-                Call addListLi(mParentId, mInputId, mListDivId, mListUlId, vaArray.V(i), True)
-            Next
-        End If
+        Set mVaArray = vaArray
+        If mVaArray.Bound = -1 Then Exit Sub
+
+        Call removeLi(mListUlId)
+        Call setInputClickFun(mParentId, mInputId, mListDivId)
+        Call addListUL(mParentId, mListDivId, mListUlId)
+        Dim i : For i = 0 To mVaArray.Bound
+            Call addListLi(mParentId, mInputId, mListDivId, mListUlId, mVaArray.V(i), True)
+        Next
     End Sub
 End Class
 
 Class ButtonWithOneLayerList
-    Private mParentId, mListDivId, mListUlId
+    Private mParentId, mListDivId, mListUlId, mVaArray
 
     Public Default Function Constructor(parentId, name)
         mParentId = parentId
@@ -429,13 +430,14 @@ Class ButtonWithOneLayerList
     End Function
 
     Public Sub addList(vaArray)
-        If vaArray.Bound <> -1 Then
-            Call removeLi(mListUlId)
-            Call addListUL(mParentId, mListDivId, mListUlId)
-            Dim i : For i = 0 To vaArray.Bound
-                Call addListLi(mParentId, "", mListDivId, mListUlId, vaArray.V(i), False)
-            Next
-        End If
+        Set mVaArray = vaArray
+        If mVaArray.Bound = -1 Then Exit Sub
+
+        Call removeLi(mListUlId)
+        Call addListUL(mParentId, mListDivId, mListUlId)
+        Dim i : For i = 0 To mVaArray.Bound
+            Call addListLi(mParentId, "", mListDivId, mListUlId, mVaArray.V(i), False)
+        Next
     End Sub
 
     Public Sub removeList()
@@ -443,6 +445,8 @@ Class ButtonWithOneLayerList
     End Sub
 
     Public Sub toggleButtonList()
+        If mVaArray.Bound = -1 Then Exit Sub
+
         Call toggleListDiv(mParentId, mListDivId)
     End Sub
 End Class
@@ -464,26 +468,28 @@ Class InputWithTwoLayerList
 
     Public Sub addList(vaArray)
         Set mVaArray = vaArray
-        If vaArray.Bound <> -1 Then
-            Call addListUL(mParentId, mDirDivId, mDirUlId)
-            Dim i, j, category
+        If mVaArray.Bound = -1 Then Exit Sub
 
-            For i = 0 To vaArray.Bound
-                category = vaArray.V(i).Name
-                Call addListDirectoryLi(mParentId, mDirDivId, mDirUlId, mListDivId & LCase(category), category)
+        Call addListUL(mParentId, mDirDivId, mDirUlId)
+        Dim i, j, category
 
-                Call addListUL(mParentId, mListDivId & LCase(category), mListUlId & LCase(category))
+        For i = 0 To mVaArray.Bound
+            category = mVaArray.V(i).Name
+            Call addListDirectoryLi(mParentId, mDirDivId, mDirUlId, mListDivId & LCase(category), category)
 
-                if vaArray.V(i).Bound <> -1 Then
-                    For j = 0 To vaArray.V(i).Bound
-                        Call addListLi(mParentId, mInputId, mListDivId & LCase(category), mListUlId & LCase(category), vaArray.V(i).V(j), True)
-                    Next
-                End If
-            Next
-        End If
+            Call addListUL(mParentId, mListDivId & LCase(category), mListUlId & LCase(category))
+
+            if mVaArray.V(i).Bound <> -1 Then
+                For j = 0 To mVaArray.V(i).Bound
+                    Call addListLi(mParentId, mInputId, mListDivId & LCase(category), mListUlId & LCase(category), mVaArray.V(i).V(j), True)
+                Next
+            End If
+        Next
     End Sub
 
     Public Sub toggleList()
+        If mVaArray.Bound = -1 Then Exit Sub
+
         If isDivShowing(mDirDivId) Then
             Call hideListDiv(mParentId, mDirDivId)
         Else
@@ -516,7 +522,11 @@ Function getOutPath(Sdk, Product)
 End Function
 
 Function getOutSdkPath(Sdk, Product)
-    getOutSdkPath = Sdk & "\out\target\product\" & Product
+    If oFso.FolderExists(Sdk & "\out\target\product\" & Product & "\merged") Then
+        getOutSdkPath = Sdk & "\out\target\product\" & Product & "\merged"
+    Else
+        getOutSdkPath = Sdk & "\out\target\product\" & Product
+    End If
 End Function
 
 Function getProductPath(Product)
@@ -543,7 +553,7 @@ End Sub
 
 Class ProjectInfos
     Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao
-    Private mProjectAlps
+    Private mProjectAlps, mSysTarget
 
     Public Property Get Work
         Work = mWork
@@ -555,6 +565,10 @@ Class ProjectInfos
 
     Public Property Get Product
         Product = mProduct
+    End Property
+
+    Public Property Get SysTarget
+        SysTarget = mSysTarget
     End Property
 
     Public Property Get Project
@@ -633,6 +647,26 @@ Class ProjectInfos
         getDriverOverlaySdkPath = DriverProjectSdkPath & ProjectAlps & "/" & path
     End Function
 
+    Function getSysTargetProject()
+        Dim fullMkPath
+        fullMkPath = mIp.Infos.Sdk & "/" & "device/mediateksample/" & Product & "/full_" & Product & ".mk"
+        If Not oFso.FileExists(fullMkPath) Then Exit Function
+
+        Dim oText, sReadLine, exitFlag
+        Set oText = oFso.OpenTextFile(fullMkPath, FOR_READING)
+
+        Do Until oText.AtEndOfStream
+            sReadLine = oText.ReadLine
+            If InStr(sReadLine, "SYS_TARGET_PROJECT") > 0 Then
+                getSysTargetProject = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
+                Exit Do
+            End If
+        Loop
+
+        oText.Close
+        Set oText = Nothing
+    End Function
+
     Public Property Let Work(value)
         mWork = value
     End Property
@@ -643,6 +677,7 @@ Class ProjectInfos
 
     Public Property Let Product(value)
         mProduct = value
+        mSysTarget = getSysTargetProject()
     End Property
 
     Public Property Let Project(value)

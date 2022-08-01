@@ -1,11 +1,11 @@
 <!--
-Version: 3.5
+Version: 3.6
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>Quick Open v3.5</Title>
+<Title>Quick Open v3.6</Title>
 
 <style type="text/css">
 
@@ -87,6 +87,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <div id="div_shortcut"></div>
 
     <input type="text" id="input_sdk_path" onchange="onSdkPathChange()"  onclick="onSdkPathInputClick()"size="50" />
+    <input type="button" class="input_button" onclick="openSdkText()" value="Edit" />
     <div class="form_sdk_path" id="parent_sdk_path" style="display:none"></div>
 
     <input type="text" id="input_product" onchange="onProductChange()" size="20" />
@@ -139,7 +140,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
 
     <input id="input_open_button" type="button" class="input_button" onclick="onOpenButtonClick()" value="Open" />
-    <input type="button" class="input_button" onclick="onOpenListClick()" value=" List " />
+    <input type="button" class="input_button" onclick="onOpenListClick()" value=" Path " />
     <input type="button" class="input_button" onclick="compareForProject()" value="Compare" />
     <input id="select_for_compare" type="button" class="input_button" onclick="selectForCompare()" value="Select for Compare" />
     <input id="compare_to" type="button" class="input_button" onclick="compareTo()" value="Compare to"  style="display:none"/>

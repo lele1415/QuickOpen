@@ -23,6 +23,7 @@ Sub onOpenListClick()
 End Sub
 
 Sub onOpenButtonClick()
+	If checkSpecialCode() Then Exit Sub
 	Call removeOpenButtonList()
 	Call makeOpenButton()
 	If vaOpenPathList.Bound = -1 Then
@@ -45,15 +46,15 @@ Sub setOpenPath(path)
 End Sub
 
 Sub addOpenPathList()
-	Call readPathText(pPathText)
+	Call readPathText()
 	Call mOpenPathList.addList(vaPathDirectory)
 End Sub
 
-Sub readPathText(DictPath)
-    If Not oFso.FileExists(DictPath) Then Exit Sub
+Sub readPathText()
+    If Not oFso.FileExists(pPathText) Then Exit Sub
     
     Dim oText
-    Set oText = oFso.OpenTextFile(DictPath, FOR_READING)
+    Set oText = oFso.OpenTextFile(pPathText, FOR_READING)
 
     Dim sReadLine
     Do Until oText.AtEndOfStream
@@ -264,32 +265,12 @@ Sub replaceOpenPath()
 		End If
 		
 		If InStr(path, "[sys_target_project]") > 0 Then
-			path = Replace(path, "[sys_target_project]", getSysTargetProject())
+			path = Replace(path, "[sys_target_project]", mIp.Infos.SysTarget)
 		End If
     End If
 
 	Call setOpenPath(path)
 End Sub
-
-Function getSysTargetProject()
-	Dim fullMkPath
-	fullMkPath = mIp.Infos.Sdk & "/" & "device/mediateksample/" & mIp.Infos.Product & "/full_" & mIp.Infos.Product & ".mk"
-	If Not oFso.FileExists(fullMkPath) Then Exit Function
-
-	Dim oText, sReadLine, exitFlag
-	Set oText = oFso.OpenTextFile(fullMkPath, FOR_READING)
-
-	Do Until oText.AtEndOfStream
-	    sReadLine = oText.ReadLine
-	    If InStr(sReadLine, "SYS_TARGET_PROJECT") > 0 Then
-	        getSysTargetProject = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
-	        Exit Do
-	    End If
-	Loop
-
-	oText.Close
-	Set oText = Nothing
-End Function
 
 Function runOpenPath()
 	If mIp.hasProjectInfos() Then Call runPath(mIp.Infos.Sdk & "\" & getOpenPath())
@@ -411,8 +392,14 @@ Sub findJavaFile()
 	Dim fileListPath : fileListPath = getFileListPathFromRes("java.txt")
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(fileListPath, ".java")
+		If vaFilePathList.Bound = -1 Then
+			fileListPath = getFileListPathFromRes("kotlin.txt")
+			If oFso.FileExists(fileListPath) Then
+				Call makeFileList(fileListPath, ".kt")
+			End If
+		End If
 	Else
-		Call CopyString("find -type f -name ""*.java"" > java.txt")
+		Call CopyString("find -type f -name *.java > java.txt")
 		MsgBox("java.txt not exist!")
 	End If
 End Sub
@@ -422,7 +409,7 @@ Sub findFrameworksJavaFile()
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(getFileListPathFromRes("f-java.txt"), ".java")
 	Else
-		Call CopyString("find frameworks/ -type f -name ""*.java"" > f-java.txt")
+		Call CopyString("find frameworks/ -type f -name *.java > f-java.txt")
 		MsgBox("f-java.txt not exist!")
 	End If
 End Sub
@@ -432,7 +419,7 @@ Sub findXmlFile()
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(getFileListPathFromRes("xml.txt"), ".xml")
 	Else
-		Call CopyString("find -type f -name ""*.xml"" > xml.txt")
+		Call CopyString("find -type f -name *.xml > xml.txt")
 		MsgBox("xml.txt not exist!")
 	End If
 End Sub
@@ -442,7 +429,7 @@ Sub findAppFolder()
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(getFileListPathFromRes("app.txt"), "app")
 	Else
-		Call CopyString("find -type f -name ""Android.*"" > app.txt")
+		Call CopyString("find -type f -name Android.* > app.txt")
 		MsgBox("app.txt not exist!")
 	End If
 End Sub
@@ -529,3 +516,40 @@ Sub pasteAndOpenPath()
     oWs.SendKeys "^v"
     oWs.SendKeys "{ENTER}"
 End Sub
+
+Function checkSpecialCode()
+	If getOpenPath() = "s" Then
+		runPath(pSdkPathText)
+		Call setOpenPath("")
+
+	ElseIf getOpenPath() = "p" Then
+	    runPath(pPathText)
+        Call setOpenPath("")
+
+	ElseIf getOpenPath() = "c" Then
+	    runPath(pConfigText)
+	    Call setOpenPath("")
+
+	ElseIf getOpenPath() = "op" Then
+	    runPath(oWs.CurrentDirectory)
+	    Call setOpenPath("")
+
+	ElseIf getOpenPath() = "st" Then
+	    Call setOpenPath("vendor/mediatek/proprietary/packages/apps/MtkSettings")
+	    Call onOpenButtonClick()
+
+	ElseIf getOpenPath() = "su" Then
+	    Call setOpenPath("vendor/mediatek/proprietary/packages/apps/SystemUI")
+	    Call onOpenButtonClick()
+
+	ElseIf getOpenPath() = "gms" Then
+	    Call setOpenPath("vendor/partner_gms")
+	    Call onOpenButtonClick()
+    
+    Else
+        checkSpecialCode = False
+        Exit Function
+    End If
+	
+	checkSpecialCode = True
+End Function

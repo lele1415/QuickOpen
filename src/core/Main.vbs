@@ -7,14 +7,18 @@ Sub Window_OnLoad
     Dim ScreenHeight : ScreenHeight = CreateObject("HtmlFile").ParentWindow.Screen.AvailHeight
     Window.MoveTo ScreenWidth - WINDOW_WIDTH ,(ScreenHeight - WINDOW_HEIGHT) \ 2
     Window.ResizeTo WINDOW_WIDTH, WINDOW_HEIGHT
+    
+    Call runInitFuns()
 End Sub
 
-Call readConfigText(pConfigText)
-Call readSdkPathText(pSdkPathText)
-Call readWorksInfoText()
+Sub runInitFuns()
+    Call readConfigText()
+    Call readWorksInfoText()
 
-Call mSdkPathList.addList(vaAndroidVer)
-Call addOpenPathList()
-Call addOutFileList()
+    Call addSdkPathList()
+    Call addOpenPathList()
+    Call addOutFileList()
 
-Call applyLastWorkInfo()
+    Call applyLastWorkInfo()
+    Call checkConfigInfos()
+End Sub

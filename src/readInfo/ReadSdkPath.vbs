@@ -8,11 +8,16 @@ Sub onSdkPathInputClick()
     Call mSdkPathList.toggleList()
 End Sub
 
-Sub readSdkPathText(DictPath)
-    If Not oFso.FileExists(DictPath) Then Exit Sub
+Sub addSdkPathList()
+    Call readSdkPathText()
+    Call mSdkPathList.addList(vaAndroidVer)
+End Sub
+
+Sub readSdkPathText()
+    If Not oFso.FileExists(pSdkPathText) Then Exit Sub
     
     Dim oText, sReadLine
-    Set oText = oFso.OpenTextFile(DictPath, FOR_READING)
+    Set oText = oFso.OpenTextFile(pSdkPathText, FOR_READING)
 
     Do Until oText.AtEndOfStream
         sReadLine = oText.ReadLine
@@ -59,4 +64,6 @@ Sub readTextAndDoSomething(path, strFun)
     Set oText = Nothing
 End Sub
 
-
+Sub openSdkText()
+    Call runPath(pSdkPathText)
+End Sub

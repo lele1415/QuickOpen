@@ -2,11 +2,11 @@ Option Explicit
 
 Dim mTextEditorPath, mBeyondComparePath, mBrowserPath
 
-Sub readConfigText(DictPath)
-    If Not oFso.FileExists(DictPath) Then Exit Sub
+Sub readConfigText()
+    If Not oFso.FileExists(pConfigText) Then Exit Sub
     
     Dim oText, sReadLine
-    Set oText = oFso.OpenTextFile(DictPath, FOR_READING)
+    Set oText = oFso.OpenTextFile(pConfigText, FOR_READING, False, True)
 
     Do Until oText.AtEndOfStream
         sReadLine = oText.ReadLine
@@ -21,4 +21,26 @@ Sub readConfigText(DictPath)
 
     oText.Close
     Set oText = Nothing
+End Sub
+
+Sub checkConfigInfos()
+    Dim oText
+    Dim count : count = 0
+    If Not oFso.FileExists(Replace(mTextEditorPath, """", "")) Then
+        Do Until (oFso.FileExists(mTextEditorPath) Or count > 5)
+            mTextEditorPath = InputBox("Text editor path : ", "Please input")
+            count = count + 1
+        Loop
+
+        mTextEditorPath = """" & mTextEditorPath & """"
+
+        Call initTxtFile(pConfigText)
+        Set oText = oFso.OpenTextFile(pConfigText, FOR_APPENDING, False, True)
+        oText.WriteLine("TextEditorPath=" & mTextEditorPath)
+        oText.WriteLine("BeyondComparePath=" & mBeyondComparePath)
+        oText.WriteLine("BrowserPath=" & mBrowserPath)
+
+        oText.Close
+    Set oText = Nothing
+    End If
 End Sub

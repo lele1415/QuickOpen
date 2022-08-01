@@ -18,7 +18,7 @@ Sub CommandOfMake()
     If element_isChecked(ID_COMMAND_RM_OUT) Then
         commandFinal = "rm -rf out/ && " & commandFinal
     ElseIf element_isChecked(ID_COMMAND_RM_BUILDPROP) Then
-        commandFinal = "find " & mIp.Infos.OutPath & " -type f -name build*.prop | xargs rm && " & commandFinal
+        commandFinal = "find " & mIp.Infos.OutPath & " -type f -name build*.prop | xargs rm -v && " & commandFinal
     End If
 
     If element_isChecked(ID_COMMAND_BUILD_OTA) Then commandFinal = commandFinal & " && " & commandOta
@@ -39,9 +39,15 @@ Sub CommandOfLunch()
             buildType = "user"
     End Select
 
-    comboName = "full_" & mIp.Infos.Product & "-" & buildType
-
-    commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mIp.Infos.Project
+    If InStr(mIp.Infos.Sdk, "8168") > 0 Then
+        Dim sysStr, vndStr
+        sysStr = "sys_" & Replace(mIp.Infos.SysTarget, "_h", "") & "-" & buildType
+        vndStr = "vnd_" & mIp.Infos.Product & "-" & buildType
+        commandFinal = sysStr & " " & vndStr & " " & mIp.Infos.Project
+    Else
+        comboName = "full_" & mIp.Infos.Product & "-" & buildType
+        commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mIp.Infos.Project
+    End If
     Call CopyString(commandFinal)
 End Sub
 

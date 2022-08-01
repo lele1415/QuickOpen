@@ -313,3 +313,19 @@ Sub onInputListClick(divId, str)
         Call setOpenPath(str)
     End If
 End Sub
+
+Const KEYCODE_ENTER = 13
+Const KEYCODE_SPACE = 32
+Function onKeyDown(keyCode)
+    If keyCode = KEYCODE_ENTER Then
+        Call onOpenButtonClick()
+
+    ElseIf keyCode = KEYCODE_SPACE Then
+        Call pasteAndOpenPath()
+
+    Else
+        onKeyDown = True : Exit Function
+    End If
+    
+    onKeyDown = False
+End Function
