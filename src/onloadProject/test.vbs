@@ -68,4 +68,8 @@ Function getDriverProjectName(mmiFolderName)
     getDriverProjectName = str
 End Function
 
-MsgBox(getDriverProjectName("m863ur200_64-SBYH_A8009_MasstelTab8Edu-apk-MMI"))
+'MsgBox(getDriverProjectName("m863ur200_64-SBYH_A8009_MasstelTab8Edu-apk-MMI"))
+Dim value, mTaskNum
+value="http://192.168.0.29:3000/zentao/task-view-181.html"
+mTaskNum = Replace(Right(value, Len(value) - InStr(value, "task-view-") - Len("task-view-") + 1), ".html", "")
+MsgBox(mTaskNum)

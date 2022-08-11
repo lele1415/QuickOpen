@@ -129,7 +129,7 @@ Function getProjectSimpleName()
 	str = Replace(str, "_MMI", "")
 	If InStr(str, "-") > 0 Then
 	    str = Replace(str, Left(str, InStr(str, "-")), "")
-	Else
+	ElseIf InStr(str, "_") > 0 Then
 	    str = Replace(str, Left(str, InStr(str, "_")), "")
 	End If
 	getProjectSimpleName = str

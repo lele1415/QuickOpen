@@ -23,7 +23,7 @@ Sub onOpenListClick()
 End Sub
 
 Sub onOpenButtonClick()
-	If checkSpecialCode() Then Exit Sub
+	If mCmdInput.text <> "" Then Call handleCmdInput() : Call mCmdInput.setText("") : Exit Sub
 	Call removeOpenButtonList()
 	Call makeOpenButton()
 	If vaOpenPathList.Bound = -1 Then
@@ -244,30 +244,36 @@ End Function
 
 Sub replaceOpenPath()
 	Dim path : path = getOpenPath()
-	path = Replace(path, "\", "/")
+
 	If InStr(path, "..") > 0 Then
 		path = pathDict.Item(path)
-
-		If InStr(path, "[product]") > 0 Then
-			path = Replace(path, "[product]", mIp.Infos.Product)
-		End If
-
-		If InStr(path, "[project]") > 0 Then
-			path = Replace(path, "[project]", mIp.Infos.Project)
-		End If
-
-		If InStr(path, "[project-driver]") > 0 Then
-			path = Replace(path, "[project-driver]", Replace(mIp.Infos.Project, "-MMI", ""))
-		End If
-
-		If InStr(path, "[boot_logo]") > 0 Then
-			path = Replace(path, "[boot_logo]", getBootLogo())
-		End If
-		
-		If InStr(path, "[sys_target_project]") > 0 Then
-			path = Replace(path, "[sys_target_project]", mIp.Infos.SysTarget)
-		End If
     End If
+	
+	path = Replace(path, "\", "/")
+	Call replaceProjectInfoStr(path)
+	Call setOpenPath(path)
+End Sub
+
+Sub replaceProjectInfoStr(path)
+	If InStr(path, "[product]") > 0 Then
+		path = Replace(path, "[product]", mIp.Infos.Product)
+	End If
+
+	If InStr(path, "[project]") > 0 Then
+		path = Replace(path, "[project]", mIp.Infos.Project)
+	End If
+
+	If InStr(path, "[project-driver]") > 0 Then
+		path = Replace(path, "[project-driver]", Replace(mIp.Infos.Project, "-MMI", ""))
+	End If
+
+	If InStr(path, "[boot_logo]") > 0 Then
+		path = Replace(path, "[boot_logo]", getBootLogo())
+	End If
+	
+	If InStr(path, "[sys_target_project]") > 0 Then
+		path = Replace(path, "[sys_target_project]", mIp.Infos.SysTarget)
+	End If
 
 	Call setOpenPath(path)
 End Sub
@@ -517,50 +523,10 @@ Sub pasteAndOpenPath()
     oWs.SendKeys "{ENTER}"
 End Sub
 
-Function checkSpecialCode()
-	If getOpenPath() = "s" Then
-		runPath(pSdkPathText)
-		Call setOpenPath("")
-
-	ElseIf getOpenPath() = "p" Then
-	    runPath(pPathText)
-        Call setOpenPath("")
-
-	ElseIf getOpenPath() = "c" Then
-	    runPath(pConfigText)
-	    Call setOpenPath("")
-
-	ElseIf getOpenPath() = "op" Then
-	    runPath(oWs.CurrentDirectory)
-	    Call setOpenPath("")
-
-	ElseIf getOpenPath() = "st" Then
-	    Call setOpenPath("vendor/mediatek/proprietary/packages/apps/MtkSettings")
-	    Call onOpenButtonClick()
-
-	ElseIf getOpenPath() = "su" Then
-	    Call setOpenPath("vendor/mediatek/proprietary/packages/apps/SystemUI")
-	    Call onOpenButtonClick()
-
-	ElseIf getOpenPath() = "gms" Then
-	    Call setOpenPath("vendor/partner_gms")
-	    Call onOpenButtonClick()
-
-	ElseIf InStr(getOpenPath(), "bn=") > 0 Then
-        Call modBuildNumber(Replace(getOpenPath(), "bn=", ""))
-        Call setOpenPath("")
-    Else
-        checkSpecialCode = False
-        Exit Function
-    End If
-	
-	checkSpecialCode = True
-End Function
-
 Sub modBuildNumber(number)
 	Dim sysPath, vndPath, sysExist, vndExist, sedStr, R_bnStr, S_bnStr, bnStr, commandStr
-	sysPath = "/device/mediatek/system/common/BoardConfig.mk"
-	vndPath = "/device/mediatek/vendor/common/BoardConfig.mk"
+	sysPath = "device/mediatek/system/common/BoardConfig.mk"
+	vndPath = "device/mediatek/vendor/common/BoardConfig.mk"
 	sysExist = False
 	vndExist = False
 	R_bnStr = "BUILD_NUMBER_WEIBU"

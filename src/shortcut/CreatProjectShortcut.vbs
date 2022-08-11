@@ -73,6 +73,10 @@ Sub removeShortcut(shortcutId)
     Call updateWorkInfoTxt()
 End Sub
 
+Sub applyProjectInfo(obj)
+	Call applyShortcut(obj.Work, obj.Sdk, obj.Product, obj.Project, obj.Firmware, obj.Requirements, obj.Zentao)
+End Sub
+
 Sub applyShortcut(work, sdk, product, project, firmware, requirements, zentao)
 	Call hideAllShortcuts()
 	
@@ -134,9 +138,9 @@ Sub updateWorkInfoTxt()
         oTxt.WriteLine(obj.Sdk)
         oTxt.WriteLine(obj.Product)
         oTxt.WriteLine(obj.Project)
-        If (obj.Firmware <> "") Then oTxt.WriteLine(obj.Firmware)
-        If (obj.Requirements <> "") Then oTxt.WriteLine(obj.Requirements)
-        If (obj.Zentao <> "") Then oTxt.WriteLine(obj.Zentao)
+        oTxt.WriteLine(obj.Firmware)
+        oTxt.WriteLine(obj.Requirements)
+        oTxt.WriteLine(obj.Zentao)
         oTxt.WriteLine()
     Next
 

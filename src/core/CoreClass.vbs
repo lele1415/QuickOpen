@@ -1,5 +1,6 @@
 Option Explicit
 
+Dim mCmdInput : Set mCmdInput = (New InputText)(getCmdInputId())
 Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
 Dim mIp : Set mIp = New ProjectInputs
 Dim mIf : Set mIf = New ProjectInfos
@@ -517,15 +518,19 @@ Function getWeibuSdkPath(Sdk)
     getWeibuSdkPath = Sdk & "\weibu"
 End Function
 
-Function getOutPath(Sdk, Product)
+Function getOutPath(Product)
     getOutPath = "out/target/product/" & Product
 End Function
 
 Function getOutSdkPath(Sdk, Product)
-    If oFso.FolderExists(Sdk & "\out\target\product\" & Product & "\merged") Then
-        getOutSdkPath = Sdk & "\out\target\product\" & Product & "\merged"
+    getOutSdkPath = Sdk & "\out\target\product\" & Product
+End Function
+
+Function getDownloadOutPath(Sdk, Product)
+    If oFso.FolderExists(getOutSdkPath(Sdk, Product) & "\merged") Then
+        getDownloadOutPath = getOutSdkPath(Sdk, Product) & "\merged"
     Else
-        getOutSdkPath = Sdk & "\out\target\product\" & Product
+        getDownloadOutPath = getOutSdkPath(Sdk, Product)
     End If
 End Function
 
@@ -552,7 +557,7 @@ Sub msgboxPathNotExist(path)
 End Sub
 
 Class ProjectInfos
-    Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao
+    Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao, mTaskNum
     Private mProjectAlps, mSysTarget
 
     Public Property Get Work
@@ -587,16 +592,24 @@ Class ProjectInfos
         Zentao = mZentao
     End Property
 
+    Public Property Get TaskNum
+        TaskNum = mTaskNum
+    End Property
+
     Public Property Get WeibuSdkPath
         WeibuSdkPath = getWeibuSdkPath(Sdk)
     End Property
 
     Public Property Get OutPath
-        OutPath = getOutPath(Sdk, Product)
+        OutPath = getOutPath(Product)
     End Property
 
     Public Property Get OutSdkPath
         OutSdkPath = getOutSdkPath(Sdk, Product)
+    End Property
+
+    Public Property Get DownloadOutPath
+        DownloadOutPath = getDownloadOutPath(Sdk, Product)
     End Property
 
     Public Property Get ProductPath
@@ -648,7 +661,7 @@ Class ProjectInfos
     End Function
 
     Function getSysTargetProject()
-        Dim fullMkPath
+        Dim fullMkPath, sysTarget
         fullMkPath = mIp.Infos.Sdk & "/" & "device/mediateksample/" & Product & "/full_" & Product & ".mk"
         If Not oFso.FileExists(fullMkPath) Then Exit Function
 
@@ -657,14 +670,19 @@ Class ProjectInfos
 
         Do Until oText.AtEndOfStream
             sReadLine = oText.ReadLine
-            If InStr(sReadLine, "SYS_TARGET_PROJECT") > 0 Then
-                getSysTargetProject = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
+            If InStr(sReadLine, "SYS_TARGET_PROJECT") > 0 And InStr(sReadLine, "=") > 0 Then
+                sysTarget = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
+                If InStr(Sdk, "8168") > 0 Then
+                    sysTarget = Replace(sysTarget, "_h", "")
+                End If
                 Exit Do
             End If
         Loop
 
         oText.Close
         Set oText = Nothing
+
+        getSysTargetProject = sysTarget
     End Function
 
     Public Property Let Work(value)
@@ -694,6 +712,9 @@ Class ProjectInfos
 
     Public Property Let Zentao(value)
         mZentao = value
+        If value <> "" And InStr(value, "task-view-") > 0 Then
+            mTaskNum = Replace(Right(value, Len(value) - InStr(value, "task-view-") - Len("task-view-") + 1), ".html", "")
+        End If
     End Property
 
     Public Property Let ProjectAlps(value)

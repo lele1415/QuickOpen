@@ -10,11 +10,11 @@ Sub readConfigText()
 
     Do Until oText.AtEndOfStream
         sReadLine = oText.ReadLine
-        If InStr(sReadLine, "TextEditorPath") > 0 Then
+        If InStr(sReadLine, "TextEditorPath") > 0 And InStr(sReadLine, "=") > 0 Then
             mTextEditorPath = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
-        ElseIf InStr(sReadLine, "BeyondComparePath") > 0 Then
+        ElseIf InStr(sReadLine, "BeyondComparePath") > 0 And InStr(sReadLine, "=") > 0 Then
             mBeyondComparePath = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
-        ElseIf InStr(sReadLine, "BrowserPath") > 0 Then
+        ElseIf InStr(sReadLine, "BrowserPath") > 0 And InStr(sReadLine, "=") > 0 Then
             mBrowserPath = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
         End If
     Loop

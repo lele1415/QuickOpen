@@ -1,11 +1,11 @@
 <!--
-Version: 3.7
+Version: 3.8
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>Quick Open v3.7</Title>
+<Title>Quick Open v3.8</Title>
 
 <style type="text/css">
 
@@ -137,6 +137,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="cutSdkPath()" value=" cutS " />
     <input type="button" class="input_button" onclick="cutProjectPath()" value=" cutP " />
 
+    <input type="text" id="input_cmd" size="30">
     <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
 
     <input id="input_open_button" type="button" class="input_button" onclick="onOpenButtonClick()" value="Open" />
@@ -199,6 +200,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 <Script Language="VBScript" src="src\readInfo\ReadWorkInfo.vbs"></Script>
 <Script Language="VBScript" src="src\onloadProject\OnloadProject.vbs"></Script>
 <Script Language="VBScript" src="src\shortcut\CreatProjectShortcut.vbs"></Script>
+<Script Language="VBScript" src="src\openPath\CmdHandle.vbs"></Script>
 <Script Language="VBScript" src="src\openPath\OpenPath.vbs"></Script>
 <Script Language="VBScript" src="src\copyCommand\CopyCommand.vbs"></Script>
 <Script Language="VBScript" src="src\fileExplorer\FileExplorer.vbs"></Script>

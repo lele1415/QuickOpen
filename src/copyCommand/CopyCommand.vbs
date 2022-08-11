@@ -41,7 +41,7 @@ Sub CommandOfLunch()
 
     If InStr(mIp.Infos.Sdk, "8168") > 0 Then
         Dim sysStr, vndStr
-        sysStr = "sys_" & Replace(mIp.Infos.SysTarget, "_h", "") & "-" & buildType
+        sysStr = "sys_" & mIp.Infos.SysTarget & "-" & buildType
         vndStr = "vnd_" & mIp.Infos.Product & "-" & buildType
         commandFinal = sysStr & " " & vndStr & " " & mIp.Infos.Project
         commandFinal = """lunch_item=""&Chr(34)&""" & commandFinal & """&Chr(34)"
@@ -56,7 +56,7 @@ End Sub
 
 Sub CommandOfOut()
     If Not mIp.hasProjectInfos() Then Exit Sub
-    Call CopyString(mIp.Infos.OutSdkPath)
+    Call CopyString(mIp.Infos.DownloadOutPath)
 End Sub
 
 Sub CopyCleanCommand()
