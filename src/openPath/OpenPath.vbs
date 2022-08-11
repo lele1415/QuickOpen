@@ -545,7 +545,10 @@ Function checkSpecialCode()
 	ElseIf getOpenPath() = "gms" Then
 	    Call setOpenPath("vendor/partner_gms")
 	    Call onOpenButtonClick()
-    
+
+	ElseIf InStr(getOpenPath(), "bn=") > 0 Then
+        Call modBuildNumber(Replace(getOpenPath(), "bn=", ""))
+        Call setOpenPath("")
     Else
         checkSpecialCode = False
         Exit Function
@@ -553,3 +556,26 @@ Function checkSpecialCode()
 	
 	checkSpecialCode = True
 End Function
+
+Sub modBuildNumber(number)
+	Dim sysPath, vndPath, sysExist, vndExist, sedStr, R_bnStr, S_bnStr, bnStr, commandStr
+	sysPath = "/device/mediatek/system/common/BoardConfig.mk"
+	vndPath = "/device/mediatek/vendor/common/BoardConfig.mk"
+	sysExist = False
+	vndExist = False
+	R_bnStr = "BUILD_NUMBER_WEIBU"
+	S_bnStr = "WEIBU_BUILD_NUMBER"
+
+	If oFso.FileExists(mIp.Infos.getOverlaySdkPath(sysPath)) Then sysExist = True
+	If oFso.FileExists(mIp.Infos.getOverlaySdkPath(vndPath)) Then vndExist = True
+	If Not sysExist And Not vndExist Then MsgBox("Not found BoardConfig.mk overlay") : Exit Sub
+    If InStr(mIp.Infos.Sdk, "_r") Then bnStr = R_bnStr
+    If InStr(mIp.Infos.Sdk, "_s") Then bnStr = S_bnStr
+    If bnStr = "" Then MsgBox("Not found _r OR _s in SDK name") : Exit Sub
+
+	sedStr = "sed -i '/" & bnStr & "/s/[0-9]\+/" & number & "/' "
+    If sysExist Then commandStr = sedStr & mIp.Infos.getOverlayPath(sysPath)
+    If vndExist Then commandStr = commandStr & " " & mIp.Infos.getOverlayPath(vndPath)
+    
+    Call CopyString(commandStr)
+End Sub

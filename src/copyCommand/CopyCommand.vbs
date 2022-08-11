@@ -44,6 +44,9 @@ Sub CommandOfLunch()
         sysStr = "sys_" & Replace(mIp.Infos.SysTarget, "_h", "") & "-" & buildType
         vndStr = "vnd_" & mIp.Infos.Product & "-" & buildType
         commandFinal = sysStr & " " & vndStr & " " & mIp.Infos.Project
+        commandFinal = """lunch_item=""&Chr(34)&""" & commandFinal & """&Chr(34)"
+        Call CopyQuoteString(commandFinal)
+        Exit Sub
     Else
         comboName = "full_" & mIp.Infos.Product & "-" & buildType
         commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mIp.Infos.Project
