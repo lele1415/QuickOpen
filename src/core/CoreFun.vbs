@@ -296,6 +296,7 @@ End Sub
 Sub CopyString(str)
     If Len(str) > 452 Then
         MsgBox("String is too long!(max length 452)")
+        setOpenPath(str)
         Exit Sub
     End If
     oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(Window.Close)"
@@ -304,6 +305,7 @@ End Sub
 Sub CopyQuoteString(str)
     If Len(str) > 452 Then
         MsgBox("String is too long!(max length 452)")
+        setOpenPath(str)
         Exit Sub
     End If
     oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text""," & str & ")(Window.Close)"
