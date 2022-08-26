@@ -23,7 +23,7 @@ Sub onOpenListClick()
 End Sub
 
 Sub onOpenButtonClick()
-	If mCmdInput.text <> "" Then Call handleCmdInput() : Call mCmdInput.setText("") : Exit Sub
+	If mCmdInput.text <> "" Then Call handleCmdInput() : Exit Sub
 	Call removeOpenButtonList()
 	Call makeOpenButton()
 	If vaOpenPathList.Bound = -1 Then
@@ -275,6 +275,14 @@ Sub replaceProjectInfoStr(path)
 		path = Replace(path, "[sys_target_project]", mIp.Infos.SysTarget)
 	End If
 
+	If InStr(path, "[kernel_version]") > 0 Then
+		path = Replace(path, "[kernel_version]", mIp.Infos.KernelVer)
+	End If
+
+	If InStr(path, "[target_arch]") > 0 Then
+		path = Replace(path, "[target_arch]", mIp.Infos.TargetArch)
+	End If
+
 	Call setOpenPath(path)
 End Sub
 
@@ -521,27 +529,4 @@ Sub pasteAndOpenPath()
     Call focusElement(ID_INPUT_OPEN_PATH)
     oWs.SendKeys "^v"
     oWs.SendKeys "{ENTER}"
-End Sub
-
-Sub modBuildNumber(number)
-	Dim sysPath, vndPath, sysExist, vndExist, sedStr, R_bnStr, S_bnStr, bnStr, commandStr
-	sysPath = "device/mediatek/system/common/BoardConfig.mk"
-	vndPath = "device/mediatek/vendor/common/BoardConfig.mk"
-	sysExist = False
-	vndExist = False
-	R_bnStr = "BUILD_NUMBER_WEIBU"
-	S_bnStr = "WEIBU_BUILD_NUMBER"
-
-	If oFso.FileExists(mIp.Infos.getOverlaySdkPath(sysPath)) Then sysExist = True
-	If oFso.FileExists(mIp.Infos.getOverlaySdkPath(vndPath)) Then vndExist = True
-	If Not sysExist And Not vndExist Then MsgBox("Not found BoardConfig.mk overlay") : Exit Sub
-    If InStr(mIp.Infos.Sdk, "_r") Then bnStr = R_bnStr
-    If InStr(mIp.Infos.Sdk, "_s") Then bnStr = S_bnStr
-    If bnStr = "" Then MsgBox("Not found _r OR _s in SDK name") : Exit Sub
-
-	sedStr = "sed -i '/" & bnStr & "/s/[0-9]\+/" & number & "/' "
-    If sysExist Then commandStr = sedStr & mIp.Infos.getOverlayPath(sysPath)
-    If vndExist Then commandStr = commandStr & " " & mIp.Infos.getOverlayPath(vndPath)
-    
-    Call CopyString(commandStr)
 End Sub

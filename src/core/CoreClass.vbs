@@ -3,7 +3,6 @@ Option Explicit
 Dim mCmdInput : Set mCmdInput = (New InputText)(getCmdInputId())
 Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
 Dim mIp : Set mIp = New ProjectInputs
-Dim mIf : Set mIf = New ProjectInfos
 Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductParentId(), getProductInputId(), "product")
 Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project")
 Dim mSdkPathList : Set mSdkPathList = (New InputWithTwoLayerList)(getSdkPathParentId(), getSdkPathInputId(), "sdkpath")
@@ -558,7 +557,7 @@ End Sub
 
 Class ProjectInfos
     Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao, mTaskNum
-    Private mProjectAlps, mSysTarget
+    Private mProjectAlps, mSysTarget, mKernelVer, mTargetArch
 
     Public Property Get Work
         Work = mWork
@@ -574,6 +573,14 @@ Class ProjectInfos
 
     Public Property Get SysTarget
         SysTarget = mSysTarget
+    End Property
+
+    Public Property Get KernelVer
+        KernelVer = mKernelVer
+    End Property
+
+    Public Property Get TargetArch
+        TargetArch = mTargetArch
     End Property
 
     Public Property Get Project
@@ -660,21 +667,21 @@ Class ProjectInfos
         getDriverOverlaySdkPath = DriverProjectSdkPath & ProjectAlps & "/" & path
     End Function
 
-    Function getSysTargetProject()
+    Sub getSysTargetProject()
         Dim fullMkPath, sysTarget
         fullMkPath = mIp.Infos.Sdk & "/" & "device/mediateksample/" & Product & "/full_" & Product & ".mk"
-        If Not oFso.FileExists(fullMkPath) Then Exit Function
+        If Not oFso.FileExists(fullMkPath) Then Exit Sub
 
-        Dim oText, sReadLine, exitFlag
+        Dim oText, sReadLine
         Set oText = oFso.OpenTextFile(fullMkPath, FOR_READING)
 
         Do Until oText.AtEndOfStream
             sReadLine = oText.ReadLine
             If InStr(sReadLine, "SYS_TARGET_PROJECT") > 0 And InStr(sReadLine, "=") > 0 Then
                 sysTarget = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
-                If InStr(Sdk, "8168") > 0 Then
-                    sysTarget = Replace(sysTarget, "_h", "")
-                End If
+                'If InStr(Sdk, "8168") > 0 Then
+                ''    sysTarget = Replace(sysTarget, "_h", "")
+                'End If
                 Exit Do
             End If
         Loop
@@ -682,8 +689,44 @@ Class ProjectInfos
         oText.Close
         Set oText = Nothing
 
-        getSysTargetProject = sysTarget
-    End Function
+        mSysTarget = sysTarget
+    End Sub
+
+    Sub getKernelInfos()
+        Dim projectConfigPath, kernelVer, k64Support
+        projectConfigPath = mIp.Infos.Sdk & "/device/mediateksample/" & Product & "/ProjectConfig.mk"
+        If Not oFso.FileExists(projectConfigPath) Then MsgBox(projectConfigPath) : Exit Sub
+
+        Dim oText, sReadLine
+        Set oText = oFso.OpenTextFile(projectConfigPath, FOR_READING)
+
+        Do Until oText.AtEndOfStream
+            sReadLine = oText.ReadLine
+            If InStr(sReadLine, "LINUX_KERNEL_VERSION") > 0 And InStr(sReadLine, "=") > 0 Then
+                kernelVer = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
+                Exit Do
+            End If
+        Loop
+
+        Do Until oText.AtEndOfStream
+            sReadLine = oText.ReadLine
+            If InStr(sReadLine, "MTK_K64_SUPPORT") > 0 And InStr(sReadLine, "=") > 0 Then
+                k64Support = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
+                Exit Do
+            End If
+        Loop
+
+        oText.Close
+        Set oText = Nothing
+
+        mKernelVer = kernelVer
+        If k64Support = "yes" Then
+            mTargetArch = "arm64"
+        ElseIf k64Support = "no" Then
+            mTargetArch = "arm"
+        End If
+        
+    End Sub
 
     Public Property Let Work(value)
         mWork = value
@@ -695,7 +738,6 @@ Class ProjectInfos
 
     Public Property Let Product(value)
         mProduct = value
-        mSysTarget = getSysTargetProject()
     End Property
 
     Public Property Let Project(value)
@@ -866,6 +908,8 @@ Class ProjectInputs
     Public Function onProductChange()
         mInfos.Product = Product
         If oFso.FolderExists(mInfos.ProductSdkPath) Then
+            Call mInfos.getSysTargetProject()
+            Call mInfos.getKernelInfos()
             onProductChange = True
         Else
             msgboxPathNotExist(mInfos.ProductSdkPath)

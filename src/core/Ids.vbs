@@ -37,6 +37,7 @@ Const ID_INPUT_REQUIREMENTS = "input_requirements"
 Const ID_INPUT_ZENTAO = "input_zentao"
 
 Const ID_INPUT_CMD = "input_cmd"
+
 Const ID_PARENT_OPEN_PATH = "parent_open_path"
 Const ID_INPUT_OPEN_PATH = "input_open_path"
 
@@ -135,6 +136,7 @@ End Function
 Function getCmdInputId()
     getCmdInputId = ID_INPUT_CMD
 End Function
+
 Function getOpenPathParentId()
     getOpenPathParentId = ID_PARENT_OPEN_PATH
 End Function
