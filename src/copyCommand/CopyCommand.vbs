@@ -40,11 +40,7 @@ Sub CommandOfLunch()
     End Select
 
     If InStr(mIp.Infos.Sdk, "8168") > 0 Then
-        Dim sysStr, vndStr
-        sysStr = "sys_" & mIp.Infos.SysTarget & "-" & buildType
-        vndStr = "vnd_" & mIp.Infos.Product & "-" & buildType
-        commandFinal = sysStr & " " & vndStr & " " & mIp.Infos.Project
-        commandFinal = """lunch_item=""&Chr(34)&""" & commandFinal & """&Chr(34)"
+        commandFinal = getLuncnItemInSplitBuild(buildType)
         Call CopyQuoteString(commandFinal)
         Exit Sub
     Else
@@ -53,6 +49,19 @@ Sub CommandOfLunch()
     End If
     Call CopyString(commandFinal)
 End Sub
+
+Function getLuncnItemInSplitBuild(buildType)
+    Dim sysStr, vndStr, commandStr
+    sysStr = "sys_" & mIp.Infos.SysTarget & "-" & buildType
+    vndStr = "vnd_" & mIp.Infos.Product & "-" & buildType
+    commandStr = sysStr & " " & vndStr & " " & mIp.Infos.Project
+    commandStr = """lunch_item=""&Chr(34)&""" & commandStr & """&Chr(34)"
+
+    Dim keyStr
+    keyStr = "##Cusomer Settings"
+    commandStr = """sed -i '/" & keyStr & "/i\""&" & commandStr & "&""' split_build.sh"""
+    getLuncnItemInSplitBuild = commandStr
+End Function
 
 Sub CommandOfOut()
     If Not mIp.hasProjectInfos() Then Exit Sub
@@ -68,6 +77,15 @@ Sub CopyCommitInfo()
     If Not mIp.hasProjectInfos() Then Exit Sub
 	commandFinal = "[" & mIp.Infos.Project & "] : "
 	Call CopyString(commandFinal)
+End Sub
+
+Sub CopyBuildOtaUpdate()
+    If InStr(mIp.Infos.Sdk, "_s") > 0 Then
+        commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i old.zip new.zip update.zip"
+    Else
+        commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
+    End If
+    Call CopyString(commandFinal)
 End Sub
 
 Sub MkdirWeibuFolderPath()
@@ -102,5 +120,10 @@ Sub MkdirWeibuFolderPath()
         End If
     End If
     commandFinal = Replace(commandFinal, "\", "/")
+    Call CopyString(commandFinal)
+End Sub
+
+Sub copyExportToolsPathCmd()
+    commandFinal = "export PATH=$HOME/Tools:$PATH"
     Call CopyString(commandFinal)
 End Sub
