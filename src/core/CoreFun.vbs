@@ -206,20 +206,26 @@ Function getFileNameFromPath(path)
     getFileNameFromPath = str
 End Function
 
+Function getFolderPath(filePath)
+    Dim str
+    str = Replace(filePath, "\", "/")
+    If InStr(str, "/") > 0 Then
+        str = Left(str, InStrRev(str, "/") - 1)
+    Else
+        str = filePath
+    End If
+    getFolderPath = str
+End Function
+
 Function getDriverProjectName(mmiFolderName)
     Dim str : str = mmiFolderName
 
     'M863Y_YUKE_066-MMI
-    If InStr(str, "-MMI") > 0 And findStr(str, "-") = 1 Then
-        str = Replace(str, "-MMI", "")
-
     'm863ur200_64-SBYH_A8005A-Nitro_8_MMI
-    ElseIf findStr(str, "-") > 1 Then
-        Do Until findStr(str, "-") = 1
-            str = Left(str, InStrRev(str, "-") - 1)
-        Loop
+    If InStr(str, "MMI") > 0 And InStr(str, "-") > 0 Then
+        str = Left(str, InStrRev(str, "-") - 1)
     Else
-        str = ""
+        str = mmiFolderName
     End If
     getDriverProjectName = str
 End Function

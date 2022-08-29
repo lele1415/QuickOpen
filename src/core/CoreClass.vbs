@@ -557,7 +557,7 @@ End Sub
 
 Class ProjectInfos
     Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao, mTaskNum
-    Private mProjectAlps, mSysTarget, mKernelVer, mTargetArch
+    Private mProjectAlps, mBootLogo, mSysTarget, mKernelVer, mTargetArch
 
     Public Property Get Work
         Work = mWork
@@ -569,6 +569,10 @@ Class ProjectInfos
 
     Public Property Get Product
         Product = mProduct
+    End Property
+
+    Public Property Get BootLogo
+        BootLogo = mBootLogo
     End Property
 
     Public Property Get SysTarget
@@ -667,9 +671,31 @@ Class ProjectInfos
         getDriverOverlaySdkPath = DriverProjectSdkPath & ProjectAlps & "/" & path
     End Function
 
+    Sub getBootLogo()
+        mBootLogo = getDriverProjectConfigValue("BOOT_LOGO=")
+        Call getFakeOrientation() 
+    End Sub
+
+    Sub getFakeOrientation()
+        Dim csciPath
+        csciPath = DriverProjectSdkPath & "/config/csci.ini"
+        If Not oFso.FileExists(csciPath) Then : Exit Sub
+
+        Dim oText, sReadLine
+        Set oText = oFso.OpenTextFile(csciPath, FOR_READING)
+
+        Do Until oText.AtEndOfStream
+            sReadLine = oText.ReadLine
+            If InStr(sReadLine, " 1 ") > 0 Then
+                mBootLogo = mBootLogo & "nl"
+                Exit Do
+            End If
+        Loop
+    End Sub
+
     Sub getSysTargetProject()
         Dim fullMkPath, sysTarget
-        fullMkPath = mIp.Infos.Sdk & "/" & "device/mediateksample/" & Product & "/full_" & Product & ".mk"
+        fullMkPath = Sdk & "/" & "device/mediateksample/" & Product & "/full_" & Product & ".mk"
         If Not oFso.FileExists(fullMkPath) Then Exit Sub
 
         Dim oText, sReadLine
@@ -694,7 +720,7 @@ Class ProjectInfos
 
     Sub getKernelInfos()
         Dim projectConfigPath, kernelVer, k64Support
-        projectConfigPath = mIp.Infos.Sdk & "/device/mediateksample/" & Product & "/ProjectConfig.mk"
+        projectConfigPath = Sdk & "/device/mediateksample/" & Product & "/ProjectConfig.mk"
         If Not oFso.FileExists(projectConfigPath) Then MsgBox(projectConfigPath) : Exit Sub
 
         Dim oText, sReadLine
@@ -908,6 +934,8 @@ Class ProjectInputs
     Public Function onProductChange()
         mInfos.Product = Product
         If oFso.FolderExists(mInfos.ProductSdkPath) Then
+            Call getProjectConfigMk()
+            Call mInfos.getBootLogo()
             Call mInfos.getSysTargetProject()
             Call mInfos.getKernelInfos()
             onProductChange = True

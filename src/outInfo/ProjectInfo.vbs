@@ -26,11 +26,6 @@ Function getMMIProjectConfigValue(keyStr)
     getMMIProjectConfigValue = value
 End Function
 
-Function getBootLogo()
-    Call getProjectConfigMk()
-    getBootLogo = getDriverProjectConfigValue("BOOT_LOGO=")
-End Function
-
 Sub getProjectConfigMk()
     If mIp.hasProjectAlps() Then
         pMMIProjectConfigMk = mIp.Infos.ProjectSdkPath & "/config/ProjectConfig.mk"
@@ -58,7 +53,7 @@ Sub getProjectInfos()
         Exit Sub
     End If
 
-    Call getProjectConfigMk()
+    'Call getProjectConfigMk()
 
     Dim str
     str = str & "BOOT_LOGO = " & getDriverProjectConfigValue("BOOT_LOGO=") & VbLf

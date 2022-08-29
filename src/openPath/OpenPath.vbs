@@ -268,7 +268,7 @@ Sub replaceProjectInfoStr(path)
 	End If
 
 	If InStr(path, "[boot_logo]") > 0 Then
-		path = Replace(path, "[boot_logo]", getBootLogo())
+		path = Replace(path, "[boot_logo]", mIp.Infos.BootLogo)
 	End If
 	
 	If InStr(path, "[sys_target_project]") > 0 Then

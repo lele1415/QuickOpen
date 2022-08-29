@@ -5,48 +5,10 @@ Sub handleCmdInput()
 	If HandleFilePathCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If handleProp() Then Exit Sub
     If handleEditTextCmd() Then Call mCmdInput.setText("") : Exit Sub
+    If handleMultiMkdirCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleProjectCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If handleCurrentDictCmd() Then Call mCmdInput.setText("") : Exit Sub
 End Sub
-
-Function setPathFromCmd(cmd, path)
-	If mCmdInput.text = cmd Then
-	    Call setOpenPath(path)
-	    Call onOpenPathChange()
-	    setPathFromCmd = True
-	Else
-	    setPathFromCmd = False
-	End If
-End Function
-
-Function setPathFromCmdAndCopyKey(cmd, key, path)
-	If mCmdInput.text = cmd Then
-	    Call setOpenPath(path)
-	    Call onOpenPathChange()
-		Call CopyString(key)
-	    setPathFromCmdAndCopyKey = True
-	Else
-	    setPathFromCmdAndCopyKey = False
-	End If
-End Function
-
-Function runPathFromCmd(cmd, path)
-	If mCmdInput.text = cmd Then
-	    Call runPath(path)
-	    runPathFromCmd = True
-	Else
-	    runPathFromCmd = False
-	End If
-End Function
-
-Function showPropString(cmd, prop)
-    If mCmdInput.text = cmd Then
-	    Call mCmdInput.setText(prop)
-		showPropString = True
-	Else
-	    showPropString = False
-	End If
-End Function
 
 Function HandleFolderPathCmd()
 	HandleFolderPathCmd = True
@@ -133,6 +95,15 @@ Function handleEditTextCmd()
     handleEditTextCmd = False
 End Function
 
+Function handleMultiMkdirCmd()
+    handleMultiMkdirCmd = True
+	If mCmdInput.text = "md-lg" Then Call mkdirLogo() : Exit Function
+	If mCmdInput.text = "md-ani" Then Call mkdirBootAnimation() : Exit Function
+	If mCmdInput.text = "md-wp" Then Call mkdirWallpaper(False) : Exit Function
+	If mCmdInput.text = "md-wp-go" Then Call mkdirWallpaper(True) : Exit Function
+    handleMultiMkdirCmd = False
+End Function
+
 Function handleProjectCmd()
 	handleProjectCmd = True
 	If isNumeric(mCmdInput.text) And Len(mCmdInput.text) < 4 Then
@@ -154,6 +125,69 @@ Function handleCurrentDictCmd()
 	If runPathFromCmd("c", pConfigText) Then Exit Function
 	If runPathFromCmd("op", oWs.CurrentDirectory) Then Exit Function
 	handleCurrentDictCmd = False
+End Function
+
+Function setPathFromCmd(cmd, path)
+	If mCmdInput.text = cmd Then
+	    Call setOpenPath(path)
+	    Call onOpenPathChange()
+	    setPathFromCmd = True
+	Else
+	    setPathFromCmd = False
+	End If
+End Function
+
+Function setPathFromCmdAndCopyKey(cmd, key, path)
+	If mCmdInput.text = cmd Then
+	    Call setOpenPath(path)
+	    Call onOpenPathChange()
+		Call CopyString(key)
+	    setPathFromCmdAndCopyKey = True
+	Else
+	    setPathFromCmdAndCopyKey = False
+	End If
+End Function
+
+Function runPathFromCmd(cmd, path)
+	If mCmdInput.text = cmd Then
+	    Call runPath(path)
+	    runPathFromCmd = True
+	Else
+	    runPathFromCmd = False
+	End If
+End Function
+
+Function showPropString(cmd, prop)
+    If mCmdInput.text = cmd Then
+	    Call mCmdInput.setText(prop)
+		showPropString = True
+	Else
+	    showPropString = False
+	End If
+End Function
+
+Function getMultiMkdirStr(arr, what)
+    Dim str, path
+    For Each path In arr
+	    If Not (what = "lg" And InStr(path, "_kernel.bmp") > 0) Then
+	        str =  str & "mkdir -p " & mIp.Infos.getOverlayPath(getFolderPath(path)) & ";"
+		End If
+
+	    If what = "lg" Then
+	        str =  str & "cp ../File/logo.bmp " & mIp.Infos.getOverlayPath(path) & ";"
+		ElseIf what = "ani" And InStr(path, "bootanimation.zip") > 0 Then
+	        str =  str & "cp ../File/bootanimation.zip " & mIp.Infos.getOverlayPath(path) & ";"
+		ElseIf what = "wp" Then
+		    If InStr(path, "default_wallpaper.png") > 0 Then
+	            str =  str & "cp ../File/default_wallpaper.png " & mIp.Infos.getOverlayPath(path) & ";"
+			ElseIf InStr(path, "default_wallpaper.jpg") > 0 Then
+	            str =  str & "cp ../File/default_wallpaper.jpg " & mIp.Infos.getOverlayPath(path) & ";"
+			End If
+		Else
+		    str =  str & "cp " & path & " " & mIp.Infos.getOverlayPath(path) & ";"
+		End If
+	Next
+	getMultiMkdirStr = str
 End Function
 
 Sub modBuildNumber(number)
@@ -194,4 +228,46 @@ Sub modDisplayIdForOtaTest()
 	    sedStr = """sed -i '/" & keyStr & "/s/\""&Chr(34)&""$/-OTA_test\""&Chr(34)&""/' " & buildinfo & """"
 	    Call CopyQuoteString(sedStr)
 	End If
+End Sub
+
+Sub mkdirLogo()
+    Dim lg_fd, lg_u, lg_k
+    lg_fd = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
+    lg_u = Replace(lg_fd & "[boot_logo]_uboot.bmp", "[boot_logo]", mIp.Infos.BootLogo)
+    lg_k = Replace(lg_fd & "[boot_logo]_kernel.bmp", "[boot_logo]", mIp.Infos.BootLogo)
+
+    Dim arr, finalStr
+    arr = Array(lg_u, lg_k)
+    finalStr = getMultiMkdirStr(arr, "lg")
+    Call CopyString(finalStr)
+End Sub
+
+Sub mkdirBootAnimation()
+    Dim ani_media, ani_product
+    ani_media = "vendor/weibu_sz/media/bootanimation.zip"
+    ani_product = "vendor/weibu_sz/products/products.mk"
+
+    Dim arr, finalStr
+    arr = Array(ani_media, ani_product)
+    finalStr = getMultiMkdirStr(arr, "ani")
+    Call CopyString(finalStr)
+End Sub
+
+Sub mkdirWallpaper(go)
+    Dim wp_gms, wp_go1, wp_go2, wp1, wp2, wp3
+    wp_gms = "vendor/partner_gms/overlay/AndroidSGmsBetaOverlay/res/drawable-nodpi/default_wallpaper.png"
+    wp_go1 = "device/mediatek/common/overlay/ago/frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.jpg"
+    wp_go2 = "device/mediatek/system/common/overlay/ago/frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.jpg"
+    wp1 = "frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.png"
+    wp2 = "frameworks/base/core/res/res/drawable-sw600dp-nodpi/default_wallpaper.png"
+    wp3 = "frameworks/base/core/res/res/drawable-sw720dp-nodpi/default_wallpaper.png"
+
+    Dim arr, finalStr
+    If Not go Then
+        arr = Array(wp_gms, wp1, wp2, wp3)
+    Else
+        arr = Array(wp_go1, wp_go2, wp1, wp2, wp3)
+    End If
+    finalStr = getMultiMkdirStr(arr, "wp")
+    Call CopyString(finalStr)
 End Sub
