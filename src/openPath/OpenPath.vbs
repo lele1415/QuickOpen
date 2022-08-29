@@ -530,3 +530,9 @@ Sub pasteAndOpenPath()
     oWs.SendKeys "^v"
     oWs.SendKeys "{ENTER}"
 End Sub
+
+Sub tabOpenPath()
+    Dim tabStr
+	tabStr = getTabStr()
+    If tabStr <> "" Then Call setOpenPath(getOpenPath() & tabStr)
+End Sub

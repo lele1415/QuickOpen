@@ -2,10 +2,12 @@ Option Explicit
 
 Const SEARCH_FILE = 0
 Const SEARCH_FOLDER = 1
+Const SEARCH_FILE_FOLDER = 2
 Const SEARCH_ROOT = 0
 Const SEARCH_SUB = 1
 Const SEARCH_WHOLE_NAME = 0
 Const SEARCH_PART_NAME = 1
+Const SEARCH_START_NAME = 2
 Const SEARCH_ONE = 0
 Const SEARCH_ALL = 1
 Const SEARCH_RETURN_PATH = 0
@@ -33,6 +35,21 @@ Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode, sea
                 searchFolder = startSearch(oRootFolder.SubFolders, pRootFolder, str, searchMode, SEARCH_ONE, returnType)
             End If
 
+        Case searchType = SEARCH_FILE_FOLDER And searchWhere = SEARCH_ROOT
+            Dim vaAll, f
+            Set vaAll = New VariableArray
+            For Each f In oRootFolder.SubFolders
+                vaAll.Append(f)
+            Next
+            For Each f In oRootFolder.Files
+                vaAll.Append(f)
+            Next
+            If searchTimes = SEARCH_ALL Then
+                Set searchFolder = startSearch(vaAll.InnerArray, pRootFolder, str, searchMode, SEARCH_ALL, returnType)
+            Else
+                searchFolder = startSearch(vaAll.InnerArray, pRootFolder, str, searchMode, SEARCH_ONE, returnType)
+            End If
+
         Case searchType = SEARCH_FILE And searchWhere = SEARCH_SUB
             For Each Folder In oRootFolder.SubFolders
                 sTmp = startSearch(Folder.Files, pRootFolder & "\" & Folder.Name, str, searchMode, SEARCH_ONE, returnType)
@@ -43,7 +60,7 @@ Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode, sea
             Next
             searchFolder = ""
 
-        Case searchType = SEARCH_FILE And searchWhere = SEARCH_SUB
+        Case searchType = SEARCH_FOLDER And searchWhere = SEARCH_SUB
             For Each Folder In oRootFolder.SubFolders
                 sTmp = startSearch(Folder.SubFolders, pRootFolder & "\" & Folder.Name, str, searchMode, SEARCH_ONE, returnType)
                 If sTmp <> "" Then
@@ -95,6 +112,14 @@ End Function
                 End If
             ELseIf searchMode = SEARCH_PART_NAME Then
                 If InStr(name ,str) > 0 Then
+                    checkSearchName = True
+                Else
+                    checkSearchName = False
+                End If
+            ELseIf searchMode = SEARCH_START_NAME Then
+                If str = "" Then
+                    checkSearchName = True
+                ElseIf StrComp(Mid(name ,1, Len(str)), str) = 0 Then
                     checkSearchName = True
                 Else
                     checkSearchName = False
@@ -212,9 +237,65 @@ Function getFolderPath(filePath)
     If InStr(str, "/") > 0 Then
         str = Left(str, InStrRev(str, "/") - 1)
     Else
-        str = filePath
+        str = ""
     End If
     getFolderPath = str
+End Function
+
+Function getTabStr()
+    Dim folderPath
+    folderPath = mIp.Infos.Sdk & "/" & getFolderPath(getOpenPath())
+    If Not oFso.FolderExists(folderPath) Then getTabStr = "" : Exit Function
+    
+    Dim input, vaFileFolder, sameStartStr
+    input = getFileNameFromPath(getOpenPath())
+    Set vaFileFolder = searchFolder(folderPath, input, SEARCH_FILE_FOLDER, SEARCH_ROOT, SEARCH_START_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+
+    sameStartStr = getSameStartStrFromArray(folderPath, input, vaFileFolder)
+    If sameStartStr <> "" Then
+        getTabStr = Replace(sameStartStr, input, "")
+    Else
+        getTabStr = sameStartStr
+    End If
+End Function
+
+Function getSameStartStrFromArray(folderPath, input, vaStr)
+    If vaStr.Bound = -1 Then getSameStartStrFromArray = "" : Exit Function
+    If vaStr.Bound = 0 Then
+        If oFso.FolderExists(folderPath & "/" & vaStr.V(0)) Then
+            getSameStartStrFromArray = vaStr.V(0) & "/" : Exit Function
+        Else
+            getSameStartStrFromArray = vaStr.V(0) : Exit Function
+        End If
+    End If
+
+    Dim s1, s2, i, str
+    s1 = vaStr.V(0)
+    For i = 0 To vaStr.Bound - 1
+        s2 = vaStr.V(i + 1)
+        If InStr(s2, s1) <> 1 Then s1 = getSameStartStr(input, s1, s2)
+    Next
+    getSameStartStrFromArray = s1
+End Function
+
+Function getSameStartStr(key, s1, s2)
+    Dim minLen
+    minLen = Len(s1)
+    If Len(s2) < minLen Then minLen = Len(s2)
+    If minLen = Len(key) Then getSameStartStr = key : Exit Function
+
+    Dim str, c1, c2, i
+    str = key
+    For i = Len(key) + 1 To minLen
+        c1 = Mid(s1, i, 1)
+        c2 = Mid(s2, i, 1)
+        If c1 = c2 Then
+            str = str & c1
+        Else
+            Exit For
+        End If
+    Next
+    getSameStartStr = str
 End Function
 
 Function getDriverProjectName(mmiFolderName)
@@ -336,12 +417,16 @@ End Sub
 
 Const KEYCODE_ENTER = 13
 Const KEYCODE_SPACE = 32
+Const KEYCODE_TAB = 9
 Function onKeyDown(keyCode)
     If keyCode = KEYCODE_ENTER Then
         Call onOpenButtonClick()
 
     ElseIf keyCode = KEYCODE_SPACE Then
         Call pasteAndOpenPath()
+    
+    ElseIf keyCode = KEYCODE_TAB Then
+        Call tabOpenPath()
 
     Else
         onKeyDown = True : Exit Function
