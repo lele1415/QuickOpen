@@ -90,15 +90,15 @@ End Sub
 
 Sub MkdirWeibuFolderPath()
     If Not mIp.hasProjectInfos() Then Exit Sub
-    Dim filePartPath : filePartPath = Replace(getOpenPath(), "\", "/")
-    Dim fileWholePath : fileWholePath = Replace(mIp.Infos.Sdk, "\", "/") & "/" & filePartPath
+    Dim path : path = getOpenPath()
+    Dim wholePath : wholePath = mIp.Infos.Sdk & "/" & path
     Dim folderPartPath, folderWholePath
     Dim mkdirCmd, cpCmd
     commandFinal = ""
 
-    If oFso.FileExists(fileWholePath) Then
-        Dim index : index = InStrRev(filePartPath, "/")
-        folderPartPath = Left(filePartPath, index)
+    If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
+        Dim index : index = InStrRev(path, "/")
+        folderPartPath = Left(path, index)
         folderWholePath = mIp.Infos.Sdk & "/" & folderPartPath
 
         If oFso.FolderExists(folderWholePath) Then
@@ -107,18 +107,19 @@ Sub MkdirWeibuFolderPath()
                 mkdirCmd = "mkdir -p " & mIp.Infos.getOverlayPath(folderPartPath) & ";"
             End If
 
-            If Not oFso.FileExists(mIp.Infos.getOverlaySdkPath(filePartPath)) Then
-                cpCmd = "cp " & filePartPath & " " & mIp.Infos.getOverlayPath(folderPartPath)
-            Else
-                MsgBox("File exist!")
-            End If
-
-            commandFinal = mkdirCmd & cpCmd
-            'If commandFinal = "" Then
-            '    MsgBox("File exist!")
-            'End If
+            commandFinal = mkdirCmd
         End If
     End If
+
+    If oFso.FileExists(wholePath) Then
+        If Not oFso.FileExists(mIp.Infos.getOverlaySdkPath(path)) Then
+            cpCmd = "cp " & path & " " & mIp.Infos.getOverlayPath(folderPartPath)
+        Else
+            MsgBox("File exist!")
+        End If
+            commandFinal = mkdirCmd & cpCmd
+    End If
+
     commandFinal = Replace(commandFinal, "\", "/")
     Call CopyString(commandFinal)
 End Sub
