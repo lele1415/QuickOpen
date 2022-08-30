@@ -11,24 +11,32 @@ Const ID_COMMAND_BUILD_OTA = "command_build_ota"
 Dim commandFinal
 
 Sub CommandOfMake()
+    Dim rmOut, rmBuildprop, ota
+    rmOut = element_isChecked(ID_COMMAND_RM_OUT)
+    rmBuildprop = element_isChecked(ID_COMMAND_RM_BUILDPROP)
+    ota = element_isChecked(ID_COMMAND_BUILD_OTA)
+    Call getMakeCommand(rmOut, rmBuildprop, ota)
+End Sub
+
+Sub getMakeCommand(rmOut, rmBuildprop, ota)
     Dim commandOta
     commandFinal = "make -j36 2>&1 | tee build.log"
     commandOta = "make -j36 otapackage 2>&1 | tee build_ota.log"
-
-    If element_isChecked(ID_COMMAND_RM_OUT) Then
+    
+    If rmOut Then
         commandFinal = "rm -rf out/ && " & commandFinal
-    ElseIf element_isChecked(ID_COMMAND_RM_BUILDPROP) Then
+    ElseIf rmBuildprop Then
         commandFinal = "find " & mIp.Infos.OutPath & " -type f -name build*.prop | xargs rm -v && " & commandFinal
     End If
 
-    If element_isChecked(ID_COMMAND_BUILD_OTA) Then commandFinal = commandFinal & " && " & commandOta
+    If ota Then commandFinal = commandFinal & " && " & commandOta
 
     Call CopyString(commandFinal)
 End Sub
 
 Sub CommandOfLunch()
     If Not mIp.hasProjectInfos() Then Exit Sub
-    Dim comboName, buildType
+    Dim buildType
 
     Select Case True
         Case element_isChecked(ID_COMMAND_ENG)
@@ -39,8 +47,13 @@ Sub CommandOfLunch()
             buildType = "user"
     End Select
 
+    Call getLunchCommand(buildType)
+End Sub
+
+Sub getLunchCommand(buildType)
+    Dim comboName
     If InStr(mIp.Infos.Sdk, "8168") > 0 Then
-        commandFinal = getLuncnItemInSplitBuild(buildType)
+        commandFinal = getLunchItemInSplitBuild(buildType)
         Call CopyQuoteString(commandFinal)
         Exit Sub
     Else
@@ -50,7 +63,7 @@ Sub CommandOfLunch()
     Call CopyString(commandFinal)
 End Sub
 
-Function getLuncnItemInSplitBuild(buildType)
+Function getLunchItemInSplitBuild(buildType)
     Dim sysStr, vndStr, commandStr
     sysStr = "sys_" & mIp.Infos.SysTarget & "-" & buildType
     vndStr = "vnd_" & mIp.Infos.Product & "-" & buildType
@@ -60,7 +73,7 @@ Function getLuncnItemInSplitBuild(buildType)
     Dim keyStr
     keyStr = "##Cusomer Settings"
     commandStr = """sed -i '/" & keyStr & "/i\""&" & commandStr & "&""' split_build.sh"""
-    getLuncnItemInSplitBuild = commandStr
+    getLunchItemInSplitBuild = commandStr
 End Function
 
 Sub CommandOfOut()

@@ -867,6 +867,7 @@ Class ProjectInputs
 
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
+        document.title = value
         Call onWorkChange()
     End Property
 

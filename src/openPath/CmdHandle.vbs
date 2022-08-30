@@ -6,7 +6,8 @@ Sub handleCmdInput()
 	If handleProp() Then Exit Sub
     If handleEditTextCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleMultiMkdirCmd() Then Call mCmdInput.setText("") : Exit Sub
-    If handleFindFileCmd() Then Call mCmdInput.setText("") : Exit Sub
+    If handleOpenPathCmd() Then Call mCmdInput.setText("") : Exit Sub
+    If handleCopyCommandCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleProjectCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If handleCurrentDictCmd() Then Call mCmdInput.setText("") : Exit Sub
 End Sub
@@ -31,7 +32,7 @@ Function HandleFolderPathCmd()
 	If setPathFromCmd("vp", "vendor/mediatek/proprietary/packages/apps") Then Exit Function
 	If setPathFromCmd("lot", "vendor/partner_gms/apps/GmsSampleIntegration") Then Exit Function
 	If setPathFromCmd("lg", "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]") Then Exit Function
-	If setPathFromCmd("md", "vendor/weibu_sz/media") Then Exit Function
+	'If setPathFromCmd("md", "vendor/weibu_sz/media") Then Exit Function
 	If setPathFromCmd("tee", "vendor/mediatek/proprietary/trustzone/trustkernel/source/build/[product]") Then Exit Function
 	HandleFolderPathCmd = False
 End Function
@@ -105,13 +106,46 @@ Function handleMultiMkdirCmd()
     handleMultiMkdirCmd = False
 End Function
 
-Function handleFindFileCmd()
-    handleFindFileCmd = True
+Function handleOpenPathCmd()
+    handleOpenPathCmd = True
 	If mCmdInput.text = "fjava" Then Call findFrameworksJavaFile() : Exit Function
 	If mCmdInput.text = "java" Then Call findJavaFile() : Exit Function
 	If mCmdInput.text = "xml" Then Call findXmlFile() : Exit Function
 	If mCmdInput.text = "app" Then Call findAppFolder() : Exit Function
-    handleFindFileCmd = False
+	If mCmdInput.text = "cl" Then Call setOpenPath("") : Exit Function
+	If mCmdInput.text = "addp" Then Call addProjectPath() : Exit Function
+	If mCmdInput.text = "addd" Then Call addDriverProjectPath() : Exit Function
+	If mCmdInput.text = "cuts" Then Call cutSdkPath() : Exit Function
+	If mCmdInput.text = "cutp" Then Call cutProjectPath() : Exit Function
+	If mCmdInput.text = "comp" Then Call compareForProject() : Exit Function
+	If mCmdInput.text = "comps" Then Call selectForCompare() : Exit Function
+	If mCmdInput.text = "compt" Then Call compareTo() : Exit Function
+	If mCmdInput.text = "fmw" Then Call openFirmwareFolder() : Exit Function
+	If mCmdInput.text = "req" Then Call openRequirementsFolder() : Exit Function
+	If mCmdInput.text = "zt" Then Call openZentao() : Exit Function
+    handleOpenPathCmd = False
+End Function
+
+Function handleCopyCommandCmd()
+    handleCopyCommandCmd = True
+	If mCmdInput.text = "lcu" Then Call getLunchCommand("user") : Exit Function
+	If mCmdInput.text = "lcd" Then Call getLunchCommand("userdebug") : Exit Function
+	If mCmdInput.text = "lce" Then Call getLunchCommand("eng") : Exit Function
+	If mCmdInput.text = "mk" Then Call getMakeCommand(False, False, False) : Exit Function
+	If mCmdInput.text = "mk-rmb" Then Call getMakeCommand(False, True, False) : Exit Function
+	If mCmdInput.text = "mk-rmo" Then Call getMakeCommand(True, False, False) : Exit Function
+	If mCmdInput.text = "mk-o" Then Call getMakeCommand(False, False, True) : Exit Function
+	If mCmdInput.text = "mk-rmb-o" Then Call getMakeCommand(False, True, True) : Exit Function
+	If mCmdInput.text = "mk-rmo-o" Then Call getMakeCommand(True, False, True) : Exit Function
+	If mCmdInput.text = "md" Then Call MkdirWeibuFolderPath() : Exit Function
+	If mCmdInput.text = "cm" Then Call CopyCommitInfo() : Exit Function
+	If mCmdInput.text = "ota" Then Call CopyBuildOtaUpdate() : Exit Function
+	If mCmdInput.text = "cc" Then Call CopyCleanCommand() : Exit Function
+	If mCmdInput.text = "outp" Then Call CommandOfOut() : Exit Function
+	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
+	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
+	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
+    handleCopyCommandCmd = False
 End Function
 
 Function handleProjectCmd()

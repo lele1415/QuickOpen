@@ -1,11 +1,11 @@
 <!--
-Version: 3.8
+Version: 4.0
 -->
 
 <Html>
 <Head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<Title>Quick Open v3.8</Title>
+<Title>Quick Open v4.0</Title>
 
 <style type="text/css">
 
@@ -64,12 +64,12 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 <Body bgcolor="#272822">
 
-<fieldset>
+<fieldset id="work_fieldset">
 <legend>Work name</legend>
     <input type="text" id="work_name" onchange="onWorkChange()" size="35">
 </fieldset>
-<br>
-<fieldset>
+<br id="br1">
+<fieldset id="project_fieldset">
     <legend>SDK path</legend>
     <input type="button" class="input_button" id="show_shortcuts" onclick="showAllShortcuts()" value="    Select    " />
     <input type="button" class="input_button" id="hide_shortcuts" onclick="hideAllShortcuts()" value="    Close    " style="display:none"/>
@@ -110,9 +110,8 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="openDriver()" value="     Driver     ">
     <div class="form_product" id="parent_out_button"></div>
 </fieldset>
-<br>
-<fieldset>
-    <legend>Open file or folder</legend>
+<br id="br2">
+<div id="openpath_fieldset">
     <input type="button" class="input_button" onclick="findFrameworksJavaFile()" value=" f-java " />
     <input type="button" class="input_button" onclick="findJavaFile()" value=" java " />
     <input type="button" class="input_button" onclick="findXmlFile()" value=" xml " />
@@ -126,22 +125,25 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="addDriverProjectPath()" value=" addD " />
     <input type="button" class="input_button" onclick="cutSdkPath()" value=" cutS " />
     <input type="button" class="input_button" onclick="cutProjectPath()" value=" cutP " />
+</div>
 
     <input type="text" id="input_cmd" size="30">
     <div class="form_product" id="parent_file_button" style="display:none"></div>
+    <div class="form_product" id="parent_open_button" style="display:none"></div>
+    <div class="form_sdk_path" id="parent_open_path"></div>
     <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
 
+<div id="openpath2_fieldset">
     <input id="input_open_button" type="button" class="input_button" onclick="onOpenButtonClick()" value="Open" />
     <input type="button" class="input_button" onclick="onOpenListClick()" value=" Path " />
     <input type="button" class="input_button" onclick="compareForProject()" value="Compare" />
     <input id="select_for_compare" type="button" class="input_button" onclick="selectForCompare()" value="Select for Compare" />
     <input id="compare_to" type="button" class="input_button" onclick="compareTo()" value="Compare to"  style="display:none"/>
+</div>
 
-    <div class="form_product" id="parent_open_button" style="display:none"></div>
-    <div class="form_sdk_path" id="parent_open_path"></div>
-</fieldset>
-<br>
-<fieldset>
+
+<br id="br3">
+<fieldset id="explorer_fieldset">
     <legend>Explorer</legend>
     <input id="button_show_explorer" type="button" class="input_button" onclick="initNewExplorerPath(0)" value="Show" />
     <input id="button_update_explorer" type="button" class="input_button" onclick="initNewExplorerPath(1)" value="Update" style="display:none"/>
@@ -150,8 +152,8 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <br>
     <div id="exp_file"></div>
 </fieldset>
-<br>
-<fieldset>
+<br id="br4">
+<fieldset id="commands_fieldset">
     <legend>Copy Commands</legend>
     <input type="radio" name="build_type" id="command_eng" >eng</input>
     <input type="radio" name="build_type" id="command_userdebug" >userdebug</input>

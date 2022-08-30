@@ -143,6 +143,14 @@ Sub enableElement(inputId)
     document.getElementById(inputId).disabled = ""
 End Sub
 
+Sub hideElement(elementId)
+    document.getElementById(elementId).style.display = "none"
+End Sub
+
+Sub showElement(elementId)
+    document.getElementById(elementId).style.display = "block"
+End Sub
+
 Function initTxtFile(FilePath)
     If oFso.FileExists(FilePath) Then
         Dim TxtFile
@@ -171,6 +179,34 @@ Sub unfreezeAllInput()
     Call enableElement(ID_CREATE_SHORTCUTS)
     Call enableElement(ID_SHOW_SHORTCUTS)
     Call enableElement(ID_HIDE_SHORTCUTS)
+End Sub
+
+Sub startCmdMode()
+    Call hideElement("work_fieldset")
+    Call hideElement("project_fieldset")
+    Call hideElement("openpath_fieldset")
+    Call hideElement("openpath2_fieldset")
+    Call hideElement("explorer_fieldset")
+    Call hideElement("commands_fieldset")
+    Call hideElement("br1")
+    Call hideElement("br2")
+    Call hideElement("br3")
+    Call hideElement("br4")
+    Call setCmdSmallWindow()
+End Sub
+
+Sub exitCmdMode()
+    Call showElement("work_fieldset")
+    Call showElement("project_fieldset")
+    Call showElement("openpath_fieldset")
+    Call showElement("openpath2_fieldset")
+    Call showElement("explorer_fieldset")
+    Call showElement("commands_fieldset")
+    Call showElement("br1")
+    Call showElement("br2")
+    Call showElement("br3")
+    Call showElement("br4")
+    Call setDefaultWindow()
 End Sub
 
 Function readTextAndGetValue(keyStr, filePath)
