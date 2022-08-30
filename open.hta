@@ -29,22 +29,13 @@ body { font-family: sans-serif; color:#f8f8f2;}
         }, 
         this.onmouseout=function(){ 
             this.style.background=""; 
-        } 
-    ) 
-}
-
-.Menu2_openPath { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
-
-.Menu2_openPath ul{ margin:0; padding:0; } 
-
-.Menu2_openPath ul li{ display:inline; width:49%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
-    change:expression( 
-        this.onmouseover=function(){ 
+        },
+        this.onfocus=function(){ 
             this.style.background="#66d9ef"; 
-        }, 
-        this.onmouseout=function(){ 
+        },
+        this.onblur=function(){ 
             this.style.background=""; 
-        } 
+        }
     ) 
 }
 
@@ -127,7 +118,6 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="findXmlFile()" value=" xml " />
     <input type="button" class="input_button" onclick="findAppFolder()" value=" app " />
     <input type="button" class="input_button" onclick="findPackageFile()" value=" pkg " />
-    <div class="form_product" id="parent_file_button" style="display:none"></div>
     <br>
 
     <input type="button" class="input_button" onclick="cleanOpenPath()" value="Clean" />
@@ -138,6 +128,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <input type="button" class="input_button" onclick="cutProjectPath()" value=" cutP " />
 
     <input type="text" id="input_cmd" size="30">
+    <div class="form_product" id="parent_file_button" style="display:none"></div>
     <textarea id="input_open_path" class="textarea_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
 
     <input id="input_open_button" type="button" class="input_button" onclick="onOpenButtonClick()" value="Open" />

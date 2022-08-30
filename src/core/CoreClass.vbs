@@ -420,17 +420,22 @@ Class InputWithOneLayerList
 End Class
 
 Class ButtonWithOneLayerList
-    Private mParentId, mListDivId, mListUlId, mVaArray
+    Private mParentId, mListDivId, mListUlId, mVaArray, mFocusLiIndex
 
     Public Default Function Constructor(parentId, name)
         mParentId = parentId
         mListDivId = "list_div_" & name
         mListUlId = "list_ul_" & name
+        Set mVaArray = New VariableArray
+        mFocusLiIndex = -1
         Set Constructor = Me
     End Function
 
-    Public Sub addList(vaArray)
-        Set mVaArray = vaArray
+    Public Property Get VaArray
+        Set VaArray = mVaArray
+    End Property
+
+    Public Sub addList()
         If mVaArray.Bound = -1 Then Exit Sub
 
         Call removeLi(mListUlId)
@@ -442,12 +447,41 @@ Class ButtonWithOneLayerList
 
     Public Sub removeList()
         Call removeLi(mListUlId)
+        Call mVaArray.ResetArray()
     End Sub
 
     Public Sub toggleButtonList()
-        If mVaArray.Bound = -1 Then Exit Sub
-
         Call toggleListDiv(mParentId, mListDivId)
+    End Sub
+
+    Public Function isShowing()
+        isShowing = isDivShowing(mListDivId)
+    End Function
+
+    Public Function hideListIfShowing()
+        If isDivShowing(mListDivId) Then
+            Call removeList()
+            Call toggleButtonList()
+            hideListIfShowing = True
+        Else
+            hideListIfShowing = False
+        End If
+    End Function
+
+    Public Sub changeListFocus(keyCode)
+        If isDivShowing(mListDivId) Then
+            If keyCode = KEYCODE_UP Then
+                mFocusLiIndex =  changeLiFocusUp(mListUlId)
+            ElseIf keyCode = KEYCODE_DOWN Then
+                mFocusLiIndex = changeLiFocusDown(mListUlId)
+            End If
+        End If
+    End Sub
+
+    Public Sub clickFocusedLi()
+        If mFocusLiIndex > -1 Then
+            Call clickListLi(mListUlId, mFocusLiIndex)
+        End if
     End Sub
 End Class
 

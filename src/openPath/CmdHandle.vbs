@@ -6,6 +6,7 @@ Sub handleCmdInput()
 	If handleProp() Then Exit Sub
     If handleEditTextCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleMultiMkdirCmd() Then Call mCmdInput.setText("") : Exit Sub
+    If handleFindFileCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleProjectCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If handleCurrentDictCmd() Then Call mCmdInput.setText("") : Exit Sub
 End Sub
@@ -102,6 +103,15 @@ Function handleMultiMkdirCmd()
 	If mCmdInput.text = "md-wp" Then Call mkdirWallpaper(False) : Exit Function
 	If mCmdInput.text = "md-wp-go" Then Call mkdirWallpaper(True) : Exit Function
     handleMultiMkdirCmd = False
+End Function
+
+Function handleFindFileCmd()
+    handleFindFileCmd = True
+	If mCmdInput.text = "fjava" Then Call findFrameworksJavaFile() : Exit Function
+	If mCmdInput.text = "java" Then Call findJavaFile() : Exit Function
+	If mCmdInput.text = "xml" Then Call findXmlFile() : Exit Function
+	If mCmdInput.text = "app" Then Call findAppFolder() : Exit Function
+    handleFindFileCmd = False
 End Function
 
 Function handleProjectCmd()

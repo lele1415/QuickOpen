@@ -37,6 +37,7 @@ function addListLi(parentId, inputId, divId, ulId, str, setValue)
     li.onmousedown = function(){onListLiClick(parentId, inputId, divId, str, setValue)};
     li.innerHTML = str;
     li.style.fontSize = "x-small";
+    li.tabIndex = 1;
     
     var ul = document.getElementById(ulId);
     ul.appendChild(li);
@@ -80,7 +81,7 @@ function onDirectoryLiClick(parentId, dirDivId, listDivId) {
 
 function isDivShowing(divId) {
     var layer = window.document.getElementById(divId);
-    return layer.style.display == "block";
+    return layer != null && layer.style.display == "block";
 }
 
 function showListDiv(parentId, divId) {
@@ -106,4 +107,60 @@ function toggleListDiv(parentId, divId) {
     } else {
         showListDiv(parentId, divId);
     }
+}
+
+function changeLiFocusDown(ulId) {
+    var i = parentNode_getChildNodesLength(ulId);
+    var parentNode = document.getElementById(ulId);
+    var focusIndex = -1;
+    if (i > 0) {
+        for(var j=0; j<i; j++) {
+            if (parentNode.childNodes[j].style.background == "#66d9ef") {
+                parentNode.childNodes[j].blur();
+                focusIndex = j;
+                break;
+            }
+        }
+        if (focusIndex > -1 && focusIndex < i - 1) {
+            parentNode.childNodes[focusIndex + 1].focus();
+            return focusIndex + 1;
+        } else if (focusIndex == -1) {
+            parentNode.childNodes[0].focus();
+            return 0;
+        } else if (focusIndex == i - 1) {
+            parentNode.childNodes[i - 1].focus();
+            return i - 1;
+        } else {
+            return -1;
+        }
+    }
+}
+
+function changeLiFocusUp(ulId) {
+    var i = parentNode_getChildNodesLength(ulId);
+    var parentNode = document.getElementById(ulId);
+    var focusIndex = -1;
+    if (i > 0) {
+        for(var j=0; j<i; j++) {
+            if (parentNode.childNodes[j].style.background == "#66d9ef") {
+                parentNode.childNodes[j].blur();
+                focusIndex = j;
+                break;
+            }
+        }
+        if (focusIndex > 0) {
+            parentNode.childNodes[focusIndex - 1].focus();
+            return focusIndex - 1;
+        } else if (focusIndex == 0) {
+            parentNode.childNodes[0].focus();
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+}
+
+function clickListLi(ulId, index) {
+    var parentNode = document.getElementById(ulId);
+    parentNode.childNodes[index].onmousedown();
 }

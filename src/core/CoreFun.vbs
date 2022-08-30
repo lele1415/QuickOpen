@@ -409,24 +409,44 @@ Sub onInputListClick(divId, str)
         If path <> "" Then runPath(path)
 
     ElseIf InStr(divId, "filebutton") > 0 Then
-        Call vaFilePathList.ResetArray()
         Call mFileButtonList.removeList()
         Call setOpenPath(str)
     End If
 End Sub
 
+Sub changeFocus(keyCode)
+    Call mFileButtonList.changeListFocus(keyCode)
+    Call mOpenButtonList.changeListFocus(keyCode)
+End Sub
+
 Const KEYCODE_ENTER = 13
 Const KEYCODE_SPACE = 32
 Const KEYCODE_TAB = 9
+Const KEYCODE_UP = 38
+Const KEYCODE_DOWN = 40
+Const KEYCODE_ESC = 27
 Function onKeyDown(keyCode)
     If keyCode = KEYCODE_ENTER Then
-        Call onOpenButtonClick()
+        If mFileButtonList.isShowing() Then
+            Call mFileButtonList.clickFocusedLi()
+        ElseIf mOpenButtonList.isShowing() Then
+            Call mOpenButtonList.clickFocusedLi()
+        Else
+            Call onOpenButtonClick()
+        End If
+
+    ElseIf keyCode = KEYCODE_ESC Then
+        Call mFileButtonList.hideListIfShowing()
+        Call mOpenButtonList.hideListIfShowing()
 
     ElseIf keyCode = KEYCODE_SPACE Then
         Call pasteAndOpenPath()
     
     ElseIf keyCode = KEYCODE_TAB Then
         Call tabOpenPath()
+    
+    ElseIf keyCode = KEYCODE_UP Or keyCode = KEYCODE_DOWN Then
+        Call changeFocus(keyCode)
 
     Else
         onKeyDown = True : Exit Function

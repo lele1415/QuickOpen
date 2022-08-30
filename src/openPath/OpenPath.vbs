@@ -6,8 +6,6 @@ Set pathDict = CreateObject("Scripting.Dictionary")
 Set mOverlayPathDict = CreateObject("Scripting.Dictionary")
 
 Dim vaPathDirectory : Set vaPathDirectory = New VariableArray
-Dim vaOpenPathList : Set vaOpenPathList = New VariableArray
-Dim vaFilePathList : Set vaFilePathList = New VariableArray
 
 Dim mLeftComparePath, mRightComparePath
 
@@ -26,7 +24,7 @@ Sub onOpenButtonClick()
 	If mCmdInput.text <> "" Then Call handleCmdInput() : Exit Sub
 	Call removeOpenButtonList()
 	Call makeOpenButton()
-	If vaOpenPathList.Bound = -1 Then
+	If mOpenButtonList.VaArray.Bound = -1 Then
 		Call runOpenPath()
 	Else
 	    Call mOpenButtonList.toggleButtonList()
@@ -112,10 +110,10 @@ Sub makeOpenButton()
 		Call findOverlayPath("MMI", isFile, fileName)
 		Call findOverlayPath("Driver", isFile, fileName)
 
-	    If vaOpenPathList.Bound > -1 Then
+	    If mOpenButtonList.VaArray.Bound > -1 Then
 	    	Call mOverlayPathDict.Add("Origin", wholePath)
-	    	Call vaOpenPathList.Append("Origin")
-	    	Call mOpenButtonList.addList(vaOpenPathList)
+	    	Call mOpenButtonList.VaArray.Append("Origin")
+	    	Call mOpenButtonList.addList()
 	    End If
 	End If
 End Sub
@@ -124,7 +122,7 @@ Sub findOverlayPath(where, isFile, fileName)
 	Dim path : path = getOverlayPath(where, isFile, fileName)
 	If path <> "" Then
 		Call mOverlayPathDict.Add(where, path)
-		Call vaOpenPathList.Append(where)
+		Call mOpenButtonList.VaArray.Append(where)
 	End If
 End Sub
 
@@ -165,19 +163,17 @@ Sub removeOpenButtonList()
 	If mOverlayPathDict.Exists("MMI") Then Call mOverlayPathDict.Remove("MMI")
 	If mOverlayPathDict.Exists("Driver") Then Call mOverlayPathDict.Remove("Driver")
 	If mOverlayPathDict.Exists("Origin") Then Call mOverlayPathDict.Remove("Origin")
-	Call vaOpenPathList.ResetArray()
 	Call mOpenButtonList.removeList()
 End Sub
 
 Sub addOutFileList()
-	Dim vaOutFile : Set vaOutFile = New VariableArray
-	vaOutFile.Append("build.log")
-	vaOutFile.Append("out")
-	vaOutFile.Append("target_files")
-	vaOutFile.Append("system/build.prop")
-	vaOutFile.Append("vendor/build.prop")
-	vaOutFile.Append("product/build.prop")
-    Call mOutFileList.addList(vaOutFile)
+	mOutFileList.VaArray.Append("build.log")
+	mOutFileList.VaArray.Append("out")
+	mOutFileList.VaArray.Append("target_files")
+	mOutFileList.VaArray.Append("system/build.prop")
+	mOutFileList.VaArray.Append("vendor/build.prop")
+	mOutFileList.VaArray.Append("product/build.prop")
+    Call mOutFileList.addList()
 End Sub
 
 Function getOutProductPath()
@@ -389,11 +385,11 @@ Dim pFrameworksJavaFileText : pFrameworksJavaFileText = oWs.CurrentDirectory & "
 Dim pAndroidmkFileText : pAndroidmkFileText = oWs.CurrentDirectory & "\res\file_list_androidmk.txt"
 
 Sub addFileList()
-	If vaFilePathList.Bound = 0 Then
-        Call setOpenPath(vaFilePathList.V(0))
-        Call vaFilePathList.ResetArray()
-    ElseIf vaFilePathList.Bound > 0 Then
-        Call mFileButtonList.addList(vaFilePathList)
+	If mFileButtonList.VaArray.Bound = 0 Then
+        Call setOpenPath(mFileButtonList.VaArray.V(0))
+        Call mFileButtonList.VaArray.ResetArray()
+    ElseIf mFileButtonList.VaArray.Bound > 0 Then
+        Call mFileButtonList.addList()
         Call mFileButtonList.toggleButtonList()
     End If
 End Sub
@@ -403,10 +399,12 @@ Function getFileListPathFromRes(name)
 End Function
 
 Sub findJavaFile()
+    If mFileButtonList.hideListIfShowing() Then Exit Sub
+
 	Dim fileListPath : fileListPath = getFileListPathFromRes("java.txt")
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(fileListPath, ".java")
-		If vaFilePathList.Bound = -1 Then
+		If mFileButtonList.VaArray.Bound = -1 Then
 			fileListPath = getFileListPathFromRes("kotlin.txt")
 			If oFso.FileExists(fileListPath) Then
 				Call makeFileList(fileListPath, ".kt")
@@ -419,6 +417,8 @@ Sub findJavaFile()
 End Sub
 
 Sub findFrameworksJavaFile()
+    If mFileButtonList.hideListIfShowing() Then Exit Sub
+
 	Dim fileListPath : fileListPath = getFileListPathFromRes("f-java.txt")
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(getFileListPathFromRes("f-java.txt"), ".java")
@@ -429,6 +429,8 @@ Sub findFrameworksJavaFile()
 End Sub
 
 Sub findXmlFile()
+    If mFileButtonList.hideListIfShowing() Then Exit Sub
+
 	Dim fileListPath : fileListPath = getFileListPathFromRes("xml.txt")
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(getFileListPathFromRes("xml.txt"), ".xml")
@@ -439,6 +441,8 @@ Sub findXmlFile()
 End Sub
 
 Sub findAppFolder()
+    If mFileButtonList.hideListIfShowing() Then Exit Sub
+
 	Dim fileListPath : fileListPath = getFileListPathFromRes("app.txt")
 	If oFso.FileExists(fileListPath) Then
 		Call makeFileList(getFileListPathFromRes("app.txt"), "app")
@@ -449,6 +453,7 @@ Sub findAppFolder()
 End Sub
 
 Sub findPackageFile()
+    If mFileButtonList.hideListIfShowing() Then Exit Sub
 	If Not mIp.hasProjectInfos() Or Trim(getOpenPath()) = "" Then Exit Sub
 	
 	If Not oFso.FileExists(mIp.Infos.Sdk & "\pkg.txt") Then
@@ -465,13 +470,6 @@ Sub findPackageFile()
 End Sub
 
 Sub makeFileList(fileListPath, suffix)
-	If vaFilePathList.Bound > -1 Then
-		Call vaFilePathList.ResetArray()
-		Call mFileButtonList.removeList()
-		Call mFileButtonList.toggleButtonList()
-		Exit Sub
-	End If
-
 	If Trim(getOpenPath()) = "" Or InStr(getOpenPath(), "/") > 0 Or InStr(getOpenPath(), "\") > 0 Then Exit Sub
 
 	If suffix <> "app" Then
@@ -498,7 +496,7 @@ Sub findFileInListText(input, suffix, path)
 	    sReadLine = oText.ReadLine
 	    If count > 10 Then Exit Do
 	    If Right(sReadLine, Len(keyStr)) = keyStr Then
-	        Call vaFilePathList.Append(Replace(sReadLine, "./", ""))
+	        Call mFileButtonList.VaArray.Append(Replace(sReadLine, "./", ""))
 	        count = count + 1
 	    End If
 	Loop
@@ -518,7 +516,7 @@ Sub findAppFolderInListText(input, path)
 	    sReadLine = oText.ReadLine
 	    If InStr(sReadLine, keyStr) > 0 Then
 	    	path = Left(sReadLine, InStr(sReadLine, keyStr) + Len(input))
-	        Call vaFilePathList.Append(Replace(path, "./", ""))
+	        Call mFileButtonList.VaArray.Append(Replace(path, "./", ""))
 	        count = count + 1
 	    End If
 	Loop
