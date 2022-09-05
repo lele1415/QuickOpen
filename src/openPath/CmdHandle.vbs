@@ -4,6 +4,7 @@ Sub handleCmdInput()
 	If HandleFolderPathCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If HandleFilePathCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If handleProp() Then Exit Sub
+    If handleGetInfo() Then Call mCmdInput.setText("") : Exit Sub
     If handleEditTextCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleMultiMkdirCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleOpenPathCmd() Then Call mCmdInput.setText("") : Exit Sub
@@ -14,80 +15,89 @@ End Sub
 
 Function HandleFolderPathCmd()
 	HandleFolderPathCmd = True
-	If runPathFromCmd("m", mIp.Infos.ProjectSdkPath) Then Exit Function
-	If runPathFromCmd("d", mIp.Infos.DriverProjectSdkPath) Then Exit Function
-	If runPathFromCmd("rom", Left(mIp.Infos.Sdk, InStr(mIp.Infos.Sdk, "alps") - 1) & "ROM") Then Exit Function
-	If runPathFromCmd("out", mIp.Infos.OutSdkPath) Then Exit Function
-	If runPathFromCmd("oa", mIp.Infos.OutSdkPath & "/obj/APPS") Then Exit Function
-	If runPathFromCmd("os", mIp.Infos.OutSdkPath & "/system/system_ext/priv-app") Then Exit Function
-	If runPathFromCmd("tf", mIp.Infos.OutSdkPath & "/obj/PACKAGING/target_files_intermediates") Then Exit Function
-	If setPathFromCmd("st", "vendor/mediatek/proprietary/packages/apps/MtkSettings") Then Exit Function
-	If setPathFromCmd("su", "vendor/mediatek/proprietary/packages/apps/SystemUI") Then Exit Function
-	If setPathFromCmd("ft", "vendor/mediatek/proprietary/packages/apps/FactoryTest") Then Exit Function
-	If setPathFromCmd("fm", "vendor/mediatek/proprietary/packages/apps/FactoryMode") Then Exit Function
-	If setPathFromCmd("gms", "vendor/partner_gms") Then Exit Function
-	If setPathFromCmd("fwa", "frameworks/base/core/java/android") Then Exit Function
-	'If setPathFromCmd("fws", "frameworks/base/services/core/java/com/android/server") Then Exit Function
-	If setPathFromCmd("fwv", "frameworks/base/core/res/res/values") Then Exit Function
-	If setPathFromCmd("vp", "vendor/mediatek/proprietary/packages/apps") Then Exit Function
-	If setPathFromCmd("lot", "vendor/partner_gms/apps/GmsSampleIntegration") Then Exit Function
-	If setPathFromCmd("lg", "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]") Then Exit Function
-	'If setPathFromCmd("md", "vendor/weibu_sz/media") Then Exit Function
-	If setPathFromCmd("tee", "vendor/mediatek/proprietary/trustzone/trustkernel/source/build/[product]") Then Exit Function
+	If mCmdInput.text = "m" Then Call runPath(mIp.Infos.ProjectSdkPath) : Exit Function
+	If mCmdInput.text = "d" Then Call runPath(mIp.Infos.DriverProjectSdkPath) : Exit Function
+	If mCmdInput.text = "rom" Then Call runPath(Left(mIp.Infos.Sdk, InStr(mIp.Infos.Sdk, "alps") - 1) & "ROM") : Exit Function
+	If mCmdInput.text = "out" Then Call runPath(mIp.Infos.OutSdkPath) : Exit Function
+	If mCmdInput.text = "oa" Then Call runPath(mIp.Infos.OutSdkPath & "/obj/APPS") : Exit Function
+	If mCmdInput.text = "os" Then Call runPath(mIp.Infos.OutSdkPath & "/system/system_ext/priv-app") : Exit Function
+	If mCmdInput.text = "tf" Then Call runPath(mIp.Infos.OutSdkPath & "/obj/PACKAGING/target_files_intermediates") : Exit Function
+	If mCmdInput.text = "st" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/MtkSettings") : Exit Function
+	If mCmdInput.text = "su" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI") : Exit Function
+	If mCmdInput.text = "ft" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/FactoryTest") : Exit Function
+	If mCmdInput.text = "fm" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/FactoryMode") : Exit Function
+	If mCmdInput.text = "gms" Then Call setPathFromCmd("vendor/partner_gms") : Exit Function
+	If mCmdInput.text = "fwa" Then Call setPathFromCmd("frameworks/base/core/java/android") : Exit Function
+	'If mCmdInput.text = "fws" Then Call setPathFromCmd("frameworks/base/services/core/java/com/android/server") : Exit Function
+	If mCmdInput.text = "fwv" Then Call setPathFromCmd("frameworks/base/core/res/res/values") : Exit Function
+	If mCmdInput.text = "vp" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps") : Exit Function
+	If mCmdInput.text = "lot" Then Call setPathFromCmd("vendor/partner_gms/apps/GmsSampleIntegration") : Exit Function
+	If mCmdInput.text = "lg" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]") : Exit Function
+	'If mCmdInput.text = "md" Then Call setPathFromCmd("vendor/weibu_sz/media") : Exit Function
+	If mCmdInput.text = "tee" Then Call setPathFromCmd("vendor/mediatek/proprietary/trustzone/trustkernel/source/build/[product]") : Exit Function
 	HandleFolderPathCmd = False
 End Function
 
 Function HandleFilePathCmd()
 	HandleFilePathCmd = True
-	If runPathFromCmd("b", mIp.Infos.Sdk & "/build.log") Then Exit Function
-	If runPathFromCmd("sb", mIp.Infos.OutSdkPath & "/system/build.prop") Then Exit Function
-	If runPathFromCmd("vb", mIp.Infos.OutSdkPath & "/vendor/build.prop") Then Exit Function
-	If runPathFromCmd("pb", mIp.Infos.OutSdkPath & "/product/etc/build.prop") Then Exit Function
-	If setPathFromCmd("bi", "build/make/tools/buildinfo.sh") Then Exit Function
-	If setPathFromCmd("mf", "build/make/core/Makefile") Then Exit Function
-	If setPathFromCmd("pc", "device/mediateksample/[product]/ProjectConfig.mk") Then Exit Function
-	If setPathFromCmd("sc", "device/mediatek/system/[sys_target_project]/SystemConfig.mk") Then Exit Function
-	If setPathFromCmd("full", "device/mediateksample/[product]/full_[product].mk") Then Exit Function
-	If setPathFromCmd("sys", "device/mediatek/system/[sys_target_project]/sys_[sys_target_project].mk") Then Exit Function
-	If setPathFromCmd("vnd", "device/mediateksample/[product]/vnd_[product].mk") Then Exit Function
-	If setPathFromCmd("bc", "device/mediatek/system/common/BoardConfig.mk") Then Exit Function
-	If setPathFromCmd("sp", "device/mediatek/system/common/system.prop") Then Exit Function
-	If setPathFromCmd("apn", "device/mediatek/config/apns-conf.xml") Then Exit Function
-	If setPathFromCmd("cc", "device/mediatek/vendor/common/custom.conf") Then Exit Function
-	If setPathFromCmd("fwc", "frameworks/base/core/res/res/values/config.xml") Then Exit Function
-	If setPathFromCmd("fws", "frameworks/base/core/res/res/values/strings.xml") Then Exit Function
-	If runPathFromCmd("tz", "frameworks/base/packages/SettingsLib/res/xml/timezones.xml") Then Exit Function
-	If setPathFromCmd("dc", "[kernel_version]/arch/[target_arch]/configs/[product]_defconfig") Then Exit Function
-	If setPathFromCmd("ddc", "[kernel_version]/arch/[target_arch]/configs/[product]_debug_defconfig") Then Exit Function
-	If setPathFromCmdAndCopyKey("mtp", "getDeviceProperty", "frameworks/base/media/java/android/mtp/MtpDatabase.java") Then Exit Function
-	If setPathFromCmdAndCopyKey("wifiap", "getDefaultApConfiguration", "packages/modules/Wifi/service/java/com/android/server/wifi/WifiApConfigStore.java") Then Exit Function
-	If setPathFromCmdAndCopyKey("wifidrt", "getPersistedDeviceName", "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java") Then Exit Function
-	If setPathFromCmdAndCopyKey("bt", "btif_default_local_name", "system/bt/btif/src/btif_dm.cc") Then Exit Function
-	If setPathFromCmdAndCopyKey("st-device", "initializeDeviceName", "vendor/mediatek/proprietary/packages/apps/MtkSettings/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java") Then Exit Function
-	If setPathFromCmd("suc", "vendor/mediatek/proprietary/packages/apps/SystemUI/res/values/config.xml") Then Exit Function
-	If setPathFromCmd("spdf", "vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml") Then Exit Function
-	If setPathFromCmd("spdb", "vendor/mediatek/proprietary/packages/apps/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java") Then Exit Function
-	If setPathFromCmd("brt", "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/res/values/config.xml") Then Exit Function
-	If setPathFromCmd("lgu", "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_uboot.bmp") Then Exit Function
-	If setPathFromCmd("lgk", "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_kernel.bmp") Then Exit Function
-	If setPathFromCmd("ani", "vendor/weibu_sz/media/bootanimation.zip") Then Exit Function
-	If setPathFromCmd("label", "vendor/mediatek/proprietary/buildinfo_sys/label.ini") Then Exit Function
+	If mCmdInput.text = "b" Then Call runPath(mIp.Infos.Sdk & "/build.log") : Exit Function
+	If mCmdInput.text = "sb" Then Call runPath(mIp.Infos.OutSdkPath & "/system/build.prop") : Exit Function
+	If mCmdInput.text = "vb" Then Call runPath(mIp.Infos.OutSdkPath & "/vendor/build.prop") : Exit Function
+	If mCmdInput.text = "pb" Then Call runPath(mIp.Infos.OutSdkPath & "/product/etc/build.prop") : Exit Function
+	If mCmdInput.text = "bi" Then Call setPathFromCmd("build/make/tools/buildinfo.sh") : Exit Function
+	If mCmdInput.text = "mf" Then Call setPathFromCmd("build/make/core/Makefile") : Exit Function
+	If mCmdInput.text = "pc" Then Call setPathFromCmd("device/mediateksample/[product]/ProjectConfig.mk") : Exit Function
+	If mCmdInput.text = "sc" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/SystemConfig.mk") : Exit Function
+	If mCmdInput.text = "full" Then Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
+	If mCmdInput.text = "sys" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/sys_[sys_target_project].mk") : Exit Function
+	If mCmdInput.text = "vnd" Then Call setPathFromCmd("device/mediateksample/[product]/vnd_[product].mk") : Exit Function
+	If mCmdInput.text = "bc" Then Call setPathFromCmd("device/mediatek/system/common/BoardConfig.mk") : Exit Function
+	If mCmdInput.text = "sp" Then Call setPathFromCmd("device/mediatek/system/common/system.prop") : Exit Function
+	If mCmdInput.text = "apn" Then Call setPathFromCmd("device/mediatek/config/apns-conf.xml") : Exit Function
+	'If mCmdInput.text = "cc" Then Call setPathFromCmd("device/mediatek/vendor/common/custom.conf") : Exit Function
+	If mCmdInput.text = "fwc" Then Call setPathFromCmd("frameworks/base/core/res/res/values/config.xml") : Exit Function
+	If mCmdInput.text = "fws" Then Call setPathFromCmd("frameworks/base/core/res/res/values/strings.xml") : Exit Function
+	If mCmdInput.text = "tz" Then Call runPath("frameworks/base/packages/SettingsLib/res/xml/timezones.xml") : Exit Function
+	If mCmdInput.text = "dc" Then Call setPathFromCmd("[kernel_version]/arch/[target_arch]/configs/[product]_defconfig") : Exit Function
+	If mCmdInput.text = "ddc" Then Call setPathFromCmd("[kernel_version]/arch/[target_arch]/configs/[product]_debug_defconfig") : Exit Function
+	If mCmdInput.text = "mtp" Then Call setPathFromCmdAndCopyKey("getDeviceProperty", "frameworks/base/media/java/android/mtp/MtpDatabase.java") : Exit Function
+	If mCmdInput.text = "wifiap" Then Call setPathFromCmdAndCopyKey("getDefaultApConfiguration", "packages/modules/Wifi/service/java/com/android/server/wifi/WifiApConfigStore.java") : Exit Function
+	If mCmdInput.text = "wifidrt" Then Call setPathFromCmdAndCopyKey("getPersistedDeviceName", "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java") : Exit Function
+	If mCmdInput.text = "bt" Then Call setPathFromCmdAndCopyKey("btif_default_local_name", "system/bt/btif/src/btif_dm.cc") : Exit Function
+	If mCmdInput.text = "st-device" Then Call setPathFromCmdAndCopyKey("initializeDeviceName", "vendor/mediatek/proprietary/packages/apps/MtkSettings/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java") : Exit Function
+	If mCmdInput.text = "suc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI/res/values/config.xml") : Exit Function
+	If mCmdInput.text = "spdf" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml") : Exit Function
+	If mCmdInput.text = "spdb" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java") : Exit Function
+	If mCmdInput.text = "brt" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/res/values/config.xml") : Exit Function
+	If mCmdInput.text = "lgu" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_uboot.bmp") : Exit Function
+	If mCmdInput.text = "lgk" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_kernel.bmp") : Exit Function
+	If mCmdInput.text = "ani" Then Call setPathFromCmd("vendor/weibu_sz/media/bootanimation.zip") : Exit Function
+	If mCmdInput.text = "label" Then Call setPathFromCmd("vendor/mediatek/proprietary/buildinfo_sys/label.ini") : Exit Function
 	HandleFilePathCmd = False
 End Function
 
 Function handleProp()
     handleProp = True
-	If showPropString("sample", "persist.sys.sample.device.name") Then Exit Function
-	If showPropString("locale", "persist.sys.locale") Then Exit Function
-	If showPropString("timezone", "persist.sys.timezone") Then Exit Function
-	If showPropString("vol_media", "ro.config.media_vol_default") Then Exit Function
-	If showPropString("vol_alarm", "ro.config.alarm_vol_default") Then Exit Function
-	If showPropString("vol_system", "ro.config.system_vol_default") Then Exit Function
-	If showPropString("vol_notif", "ro.config.notification_vol_default") Then Exit Function
-	If showPropString("vol_call", "ro.config.vc_call_vol_default") Then Exit Function
-	If showPropString("sku", "ro.boot.hardware.sku") Then Exit Function
-	If showPropString("hardware", "ro.boot.hardware.revision") Then Exit Function
+	If mCmdInput.text = "sample" Then Call mCmdInput.setText("persist.sys.sample.device.name") : Exit Function
+	If mCmdInput.text = "locale" Then Call mCmdInput.setText("persist.sys.locale") : Exit Function
+	If mCmdInput.text = "timezone" Then Call mCmdInput.setText("persist.sys.timezone") : Exit Function
+	If mCmdInput.text = "vol_media" Then Call mCmdInput.setText("ro.config.media_vol_default") : Exit Function
+	If mCmdInput.text = "vol_alarm" Then Call mCmdInput.setText("ro.config.alarm_vol_default") : Exit Function
+	If mCmdInput.text = "vol_system" Then Call mCmdInput.setText("ro.config.system_vol_default") : Exit Function
+	If mCmdInput.text = "vol_notif" Then Call mCmdInput.setText("ro.config.notification_vol_default") : Exit Function
+	If mCmdInput.text = "vol_call" Then Call mCmdInput.setText("ro.config.vc_call_vol_default") : Exit Function
+	If mCmdInput.text = "sku" Then Call mCmdInput.setText("ro.boot.hardware.sku") : Exit Function
+	If mCmdInput.text = "hardware" Then Call mCmdInput.setText("ro.boot.hardware.revision") : Exit Function
 	handleProp = False
+End Function
+
+Function handleGetInfo()
+    handleGetInfo = True
+	If mCmdInput.text = "getid" Then Call setOpenPath(getOutInfo("ro.build.display.inner.id")) : Exit Function
+	If mCmdInput.text = "getfp" Then Call setOpenPath(getOutInfo("ro.system.build.fingerprint")) : Exit Function
+	If mCmdInput.text = "getsp" Then Call setOpenPath(getOutInfo("ro.build.version.security_patch")) : Exit Function
+	If mCmdInput.text = "getbo" Then Call setOpenPath(getOutInfo("ro.build.version.base_os")) : Exit Function
+    handleGetInfo = False
 End Function
 
 Function handleEditTextCmd()
@@ -132,13 +142,14 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "lcd" Then Call getLunchCommand("userdebug") : Exit Function
 	If mCmdInput.text = "lce" Then Call getLunchCommand("eng") : Exit Function
 	If mCmdInput.text = "mk" Then Call getMakeCommand(False, False, False) : Exit Function
-	If mCmdInput.text = "mk-rmb" Then Call getMakeCommand(False, True, False) : Exit Function
-	If mCmdInput.text = "mk-rmo" Then Call getMakeCommand(True, False, False) : Exit Function
-	If mCmdInput.text = "mk-o" Then Call getMakeCommand(False, False, True) : Exit Function
-	If mCmdInput.text = "mk-rmb-o" Then Call getMakeCommand(False, True, True) : Exit Function
-	If mCmdInput.text = "mk-rmo-o" Then Call getMakeCommand(True, False, True) : Exit Function
+	If mCmdInput.text = "bmk" Then Call getMakeCommand(False, True, False) : Exit Function
+	If mCmdInput.text = "omk" Then Call getMakeCommand(True, False, False) : Exit Function
+	If mCmdInput.text = "mko" Then Call getMakeCommand(False, False, True) : Exit Function
+	If mCmdInput.text = "bmko" Then Call getMakeCommand(False, True, True) : Exit Function
+	If mCmdInput.text = "omko" Then Call getMakeCommand(True, False, True) : Exit Function
 	If mCmdInput.text = "md" Then Call MkdirWeibuFolderPath() : Exit Function
 	If mCmdInput.text = "cm" Then Call CopyCommitInfo() : Exit Function
+	If mCmdInput.text = "dcm" Then Call CopyDriverCommitInfo() : Exit Function
 	If mCmdInput.text = "ota" Then Call CopyBuildOtaUpdate() : Exit Function
 	If mCmdInput.text = "cc" Then Call CopyCleanCommand() : Exit Function
 	If mCmdInput.text = "outp" Then Call CommandOfOut() : Exit Function
@@ -164,51 +175,23 @@ End Function
 
 Function handleCurrentDictCmd()
 	handleCurrentDictCmd = True
-	If runPathFromCmd("s", pSdkPathText) Then Exit Function
-	If runPathFromCmd("p", pPathText) Then Exit Function
-	If runPathFromCmd("c", pConfigText) Then Exit Function
-	If runPathFromCmd("op", oWs.CurrentDirectory) Then Exit Function
+	If mCmdInput.text = "s" Then Call runPath(pSdkPathText) : Exit Function
+	If mCmdInput.text = "p" Then Call runPath(pPathText) : Exit Function
+	If mCmdInput.text = "c" Then Call runPath(pConfigText) : Exit Function
+	If mCmdInput.text = "op" Then Call runPath(oWs.CurrentDirectory) : Exit Function
 	handleCurrentDictCmd = False
 End Function
 
-Function setPathFromCmd(cmd, path)
-	If mCmdInput.text = cmd Then
-	    Call setOpenPath(path)
-	    Call onOpenPathChange()
-	    setPathFromCmd = True
-	Else
-	    setPathFromCmd = False
-	End If
-End Function
+Sub setPathFromCmd(path)
+	Call setOpenPath(path)
+	Call onOpenPathChange()
+End Sub
 
-Function setPathFromCmdAndCopyKey(cmd, key, path)
-	If mCmdInput.text = cmd Then
-	    Call setOpenPath(path)
-	    Call onOpenPathChange()
-		Call CopyString(key)
-	    setPathFromCmdAndCopyKey = True
-	Else
-	    setPathFromCmdAndCopyKey = False
-	End If
-End Function
-
-Function runPathFromCmd(cmd, path)
-	If mCmdInput.text = cmd Then
-	    Call runPath(path)
-	    runPathFromCmd = True
-	Else
-	    runPathFromCmd = False
-	End If
-End Function
-
-Function showPropString(cmd, prop)
-    If mCmdInput.text = cmd Then
-	    Call mCmdInput.setText(prop)
-		showPropString = True
-	Else
-	    showPropString = False
-	End If
-End Function
+Sub setPathFromCmdAndCopyKey(key, path)
+	Call setOpenPath(path)
+	Call onOpenPathChange()
+	Call CopyString(key)
+End Sub
 
 Function getMultiMkdirStr(arr, what)
     Dim str, path

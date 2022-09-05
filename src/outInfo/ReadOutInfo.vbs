@@ -61,4 +61,9 @@ Sub closeOutInfos()
     Call showElement(ID_BUTTON_SHOW_OUT_INFOS)
 End Sub
 
+Function getOutInfo(prop)
+    Dim outProductPath : outProductPath = getOutProductPath()
+    pSystemBuildProp = outProductPath & "/system/build.prop"
 
+    getOutInfo = readTextAndGetValue(prop, pSystemBuildProp)
+End Function

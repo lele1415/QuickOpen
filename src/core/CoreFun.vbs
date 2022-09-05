@@ -193,6 +193,7 @@ Sub startCmdMode()
     Call hideElement("br3")
     Call hideElement("br4")
     Call setCmdSmallWindow()
+    Call setCmdTextClass(getCmdInputId(), getOpenPathInputId(), "cmd_text")
 End Sub
 
 Sub exitCmdMode()
@@ -207,6 +208,7 @@ Sub exitCmdMode()
     Call showElement("br3")
     Call showElement("br4")
     Call setDefaultWindow()
+    Call setCmdTextClass(getCmdInputId(), getOpenPathInputId(), "textarea_text")
 End Sub
 
 Function readTextAndGetValue(keyStr, filePath)
@@ -375,19 +377,54 @@ Function isCompressFilePath(path)
     End If
 End Function
 
+Sub saveHistoryPath(path)
+    Dim index
+    index = vaPathHistory.GetIndexIfExist(path)
+    If index > -1 Then Call vaPathHistory.MoveToEnd(index) : Exit Sub
+
+    If vaPathHistory.Bound = 9 Then Call vaPathHistory.PopBySeq(9)
+    Call vaPathHistory.Append(path)
+End Sub
+
+Sub showHistoryPath(keyCode)
+    If vaPathHistory.Bound = -1 Then Exit Sub
+
+    Dim index
+    index = vaPathHistory.GetIndexIfExist(getOpenPath())
+    If index = -1 Then mCurrentPath = getOpenPath()
+
+    If keyCode = KEYCODE_UP Then
+        If index > 0 Then
+            Call setOpenPath(vaPathHistory.V(index - 1))
+        ElseIf index = -1 Then
+            Call setOpenPath(vaPathHistory.V(vaPathHistory.Bound))
+        End If
+    ElseIf keyCode = KEYCODE_DOWN Then
+        If index > -1 And index < vaPathHistory.Bound Then
+            Call setOpenPath(vaPathHistory.V(index + 1))
+        ElseIf index = vaPathHistory.Bound Then
+            Call setOpenPath(mCurrentPath)
+        End If
+    End If
+End Sub
+
 Sub runPath(path)
+    Dim success : success = False
     path = Replace(path, "/", "\")
     If oFso.FolderExists(path) Then
         oWs.Run "explorer.exe " & path
+        success = True
     ElseIf oFso.FileExists(path) Then
         If isPictureFilePath(path) Or isCompressFilePath(path) Then
             oWs.Run "explorer.exe " & path
         Else
             oWs.Run mTextEditorPath & " " & path
         End If
+        success = True
     Else
         MsgBox("not found :" & Vblf & path)
     End If
+    If success And InStr(path, mIp.Infos.Sdk) > 0 Then Call saveHistoryPath(mIp.cutProject(path))
 End Sub
 
 Sub runTextPath(path)
@@ -450,10 +487,11 @@ Sub onInputListClick(divId, str)
     End If
 End Sub
 
-Sub changeFocus(keyCode)
-    Call mFileButtonList.changeListFocus(keyCode)
-    Call mOpenButtonList.changeListFocus(keyCode)
-End Sub
+Function changeFocus(keyCode)
+    If mFileButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
+    If mOpenButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
+    changeFocus = False
+End Function
 
 Const KEYCODE_ENTER = 13
 Const KEYCODE_SPACE = 32
@@ -482,7 +520,8 @@ Function onKeyDown(keyCode)
         Call tabOpenPath()
     
     ElseIf keyCode = KEYCODE_UP Or keyCode = KEYCODE_DOWN Then
-        Call changeFocus(keyCode)
+        If changeFocus(keyCode) Then onKeyDown = False : Exit Function
+        Call showHistoryPath(keyCode)
 
     Else
         onKeyDown = True : Exit Function

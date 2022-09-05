@@ -123,9 +123,18 @@ function documentKeydown(e) {
     var currKey = 0, e = e || event;
     currKey = e.keyCode || e.which || e.charCode;
     //alert(currKey)
-    return onKeyDown(currKey);
+    if (!e.shiftKey) {
+        return onKeyDown(currKey);
+    }
 }
 
 function focusElement(elementId) {
     document.getElementById(elementId).focus();
+}
+
+function setCmdTextClass(id1, id2, className) {
+    var e1 = document.getElementById(id1);
+    var e2 = document.getElementById(id2);
+    e1.className = className;
+    e2.className = className;
 }

@@ -72,7 +72,7 @@ Function getLunchItemInSplitBuild(buildType)
 
     Dim keyStr
     keyStr = "##Cusomer Settings"
-    commandStr = """sed -i '/" & keyStr & "/i\""&" & commandStr & "&""' split_build.sh"""
+    commandStr = """sed -i '/" & keyStr & "/i\""&" & commandStr & "&""' split_build.sh;git diff split_build.sh"""
     getLunchItemInSplitBuild = commandStr
 End Function
 
@@ -89,6 +89,12 @@ End Sub
 Sub CopyCommitInfo()
     If Not mIp.hasProjectInfos() Then Exit Sub
 	commandFinal = "[" & mIp.Infos.Project & "] : "
+	Call CopyString(commandFinal)
+End Sub
+
+Sub CopyDriverCommitInfo()
+    If Not mIp.hasProjectInfos() Then Exit Sub
+	commandFinal = "[" & mIp.Infos.DriverProject & "] : "
 	Call CopyString(commandFinal)
 End Sub
 

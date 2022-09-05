@@ -11,6 +11,9 @@ Dim mOutFileList : Set mOutFileList = (New ButtonWithOneLayerList)(getOutButtonP
 Dim mOpenButtonList : Set mOpenButtonList = (New ButtonWithOneLayerList)(getOpenButtonParentId(), "openbutton")
 Dim mFileButtonList : Set mFileButtonList = (New ButtonWithOneLayerList)(getFileButtonParentId(), "filebutton")
 
+Dim vaPathHistory : Set vaPathHistory = New VariableArray
+Dim mCurrentPath
+
 
 
 Class VariableArray
@@ -468,15 +471,17 @@ Class ButtonWithOneLayerList
         End If
     End Function
 
-    Public Sub changeListFocus(keyCode)
+    Public Function changeListFocus(keyCode)
         If isDivShowing(mListDivId) Then
             If keyCode = KEYCODE_UP Then
                 mFocusLiIndex =  changeLiFocusUp(mListUlId)
             ElseIf keyCode = KEYCODE_DOWN Then
                 mFocusLiIndex = changeLiFocusDown(mListUlId)
             End If
+            changeListFocus = True : Exit Function
         End If
-    End Sub
+        changeListFocus = False
+    End Function
 
     Public Sub clickFocusedLi()
         If mFocusLiIndex > -1 Then
@@ -947,6 +952,14 @@ Class ProjectInputs
             Call setOpenPath(Replace(getOpenPath(), mInfos.DriverProjectPath & mInfos.ProjectAlps & "/", ""))
         End If
     End Sub
+
+    Public Function cutProject(path)
+        path = Replace(path, "\", "/")
+        path = Replace(path, Replace(mInfos.Sdk, "\", "/") & "/", "")
+        path = Replace(path, mInfos.ProjectPath & mInfos.ProjectAlps & "/", "")
+        path = Replace(path, mInfos.DriverProjectPath & mInfos.ProjectAlps & "/", "")
+        cutProject = path
+    End Function
 
     Public Sub onWorkChange()
         mInfos.Work = Work
