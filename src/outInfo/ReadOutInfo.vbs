@@ -8,7 +8,7 @@ Dim pSystemBuildProp
 Dim pVendorBuildProp
 Dim pProductBuildProp
 
-Sub getOutInfos()
+Sub getBuildProp()
     If Not mIp.hasProjectInfos() Then
         pSystemBuildProp = ""
         pVendorBuildProp = ""
@@ -24,6 +24,10 @@ Sub getOutInfos()
     If Not oFso.FileExists(pProductBuildProp) Then
         pProductBuildProp = outProductPath & "/product/etc/build.prop"
     End If
+End Sub
+
+Sub getOutInfos()
+    Call getBuildProp()
 
     Dim str
     str = str & "display_id=" & readTextAndGetValue("ro.build.display.id", pSystemBuildProp) & VbLf
@@ -62,8 +66,11 @@ Sub closeOutInfos()
 End Sub
 
 Function getOutInfo(prop)
-    Dim outProductPath : outProductPath = getOutProductPath()
-    pSystemBuildProp = outProductPath & "/system/build.prop"
+    Call getBuildProp()
 
-    getOutInfo = readTextAndGetValue(prop, pSystemBuildProp)
+    Dim value
+    value = readTextAndGetValue(prop, pSystemBuildProp)
+    If value = "" Then value = readTextAndGetValue(prop, pVendorBuildProp)
+    If value = "" Then value = readTextAndGetValue(prop, pProductBuildProp)
+    getOutInfo = value
 End Function

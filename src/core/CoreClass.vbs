@@ -711,7 +711,7 @@ Class ProjectInfos
     End Function
 
     Sub getBootLogo()
-        mBootLogo = getDriverProjectConfigValue("BOOT_LOGO=")
+        mBootLogo = getDriverProjectConfigValue("BOOT_LOGO")
         Call getFakeOrientation() 
     End Sub
 
@@ -725,7 +725,7 @@ Class ProjectInfos
 
         Do Until oText.AtEndOfStream
             sReadLine = oText.ReadLine
-            If InStr(sReadLine, " 1 ") > 0 Then
+            If InStr(sReadLine, "ro.vendor.fake.orientation") > 0 And InStr(sReadLine, " 1 ") > 0 Then
                 mBootLogo = mBootLogo & "nl"
                 Exit Do
             End If
@@ -743,7 +743,7 @@ Class ProjectInfos
         Do Until oText.AtEndOfStream
             sReadLine = oText.ReadLine
             If InStr(sReadLine, "SYS_TARGET_PROJECT") > 0 And InStr(sReadLine, "=") > 0 Then
-                sysTarget = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
+                sysTarget = readTextAndGetValue("SYS_TARGET_PROJECT", fullMkPath)
                 'If InStr(Sdk, "8168") > 0 Then
                 ''    sysTarget = Replace(sysTarget, "_h", "")
                 'End If
@@ -982,8 +982,6 @@ Class ProjectInputs
     Public Function onProductChange()
         mInfos.Product = Product
         If oFso.FolderExists(mInfos.ProductSdkPath) Then
-            Call getProjectConfigMk()
-            Call mInfos.getBootLogo()
             Call mInfos.getSysTargetProject()
             Call mInfos.getKernelInfos()
             onProductChange = True
@@ -1006,6 +1004,8 @@ Class ProjectInputs
             Else
                 mInfos.ProjectAlps = ""
             End If
+            Call getProjectConfigMk()
+            Call mInfos.getBootLogo()
             onProjectChange = True
         Else
             msgboxPathNotExist(mInfos.ProjectSdkPath)

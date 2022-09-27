@@ -47,6 +47,7 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "bi" Then Call setPathFromCmd("build/make/tools/buildinfo.sh") : Exit Function
 	If mCmdInput.text = "mf" Then Call setPathFromCmd("build/make/core/Makefile") : Exit Function
 	If mCmdInput.text = "pc" Then Call setPathFromCmd("device/mediateksample/[product]/ProjectConfig.mk") : Exit Function
+	If mCmdInput.text = "dvc" Then Call setPathFromCmd("device/mediatek/system/common/device.mk") : Exit Function
 	If mCmdInput.text = "sc" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/SystemConfig.mk") : Exit Function
 	If mCmdInput.text = "full" Then Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
 	If mCmdInput.text = "sys" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/sys_[sys_target_project].mk") : Exit Function
@@ -64,7 +65,8 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "wifiap" Then Call setPathFromCmdAndCopyKey("getDefaultApConfiguration", "packages/modules/Wifi/service/java/com/android/server/wifi/WifiApConfigStore.java") : Exit Function
 	If mCmdInput.text = "wifidrt" Then Call setPathFromCmdAndCopyKey("getPersistedDeviceName", "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java") : Exit Function
 	If mCmdInput.text = "bt" Then Call setPathFromCmdAndCopyKey("btif_default_local_name", "system/bt/btif/src/btif_dm.cc") : Exit Function
-	If mCmdInput.text = "st-device" Then Call setPathFromCmdAndCopyKey("initializeDeviceName", "vendor/mediatek/proprietary/packages/apps/MtkSettings/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java") : Exit Function
+	If mCmdInput.text = "st-device" Then Call setPathFromCmdAndCopyKey("battery.capacity", "vendor/mediatek/proprietary/packages/apps/MtkSettings/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java") : Exit Function
+	If mCmdInput.text = "bat" Then Call setPathFromCmdAndCopyKey("battery.capacity", "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml") : Exit Function
 	If mCmdInput.text = "suc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI/res/values/config.xml") : Exit Function
 	If mCmdInput.text = "spdf" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml") : Exit Function
 	If mCmdInput.text = "spdb" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java") : Exit Function
@@ -97,6 +99,7 @@ Function handleGetInfo()
 	If mCmdInput.text = "getfp" Then Call setOpenPath(getOutInfo("ro.system.build.fingerprint")) : Exit Function
 	If mCmdInput.text = "getsp" Then Call setOpenPath(getOutInfo("ro.build.version.security_patch")) : Exit Function
 	If mCmdInput.text = "getbo" Then Call setOpenPath(getOutInfo("ro.build.version.base_os")) : Exit Function
+	If mCmdInput.text = "getplf" Then Call setOpenPath(getOutInfo("ro.board.platform")) : Exit Function
     handleGetInfo = False
 End Function
 

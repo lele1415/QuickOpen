@@ -260,7 +260,7 @@ Sub replaceProjectInfoStr(path)
 	End If
 
 	If InStr(path, "[project-driver]") > 0 Then
-		path = Replace(path, "[project-driver]", Replace(mIp.Infos.Project, "-MMI", ""))
+		path = Replace(path, "[project-driver]", mIp.Infos.DriverProject)
 	End If
 
 	If InStr(path, "[boot_logo]") > 0 Then

@@ -31,13 +31,13 @@ Sub getProjectConfigMk()
         pMMIProjectConfigMk = mIp.Infos.ProjectSdkPath & "/config/ProjectConfig.mk"
         If Not oFso.FileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
 
-        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & Replace(mIp.Infos.Project, "-MMI", "") & "/config/ProjectConfig.mk"
+        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & mIp.Infos.DriverProject & "/config/ProjectConfig.mk"
         If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
     Else
         pMMIProjectConfigMk = mIp.Infos.getOverlaySdkPath("/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
         If Not oFso.FileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
 
-        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & Replace(mIp.Infos.Project, "-MMI", "") & "/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
+        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & mIp.Infos.DriverProject & "/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
         If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
     End If
     

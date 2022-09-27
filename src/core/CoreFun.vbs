@@ -219,7 +219,7 @@ Function readTextAndGetValue(keyStr, filePath)
     Set oText = oFso.OpenTextFile(filePath, FOR_READING)
 
     Do Until oText.AtEndOfStream
-        sReadLine = oText.ReadLine
+        sReadLine = Trim(oText.ReadLine)
         Do While InStr(sReadLine, "  ") > 0
             sReadLine = Replace(sReadLine, "  ", " ")
         Loop
@@ -227,7 +227,7 @@ Function readTextAndGetValue(keyStr, filePath)
             sReadLine = Replace(sReadLine, " =", "=")
         End If
 
-        If InStr(sReadLine, keyStr) > 0 Then
+        If InStr(sReadLine, keyStr) = 1 Then
             readTextAndGetValue = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
             flag = True
             Exit Do
