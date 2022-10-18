@@ -999,7 +999,9 @@ Class ProjectInputs
         mInfos.Project = Project
         mInfos.ProjectAlps = ""
         If oFso.FolderExists(mInfos.ProjectSdkPath) Then
-            If oFso.FolderExists(mInfos.ProjectSdkPath & "/alps") Then
+            If InStr(mInfos.Sdk, "_r") = 0 _
+                    Or oFso.FolderExists(mInfos.ProjectSdkPath & "/alps") _
+                    Or oFso.FolderExists(mInfos.ProjectSdkPath & "/config") Then
                 mInfos.ProjectAlps = "/alps"
             Else
                 mInfos.ProjectAlps = ""

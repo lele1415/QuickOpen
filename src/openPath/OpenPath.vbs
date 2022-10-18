@@ -132,14 +132,14 @@ Function getOverlayPath(where, isFile, fileName)
 
 	If where = "MMI" Then
 		wholePath = mIp.Infos.getOverlaySdkPath(inputPath)
-		If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
+		If isFile And (Not oFso.FileExists(wholePath)) Then
 			If oFso.FileExists(mIp.Infos.ProjectSdkPath & "/config/" & fileName) Then
 				wholePath = mIp.Infos.ProjectSdkPath & "/config/" & fileName
 			End If
 		End If
     ElseIf where = "Driver" Then
         wholePath = mIp.Infos.getDriverOverlaySdkPath(inputPath)
-        If isFile And (Not oFso.FileExists(wholePath)) And mIp.hasProjectAlps() Then
+        If isFile And (Not oFso.FileExists(wholePath)) Then
 			If oFso.FileExists(mIp.Infos.DriverProjectSdkPath & "/config/" & fileName) Then
 				wholePath = mIp.Infos.DriverProjectSdkPath & "/config/" & fileName
 			End If
