@@ -97,7 +97,7 @@ Sub makeOpenButton()
 
     If mIp.hasProjectInfos() Then
 		Dim wholePath, isFile, fileName
-		wholePath = mIp.Infos.Sdk & "/" & inputPath
+		wholePath = mIp.Infos.getPathWithDriveSdk(inputPath)
 		If oFso.FileExists(wholePath) Then
 			isFile = True
 		ElseIf oFso.FolderExists(wholePath) Then
@@ -178,27 +178,27 @@ End Sub
 
 Function getOutProductPath()
 	If mIp.hasProjectInfos() Then
-		Dim path : path = mIp.Infos.Sdk & "/out/target/product/" & mIp.Infos.Product
+		Dim path : path = mIp.Infos.OutSdkPath
 
 		If Not oFso.FolderExists(path) Then
-			If Not oFso.FolderExists(mIp.Infos.Sdk & "/out") Then
+			If Not isFolderExists("out") Then
 				MsgBox("Not found out/")
-				runFolderPath(mIp.Infos.Sdk)
+				runFolderPath(mIp.Infos.DriveSdk)
 				getOutProductPath = ""
-			ElseIf Not oFso.FolderExists(mIp.Infos.Sdk & "/out/target/product") Then
+			ElseIf Not isFolderExists("out/target/product") Then
 				MsgBox("Not found out/target/product/")
-				runFolderPath(mIp.Infos.Sdk & "/out")
+				runFolderPath(mIp.Infos.getPathWithDriveSdk("out"))
 				getOutProductPath = ""
 			Else
-			    Dim vaOutProduct : Set vaOutProduct = searchFolder(mIp.Infos.Sdk & "/out/target/product", "", _
+			    Dim vaOutProduct : Set vaOutProduct = searchFolder(mIp.Infos.getPathWithDriveSdk("out/target/product"), "", _
 		                SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 			    If vaOutProduct.Bound < 0 Then
 			        MsgBox("No product folders found in out/target/product/")
-			        runFolderPath(mIp.Infos.Sdk & "/out/target/product")
+			        runFolderPath(mIp.InfosgetPathWithDriveSdk("out/target/product"))
 			        getOutProductPath = ""
 			    ElseIf vaOutProduct.V(0) <> mIp.Infos.Product Then
 			        MsgBox("Other product found in out/target/product/" & Vblf & vaOutProduct.V(0))
-			        getOutProductPath = mIp.Infos.Sdk & "/out/target/product/" & vaOutProduct.V(0)
+			        getOutProductPath = mIp.Infos.getPathWithDriveSdk("out/target/product/") & vaOutProduct.V(0)
 			    End If
 			End If
 		Else
@@ -217,7 +217,7 @@ Function getOutListPath(where)
     End If
 
     If where = "build.log" Then
-        getOutListPath = mIp.Infos.Sdk & "/build.log"
+        getOutListPath = mIp.Infos.getPathWithDriveSdk("build.log")
     ElseIf where = "out" Then
         getOutListPath = outProductPath
     ElseIf where = "target_files" Then
@@ -244,13 +244,13 @@ Sub replaceOpenPath()
 	If InStr(path, "..") > 0 Then
 		path = pathDict.Item(path)
     End If
-	
-	path = Replace(path, "\", "/")
-	Call replaceProjectInfoStr(path)
+	path = replaceProjectInfoStr(path)
 	Call setOpenPath(path)
+
+	Call cutSdkPath()
 End Sub
 
-Sub replaceProjectInfoStr(path)
+Function replaceProjectInfoStr(path)
 	If InStr(path, "[product]") > 0 Then
 		path = Replace(path, "[product]", mIp.Infos.Product)
 	End If
@@ -279,11 +279,11 @@ Sub replaceProjectInfoStr(path)
 		path = Replace(path, "[target_arch]", mIp.Infos.TargetArch)
 	End If
 
-	Call setOpenPath(path)
-End Sub
+	replaceProjectInfoStr = path
+End Function
 
 Function runOpenPath()
-	If mIp.hasProjectInfos() Then Call runPath(mIp.Infos.Sdk & "\" & getOpenPath())
+	If mIp.hasProjectInfos() Then Call runPath(mIp.Infos.getPathWithDriveSdk(getOpenPath()))
 End Function
 
 Sub compareForProject()
@@ -291,7 +291,7 @@ Sub compareForProject()
 
     Dim inputPath, wholePath
     inputPath = getOpenPath()
-    wholePath = mIp.Infos.Sdk & "/" & inputPath
+    wholePath = mIp.Infos.getPathWithDriveSdk(inputPath)
 
     If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
         Dim projectPath, driverPath
@@ -322,7 +322,7 @@ End Sub
 Sub selectForCompare()
     Dim inputPath, wholePath
     inputPath = getOpenPath()
-    wholePath = mIp.Infos.Sdk & "/" & inputPath
+    wholePath = mIp.Infos.getPathWithDriveSdk(inputPath)
 
     If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
     	mLeftComparePath = """" & Replace(wholePath, "/", "\") & """"
@@ -336,7 +336,7 @@ End Sub
 Sub compareTo()
     Dim inputPath, wholePath
     inputPath = getOpenPath()
-    wholePath = mIp.Infos.Sdk & "/" & inputPath
+    wholePath = mIp.Infos.getPathWithDriveSdk(inputPath)
 
     If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
     	mRightComparePath = """" & Replace(wholePath, "/", "\") & """"
@@ -456,16 +456,16 @@ Sub findPackageFile()
     If mFileButtonList.hideListIfShowing() Then Exit Sub
 	If Not mIp.hasProjectInfos() Or Trim(getOpenPath()) = "" Then Exit Sub
 	
-	If Not oFso.FileExists(mIp.Infos.Sdk & "\pkg.txt") Then
-		If Not oFso.FolderExists(mIp.Infos.Sdk & "\" & getOpenPath()) Then
-			MsgBox("Path not exist!" & VbLf & mIp.Infos.Sdk & "\" & getOpenPath())
+	If Not oFso.FileExists(mIp.Infos.getPathWithDriveSdk("pkg.txt")) Then
+		If Not oFso.FolderExists(mIp.Infos.getPathWithDriveSdk(getOpenPath())) Then
+			MsgBox("Path not exist!" & VbLf & mIp.Infos.getPathWithDriveSdk(getOpenPath()))
 		    Exit Sub
 		End If
 		Call replaceSlash()
 		Call CopyString("find " & getOpenPath() & " -type f -name *.java > pkg.txt")
 		MsgBox("pkg.txt not exist!")
 	Else
-	    Call makeFileList(mIp.Infos.Sdk & "\pkg.txt", ".java")
+	    Call makeFileList(mIp.Infos.getPathWithDriveSdk("pkg.txt"), ".java")
 	End If
 End Sub
 

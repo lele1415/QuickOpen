@@ -211,6 +211,22 @@ Sub exitCmdMode()
     Call setCmdTextClass(getCmdInputId(), getOpenPathInputId(), "textarea_text")
 End Sub
 
+Function isFileExists(path)
+    If mIp.hasProjectInfos() Then
+        isFileExists = oFso.FileExists(mIp.Infos.getPathWithDriveSdk(path))
+    Else
+        isFileExists = False
+    End If
+End Function
+
+Function isFolderExists(path)
+    If mIp.hasProjectInfos() Then
+        isFolderExists = oFso.FolderExists(mIp.Infos.getPathWithDriveSdk(path))
+    Else
+        isFolderExists = False
+    End If
+End Function
+
 Function readTextAndGetValue(keyStr, filePath)
     If Not oFso.FileExists(filePath) Then Exit Function
     
@@ -282,7 +298,7 @@ End Function
 
 Function getTabStr()
     Dim folderPath
-    folderPath = mIp.Infos.Sdk & "/" & getFolderPath(getOpenPath())
+    folderPath = mIp.Infos.getPathWithDriveSdk(getFolderPath(getOpenPath()))
     If Not oFso.FolderExists(folderPath) Then getTabStr = "" : Exit Function
     
     Dim input, vaFileFolder, sameStartStr
@@ -424,7 +440,7 @@ Sub runPath(path)
     Else
         MsgBox("not found :" & Vblf & path)
     End If
-    If success And InStr(path, mIp.Infos.Sdk) > 0 Then Call saveHistoryPath(mIp.cutProject(path))
+    If success And InStr(path, mIp.Infos.DriveSdk) > 0 Then Call saveHistoryPath(mIp.cutProject(path))
 End Sub
 
 Sub runTextPath(path)
@@ -529,3 +545,46 @@ Function onKeyDown(keyCode)
     
     onKeyDown = False
 End Function
+
+Sub setDrive(drive)
+    If (drive = "z") Then
+        mDrive = "Z:\work05\"
+    ElseIf (drive = "z6") Then
+        mDrive = "Z:\work06\"
+    ElseIf (drive = "x") Then
+        mDrive = "X:\work2\"
+    End If
+    
+    document.title = getElementValue(getWorkInputId()) & " " & mDrive
+End Sub
+
+Sub setSdk(sdk)
+    If sdk = "8766s" Then
+        mIp.Sdk = "mt8766_s\alps"
+        Call onSdkPathChange()
+    ElseIf sdk = "8168s" Then
+        mIp.Sdk = "mt8168_s\alps"
+        Call onSdkPathChange()
+    ElseIf sdk = "8766r" Then
+        If mDrive = "X:\work2\" Then
+            mIp.Sdk = "mt8766_r\alps"
+            Call onSdkPathChange()
+        ElseIf mDrive = "Z:\work05\" Then
+            mIp.Sdk = "mt8766_r\alps2"
+            Call onSdkPathChange()
+        End If
+    End If
+End Sub
+
+Sub applyProjectPath()
+    Dim aInfos : aInfos = Split(getOpenPath(), "/")
+    If UBound(aInfos) < 2 Then MsgBox("Not valid project path!") : Exit Sub
+
+    If isFolderExists("weibu/" & aInfos(1) & "/" & aInfos(2)) Then
+        mIp.Product = aInfos(1)
+        Call onProductChange()
+        mIp.Project = aInfos(2)
+        Call onProjectChange()
+    End if
+End Sub
+

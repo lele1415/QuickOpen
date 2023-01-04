@@ -2,6 +2,7 @@ Option Explicit
 
 Dim mCmdInput : Set mCmdInput = (New InputText)(getCmdInputId())
 Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
+Dim mDrive : mDrive = "X:\work2\"
 Dim mIp : Set mIp = New ProjectInputs
 Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductParentId(), getProductInputId(), "product")
 Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project")
@@ -13,6 +14,7 @@ Dim mFileButtonList : Set mFileButtonList = (New ButtonWithOneLayerList)(getFile
 
 Dim vaPathHistory : Set vaPathHistory = New VariableArray
 Dim mCurrentPath
+Dim mSaveString : Set mSaveString = New SaveString
 
 
 
@@ -646,8 +648,12 @@ Class ProjectInfos
         TaskNum = mTaskNum
     End Property
 
+    Public Property Get DriveSdk
+        DriveSdk = mDrive & mSdk
+    End Property
+
     Public Property Get WeibuSdkPath
-        WeibuSdkPath = getWeibuSdkPath(Sdk)
+        WeibuSdkPath = getWeibuSdkPath(DriveSdk)
     End Property
 
     Public Property Get OutPath
@@ -655,11 +661,11 @@ Class ProjectInfos
     End Property
 
     Public Property Get OutSdkPath
-        OutSdkPath = getOutSdkPath(Sdk, Product)
+        OutSdkPath = getOutSdkPath(DriveSdk, Product)
     End Property
 
     Public Property Get DownloadOutPath
-        DownloadOutPath = getDownloadOutPath(Sdk, Product)
+        DownloadOutPath = getDownloadOutPath(DriveSdk, Product)
     End Property
 
     Public Property Get ProductPath
@@ -667,7 +673,7 @@ Class ProjectInfos
     End Property
 
     Public Property Get ProductSdkPath
-        ProductSdkPath = getProductSdkPath(Sdk, Product)
+        ProductSdkPath = getProductSdkPath(DriveSdk, Product)
     End Property
 
     Public Property Get ProjectPath
@@ -675,7 +681,7 @@ Class ProjectInfos
     End Property
 
     Public Property Get ProjectSdkPath
-        ProjectSdkPath = getProjectSdkPath(Sdk, Product, Project)
+        ProjectSdkPath = getProjectSdkPath(DriveSdk, Product, Project)
     End Property
 
     Public Property Get ProjectAlps
@@ -691,8 +697,12 @@ Class ProjectInfos
     End Property
 
     Public Property Get DriverProjectSdkPath
-        DriverProjectSdkPath = getProjectSdkPath(Sdk, Product, DriverProject)
+        DriverProjectSdkPath = getProjectSdkPath(DriveSdk, Product, DriverProject)
     End Property
+
+    Public Function getPathWithDriveSdk(path)
+        getPathWithDriveSdk = DriveSdk & "/" & path
+    End Function
 
     Public Function getOverlayPath(path)
         getOverlayPath = ProjectPath & ProjectAlps & "/" & path
@@ -734,7 +744,7 @@ Class ProjectInfos
 
     Sub getSysTargetProject()
         Dim fullMkPath, sysTarget
-        fullMkPath = Sdk & "/" & "device/mediateksample/" & Product & "/full_" & Product & ".mk"
+        fullMkPath = getPathWithDriveSdk("device/mediateksample/" & Product & "/full_" & Product & ".mk")
         If Not oFso.FileExists(fullMkPath) Then Exit Sub
 
         Dim oText, sReadLine
@@ -759,7 +769,7 @@ Class ProjectInfos
 
     Sub getKernelInfos()
         Dim projectConfigPath, kernelVer, k64Support
-        projectConfigPath = Sdk & "/device/mediateksample/" & Product & "/ProjectConfig.mk"
+        projectConfigPath = getPathWithDriveSdk("/device/mediateksample/" & Product & "/ProjectConfig.mk")
         If Not oFso.FileExists(projectConfigPath) Then MsgBox(projectConfigPath) : Exit Sub
 
         Dim oText, sReadLine
@@ -872,7 +882,7 @@ Class ProjectInputs
 
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
-        document.title = value
+        document.title = value & " " & mDrive
         Call onWorkChange()
     End Property
 
@@ -925,9 +935,9 @@ Class ProjectInputs
 
     Public Sub clearWorkInfos()
         Work = ""
-        Firmware = ""
-        Requirements = ""
-        Zentao = ""
+        Firmware = "\\192.168.0.248\安卓固件文件\"
+        Requirements = "\\192.168.0.24\wbshare\客户需求\"
+        Zentao = "http://192.168.0.29:3000/zentao/task-view-1.html"
     End Sub
 
     Public Sub clearSdkInfos()
@@ -940,7 +950,7 @@ Class ProjectInputs
         If Trim(getOpenPath()) = "" Then Exit Sub
         If hasProjectInfos() Then
             Call replaceSlash()
-            Call setOpenPath(Replace(getOpenPath(), Replace(mInfos.Sdk, "\", "/") & "/", ""))
+            Call setOpenPath(Replace(getOpenPath(), Replace(mInfos.DriveSdk, "\", "/") & "/", ""))
         End If
     End Sub
 
@@ -955,7 +965,7 @@ Class ProjectInputs
 
     Public Function cutProject(path)
         path = Replace(path, "\", "/")
-        path = Replace(path, Replace(mInfos.Sdk, "\", "/") & "/", "")
+        path = Replace(path, Replace(mInfos.DriveSdk, "\", "/") & "/", "")
         path = Replace(path, mInfos.ProjectPath & mInfos.ProjectAlps & "/", "")
         path = Replace(path, mInfos.DriverProjectPath & mInfos.ProjectAlps & "/", "")
         cutProject = path
@@ -966,13 +976,13 @@ Class ProjectInputs
     End Sub
 
     Public Function onSdkChange()
-        Call mIp.cutSdkInOpenPath()
+        'Call mIp.cutSdkInOpenPath()
 
         mInfos.Sdk = Sdk
-        If oFso.FolderExists(mInfos.Sdk) Then
+        If oFso.FolderExists(mInfos.DriveSdk) Then
             onSdkChange = True
         Else
-            msgboxPathNotExist(mInfos.Sdk)
+            msgboxPathNotExist(mInfos.DriveSdk)
             Call setElementValue(getSdkPathInputId(), "")
             mInfos.Sdk = ""
             onSdkChange = False
@@ -994,7 +1004,7 @@ Class ProjectInputs
     End Function
 
     Public Function onProjectChange()
-        Call mIp.cutProjectInOpenPath()
+        'Call mIp.cutProjectInOpenPath()
 
         mInfos.Project = Project
         mInfos.ProjectAlps = ""
@@ -1029,4 +1039,18 @@ Class ProjectInputs
         mInfos.Zentao = Zentao
     End Sub
 
+End Class
+
+
+
+Class SaveString
+    Private mStr
+
+    Public Property Let Str(value)
+        mStr = value
+    End Property
+
+    Public Sub copy()
+        Call CopyString(mStr)
+    End Sub
 End Class

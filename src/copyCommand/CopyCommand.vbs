@@ -86,10 +86,61 @@ Sub CopyCleanCommand()
 	Call CopyString(commandFinal)
 End Sub
 
-Sub CopyCommitInfo()
+Sub CopyCommitInfo(what)
     If Not mIp.hasProjectInfos() Then Exit Sub
-	commandFinal = "[" & mIp.Infos.Project & "] : "
-	Call CopyString(commandFinal)
+    If what = "" Then
+	    commandFinal = "[" & mIp.Infos.Project & "] : "
+        Call CopyString(commandFinal)
+        Exit Sub
+
+    ElseIf what = "lg" Then
+        commandFinal = "Logo [" & mIp.Infos.Project & "] : 客制开机logo"
+    ElseIf what = "ani" Then
+        commandFinal = "BootAnimation [" & mIp.Infos.Project & "] : 客制开机动画"
+    ElseIf what = "wp" Then
+        commandFinal = "Wallpaper [" & mIp.Infos.Project & "] : 客制默认壁纸"
+    ElseIf what = "loc" Then
+        commandFinal = "Locale [" & mIp.Infos.Project & "] : 默认语言"
+    ElseIf what = "tz" Then
+        commandFinal = "Timezone [" & mIp.Infos.Project & "] : 默认时区"
+    ElseIf what = "di" Then
+        commandFinal = "DisplayId [" & mIp.Infos.Project & "] : 版本号"
+    ElseIf what = "bn" Then
+        commandFinal = "BuildNumber [" & mIp.Infos.Project & "] : build number "
+    ElseIf what = "bm" Then
+        commandFinal = "MMI [" & mIp.Infos.Project & "] : 品牌，型号"
+    ElseIf what = "bwm" Then
+        commandFinal = "MMI [" & mIp.Infos.Project & "] : 蓝牙、WiFi热点、WiFi直连、盘符"
+    ElseIf what = "mmi" Then
+        commandFinal = "MMI [" & mIp.Infos.Project & "] : "
+    ElseIf what = "st" Then
+        commandFinal = "Settings [" & mIp.Infos.Project & "] : "    
+    ElseIf what = "su" Then
+        commandFinal = "SystemUI [" & mIp.Infos.Project & "] : "
+    ElseIf what = "lac" Then
+        commandFinal = "Launcher [" & mIp.Infos.Project & "] : "
+    ElseIf what = "bt" Then
+        commandFinal = "Bluetooth [" & mIp.Infos.Project & "] : 默认蓝牙名称"
+    ElseIf what = "wfap" Then
+        commandFinal = "WiFi [" & mIp.Infos.Project & "] : 默认WiFi热点名称"
+    ElseIf what = "wfdrt" Then
+        commandFinal = "WiFi [" & mIp.Infos.Project & "] : 默认WiFi直连名称"
+    ElseIf what = "mtp" Then
+        commandFinal = "MTP [" & mIp.Infos.Project & "] : 默认盘符名称"
+    ElseIf what = "brt" Then
+        commandFinal = "Brightness [" & mIp.Infos.Project & "] : 默认亮度"
+    ElseIf what = "ad" Then
+        commandFinal = "Audio [" & mIp.Infos.Project & "] : 默认音量"
+    ElseIf what = "slp" Then
+        commandFinal = "Settings [" & mIp.Infos.Project & "] : 默认休眠时间"
+    ElseIf what = "hp" Then
+        commandFinal = "Browser [" & mIp.Infos.Project & "] : 默认网址"
+    ElseIf what = "bat" Then
+        commandFinal = "Battery [" & mIp.Infos.Project & "] : 电池检测容量"
+    ElseIf what = "app" Then
+        commandFinal = "App [" & mIp.Infos.Project & "] : "
+    End If
+	Call CopyQuoteString("""git add weibu;git commit -m ""&Chr(34)&""" & commandFinal & """&Chr(34)")
 End Sub
 
 Sub CopyDriverCommitInfo()
@@ -110,29 +161,27 @@ End Sub
 Sub MkdirWeibuFolderPath()
     If Not mIp.hasProjectInfos() Then Exit Sub
     Dim path : path = getOpenPath()
-    Dim wholePath : wholePath = mIp.Infos.Sdk & "/" & path
-    Dim folderPartPath, folderWholePath
+    Dim folderPath
     Dim mkdirCmd, cpCmd
     commandFinal = ""
 
-    If oFso.FileExists(wholePath) Or oFso.FolderExists(wholePath) Then
+    If isFileExists(path) Or isFolderExists(path) Then
         Dim index : index = InStrRev(path, "/")
-        folderPartPath = Left(path, index)
-        folderWholePath = mIp.Infos.Sdk & "/" & folderPartPath
+        folderPath = Left(path, index)
 
-        If oFso.FolderExists(folderWholePath) Then
+        If isFolderExists(folderPath) Then
 
-            If Not oFso.FolderExists(mIp.Infos.getOverlaySdkPath(folderPartPath)) Then
-                mkdirCmd = "mkdir -p " & mIp.Infos.getOverlayPath(folderPartPath) & ";"
+            If Not isFolderExists(mIp.Infos.getOverlayPath(folderPath)) Then
+                mkdirCmd = "mkdir -p " & mIp.Infos.getOverlayPath(folderPath) & ";"
             End If
 
             commandFinal = mkdirCmd
         End If
     End If
 
-    If oFso.FileExists(wholePath) Then
-        If Not oFso.FileExists(mIp.Infos.getOverlaySdkPath(path)) Then
-            cpCmd = "cp " & path & " " & mIp.Infos.getOverlayPath(folderPartPath)
+    If isFileExists(path) Then
+        If Not isFileExists(mIp.Infos.getOverlayPath(path)) Then
+            cpCmd = "cp " & path & " " & mIp.Infos.getOverlayPath(folderPath)
         Else
             MsgBox("File exist!")
         End If
@@ -145,5 +194,23 @@ End Sub
 
 Sub copyExportToolsPathCmd()
     commandFinal = "export PATH=$HOME/Tools:$PATH"
+    Call CopyString(commandFinal)
+End Sub
+
+Sub CopyPathInWindows()
+    If oFso.FileExists(mIp.Infos.getOverlaySdkPath(getOpenPath())) Then
+        commandFinal = mIp.Infos.getPathWithDriveSdk(Replace(mIp.Infos.getOverlayPath(getOpenPath()), "/", "\"))
+    Else
+        commandFinal = mIp.Infos.getPathWithDriveSdk(Replace(getOpenPath(), "/", "\"))
+    End If
+    Call CopyString(commandFinal)
+End Sub
+
+Sub CopyPathInLinux()
+    If oFso.FileExists(mIp.Infos.getOverlaySdkPath(getOpenPath())) Then
+        commandFinal = mIp.Infos.getOverlaySdkPath(getOpenPath())
+    Else
+        commandFinal = mIp.Infos.Sdk & "\" & getOpenPath()
+    End If
     Call CopyString(commandFinal)
 End Sub

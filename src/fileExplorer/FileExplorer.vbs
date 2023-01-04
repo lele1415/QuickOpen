@@ -24,7 +24,7 @@ Sub initNewExplorerPath(doWhat)
 	End If
 
 	If doWhat <> EXP_HIDE Then
-		Dim rootPath : rootPath = mIp.Infos.Sdk & "\" & getOpenPath()
+		Dim rootPath : rootPath = mIp.Infos.getPathWithDriveSdk(getOpenPath())
 		If isValidRootPath(rootPath) Then
 		    Call showExplorerButtons(False)
 			Call addRootPath(rootPath)
@@ -183,7 +183,7 @@ End Sub
 
 Sub updateOpenPath(fileName)
 	Dim path
-	path = Replace(sCrtPath, mIp.Infos.Sdk & "\", "")
+	path = Replace(sCrtPath, mIp.Infos.DriveSdk & "\", "")
 	path = Replace(path, "\", "/")
 
 	If fileName <> "" Then

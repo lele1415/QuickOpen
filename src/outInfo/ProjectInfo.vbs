@@ -34,14 +34,14 @@ Sub getProjectConfigMk()
         pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & mIp.Infos.DriverProject & "/config/ProjectConfig.mk"
         If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
     Else
-        pMMIProjectConfigMk = mIp.Infos.getOverlaySdkPath("/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
+        pMMIProjectConfigMk = mIp.Infos.getOverlaySdkPath("device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
         If Not oFso.FileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
 
-        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & mIp.Infos.DriverProject & "/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
+        pDriverProjectConfigMk = mIp.Infos.getDriverOverlaySdkPath("device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
         If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
     End If
     
-    pDeviceProjectConfigMk = mIp.Infos.Sdk & "/device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
+    pDeviceProjectConfigMk = mIp.Infos.getPathWithDriveSdk("device/mediateksample/") & mIp.Infos.Product & "/ProjectConfig.mk"
     If Not oFso.FileExists(pDeviceProjectConfigMk) Then pDeviceProjectConfigMk = ""
 End Sub
 
@@ -76,4 +76,7 @@ Sub closeProjectInfos()
     Call showElement(ID_BUTTON_SHOW_PROJECT_INFOS)
 End Sub
 
+Function getPlatform()
+    getPlatform = readTextAndGetValue("CUSTOM_HAL_COMBO", pDeviceProjectConfigMk)
+End Function
 

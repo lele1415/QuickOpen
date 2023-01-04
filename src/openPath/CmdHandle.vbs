@@ -17,7 +17,7 @@ Function HandleFolderPathCmd()
 	HandleFolderPathCmd = True
 	If mCmdInput.text = "m" Then Call runPath(mIp.Infos.ProjectSdkPath) : Exit Function
 	If mCmdInput.text = "d" Then Call runPath(mIp.Infos.DriverProjectSdkPath) : Exit Function
-	If mCmdInput.text = "rom" Then Call runPath(Left(mIp.Infos.Sdk, InStr(mIp.Infos.Sdk, "alps") - 1) & "ROM") : Exit Function
+	If mCmdInput.text = "rom" Then Call runPath(Left(mIp.Infos.DriveSdk, InStr(mIp.Infos.DriveSdk, "alps") - 1) & "ROM") : Exit Function
 	If mCmdInput.text = "out" Then Call runPath(mIp.Infos.OutSdkPath) : Exit Function
 	If mCmdInput.text = "oa" Then Call runPath(mIp.Infos.OutSdkPath & "/obj/APPS") : Exit Function
 	If mCmdInput.text = "os" Then Call runPath(mIp.Infos.OutSdkPath & "/system/system_ext/priv-app") : Exit Function
@@ -40,7 +40,7 @@ End Function
 
 Function HandleFilePathCmd()
 	HandleFilePathCmd = True
-	If mCmdInput.text = "b" Then Call runPath(mIp.Infos.Sdk & "/build.log") : Exit Function
+	If mCmdInput.text = "b" Then Call runPath(mIp.Infos.getPathWithDriveSdk("build.log")) : Exit Function
 	If mCmdInput.text = "sb" Then Call runPath(mIp.Infos.OutSdkPath & "/system/build.prop") : Exit Function
 	If mCmdInput.text = "vb" Then Call runPath(mIp.Infos.OutSdkPath & "/vendor/build.prop") : Exit Function
 	If mCmdInput.text = "pb" Then Call runPath(mIp.Infos.OutSdkPath & "/product/etc/build.prop") : Exit Function
@@ -58,14 +58,15 @@ Function HandleFilePathCmd()
 	'If mCmdInput.text = "cc" Then Call setPathFromCmd("device/mediatek/vendor/common/custom.conf") : Exit Function
 	If mCmdInput.text = "fwc" Then Call setPathFromCmd("frameworks/base/core/res/res/values/config.xml") : Exit Function
 	If mCmdInput.text = "fws" Then Call setPathFromCmd("frameworks/base/core/res/res/values/strings.xml") : Exit Function
-	If mCmdInput.text = "tz" Then Call runPath("frameworks/base/packages/SettingsLib/res/xml/timezones.xml") : Exit Function
+	If mCmdInput.text = "tz" Then Call setPathFromCmd("frameworks/base/packages/SettingsLib/res/xml/timezones.xml") : Exit Function
+	If mCmdInput.text = "tz2" Then Call setPathFromCmd("system/timezone/output_data/android/tzlookup.xml") : Exit Function
 	If mCmdInput.text = "dc" Then Call setPathFromCmd("[kernel_version]/arch/[target_arch]/configs/[product]_defconfig") : Exit Function
 	If mCmdInput.text = "ddc" Then Call setPathFromCmd("[kernel_version]/arch/[target_arch]/configs/[product]_debug_defconfig") : Exit Function
 	If mCmdInput.text = "mtp" Then Call setPathFromCmdAndCopyKey("getDeviceProperty", "frameworks/base/media/java/android/mtp/MtpDatabase.java") : Exit Function
-	If mCmdInput.text = "wifiap" Then Call setPathFromCmdAndCopyKey("getDefaultApConfiguration", "packages/modules/Wifi/service/java/com/android/server/wifi/WifiApConfigStore.java") : Exit Function
-	If mCmdInput.text = "wifidrt" Then Call setPathFromCmdAndCopyKey("getPersistedDeviceName", "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java") : Exit Function
+	If mCmdInput.text = "wfap" Then Call setPathFromCmdAndCopyKey("getDefaultApConfiguration", "packages/modules/Wifi/service/java/com/android/server/wifi/WifiApConfigStore.java") : Exit Function
+	If mCmdInput.text = "wfdrt" Then Call setPathFromCmdAndCopyKey("getPersistedDeviceName", "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java") : Exit Function
 	If mCmdInput.text = "bt" Then Call setPathFromCmdAndCopyKey("btif_default_local_name", "system/bt/btif/src/btif_dm.cc") : Exit Function
-	If mCmdInput.text = "st-device" Then Call setPathFromCmdAndCopyKey("battery.capacity", "vendor/mediatek/proprietary/packages/apps/MtkSettings/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java") : Exit Function
+	If mCmdInput.text = "st-device" Then Call setPathFromCmdAndCopyKey("initializeDeviceName", "vendor/mediatek/proprietary/packages/apps/MtkSettings/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java") : Exit Function
 	If mCmdInput.text = "bat" Then Call setPathFromCmdAndCopyKey("battery.capacity", "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml") : Exit Function
 	If mCmdInput.text = "suc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI/res/values/config.xml") : Exit Function
 	If mCmdInput.text = "spdf" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml") : Exit Function
@@ -74,6 +75,7 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "lgu" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_uboot.bmp") : Exit Function
 	If mCmdInput.text = "lgk" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_kernel.bmp") : Exit Function
 	If mCmdInput.text = "ani" Then Call setPathFromCmd("vendor/weibu_sz/media/bootanimation.zip") : Exit Function
+	If mCmdInput.text = "pdt" Then Call setPathFromCmd("vendor/weibu_sz/products/products.mk") : Exit Function
 	If mCmdInput.text = "label" Then Call setPathFromCmd("vendor/mediatek/proprietary/buildinfo_sys/label.ini") : Exit Function
 	HandleFilePathCmd = False
 End Function
@@ -99,7 +101,8 @@ Function handleGetInfo()
 	If mCmdInput.text = "getfp" Then Call setOpenPath(getOutInfo("ro.system.build.fingerprint")) : Exit Function
 	If mCmdInput.text = "getsp" Then Call setOpenPath(getOutInfo("ro.build.version.security_patch")) : Exit Function
 	If mCmdInput.text = "getbo" Then Call setOpenPath(getOutInfo("ro.build.version.base_os")) : Exit Function
-	If mCmdInput.text = "getplf" Then Call setOpenPath(getOutInfo("ro.board.platform")) : Exit Function
+	If mCmdInput.text = "getplf" Then Call setOpenPath(getPlatform()) : Exit Function
+	If mCmdInput.text = "getgmsv" Then Call setOpenPath(getGmsVersion()) : Exit Function
     handleGetInfo = False
 End Function
 
@@ -130,9 +133,9 @@ Function handleOpenPathCmd()
 	If mCmdInput.text = "addd" Then Call addDriverProjectPath() : Exit Function
 	If mCmdInput.text = "cuts" Then Call cutSdkPath() : Exit Function
 	If mCmdInput.text = "cutp" Then Call cutProjectPath() : Exit Function
-	If mCmdInput.text = "comp" Then Call compareForProject() : Exit Function
-	If mCmdInput.text = "comps" Then Call selectForCompare() : Exit Function
-	If mCmdInput.text = "compt" Then Call compareTo() : Exit Function
+	If mCmdInput.text = "cp" Then Call compareForProject() : Exit Function
+	If mCmdInput.text = "cs" Then Call selectForCompare() : Exit Function
+	If mCmdInput.text = "ct" Then Call compareTo() : Exit Function
 	If mCmdInput.text = "fmw" Then Call openFirmwareFolder() : Exit Function
 	If mCmdInput.text = "req" Then Call openRequirementsFolder() : Exit Function
 	If mCmdInput.text = "zt" Then Call openZentao() : Exit Function
@@ -151,14 +154,21 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "bmko" Then Call getMakeCommand(False, True, True) : Exit Function
 	If mCmdInput.text = "omko" Then Call getMakeCommand(True, False, True) : Exit Function
 	If mCmdInput.text = "md" Then Call MkdirWeibuFolderPath() : Exit Function
-	If mCmdInput.text = "cm" Then Call CopyCommitInfo() : Exit Function
+	If mCmdInput.text = "cm" Then Call CopyCommitInfo("") : Exit Function
+	If InStr(mCmdInput.text, "cm-") = 1 Then Call CopyCommitInfo(Replace(mCmdInput.text, "cm-", "")) : Exit Function
 	If mCmdInput.text = "dcm" Then Call CopyDriverCommitInfo() : Exit Function
 	If mCmdInput.text = "ota" Then Call CopyBuildOtaUpdate() : Exit Function
 	If mCmdInput.text = "cc" Then Call CopyCleanCommand() : Exit Function
 	If mCmdInput.text = "outp" Then Call CommandOfOut() : Exit Function
+	If mCmdInput.text = "winp" Then Call CopyPathInWindows() : Exit Function
+	If mCmdInput.text = "lnxp" Then Call CopyPathInLinux() : Exit Function
+	If mCmdInput.text = "ps-su" Then Call CopyAdbPushCmd("su") : Exit Function
+	If mCmdInput.text = "ps-st" Then Call CopyAdbPushCmd("st") : Exit Function
+	If mCmdInput.text = "ps-sl" Then Call CopyAdbPushCmd("sl") : Exit Function
 	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
 	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
+	If mCmdInput.text = "ss" Then Call mSaveString.copy() : Exit Function
     handleCopyCommandCmd = False
 End Function
 
@@ -172,6 +182,15 @@ Function handleProjectCmd()
 		    	Exit Function
 		    End If
 		Next
+	ElseIf mCmdInput.text = "z" Or mCmdInput.text = "z6" Or mCmdInput.text = "x" Then
+	    Call setDrive(mCmdInput.text)
+		Exit Function
+	ElseIf mCmdInput.text = "8766s" Or mCmdInput.text = "8168s" Or mCmdInput.text = "8766r" Then
+	    Call setSdk(mCmdInput.text)
+		Exit Function
+	ElseIf mCmdInput.text = "pp" Then
+	    Call applyProjectPath()
+		Exit Function
 	End If
 	handleProjectCmd = False
 End Function
@@ -193,28 +212,30 @@ End Sub
 Sub setPathFromCmdAndCopyKey(key, path)
 	Call setOpenPath(path)
 	Call onOpenPathChange()
-	Call CopyString(key)
+	mSaveString.str = key
 End Sub
 
 Function getMultiMkdirStr(arr, what)
-    Dim str, path
+    Dim str, path, ovlFolder, ovlFile
     For Each path In arr
-	    If Not (what = "lg" And InStr(path, "_kernel.bmp") > 0) Then
-	        str =  str & "mkdir -p " & mIp.Infos.getOverlayPath(getFolderPath(path)) & ";"
+	    ovlFolder = mIp.Infos.getOverlayPath(getFolderPath(path))
+	    ovlFile = mIp.Infos.getOverlayPath(path)
+	    If (Not (what = "lg" And InStr(path, "_kernel.bmp") > 0)) And (Not isFolderExists(ovlFolder)) Then
+	        str =  str & "mkdir -p " & ovlFolder & ";"
 		End If
 
 	    If what = "lg" Then
-	        str =  str & "cp ../File/logo.bmp " & mIp.Infos.getOverlayPath(path) & ";"
+	        str =  str & "cp ../File/logo.bmp " & ovlFile & ";"
 		ElseIf what = "ani" And InStr(path, "bootanimation.zip") > 0 Then
-	        str =  str & "cp ../File/bootanimation.zip " & mIp.Infos.getOverlayPath(path) & ";"
+	        str =  str & "cp ../File/bootanimation.zip " & ovlFile & ";"
 		ElseIf what = "wp" Then
 		    If InStr(path, "default_wallpaper.png") > 0 Then
-	            str =  str & "cp ../File/default_wallpaper.png " & mIp.Infos.getOverlayPath(path) & ";"
+	            str =  str & "cp ../File/default_wallpaper.png " & ovlFile & ";"
 			ElseIf InStr(path, "default_wallpaper.jpg") > 0 Then
-	            str =  str & "cp ../File/default_wallpaper.jpg " & mIp.Infos.getOverlayPath(path) & ";"
+	            str =  str & "cp ../File/default_wallpaper.jpg " & ovlFile & ";"
 			End If
 		Else
-		    str =  str & "cp " & path & " " & mIp.Infos.getOverlayPath(path) & ";"
+		    str =  str & "cp " & path & " " & ovlFile & ";"
 		End If
 	Next
 	getMultiMkdirStr = str
@@ -246,9 +267,9 @@ End Sub
 Sub modDisplayIdForOtaTest()
 	Dim buildinfo, keyStr, sedStr
 	buildinfo = mIp.Infos.ProjectPath & "/config/buildinfo.sh"
-	If Not oFso.FileExists(mIp.Infos.Sdk & "/" & buildinfo) Then buildinfo = mIp.Infos.DriverProjectPath & "/config/buildinfo.sh"
-	If Not oFso.FileExists(mIp.Infos.Sdk & "/" & buildinfo) Then buildinfo = mIp.Infos.getOverlayPath("build/make/tools/buildinfo.sh")
-	If Not oFso.FileExists(mIp.Infos.Sdk & "/" & buildinfo) Then MsgBox("No buildinfo.sh found in overlay") : Exit Sub
+	If Not oFso.FileExists(mIp.Infos.getPathWithDriveSdk(buildinfo)) Then buildinfo = mIp.Infos.DriverProjectPath & "/config/buildinfo.sh"
+	If Not oFso.FileExists(mIp.Infos.getPathWithDriveSdk(buildinfo)) Then buildinfo = mIp.Infos.getOverlayPath("build/make/tools/buildinfo.sh")
+	If Not oFso.FileExists(mIp.Infos.getPathWithDriveSdk(buildinfo)) Then MsgBox("No buildinfo.sh found in overlay") : Exit Sub
 
 	keyStr = "ro.build.display.id"
 	If InStr(buildinfo, "/config/") Then
@@ -301,3 +322,25 @@ Sub mkdirWallpaper(go)
     finalStr = getMultiMkdirStr(arr, "wp")
     Call CopyString(finalStr)
 End Sub
+
+Sub CopyAdbPushCmd(which)
+    Dim sourcePath, targetPath, finalStr
+    If which = "su" Then
+	    sourcePath = mIp.Infos.OutSdkPath & "\system\system_ext\priv-app\MtkSystemUI"
+		targetPath = "/system/system_ext/priv-app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+	ElseIf which = "st" Then
+	    sourcePath = mIp.Infos.OutSdkPath & "\system\system_ext\priv-app\MtkSettings"
+		targetPath = "/system/system_ext/priv-app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+	ElseIf which = "sl" Then
+	    sourcePath = mIp.Infos.OutSdkPath & "\system\system_ext\priv-app\SearchLauncherQuickStep"
+		targetPath = "/system/system_ext/priv-app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+	End If
+	Call CopyString(finalStr)
+End Sub
+
+Function getGmsVersion()
+    getGmsVersion = readTextAndGetValue("GMS_PACKAGE_VERSION_ID", mIp.Infos.getPathWithDriveSdk("vendor/partner_gms/products/gms_package_version.mk"))
+End Function
