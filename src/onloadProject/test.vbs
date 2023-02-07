@@ -31,7 +31,7 @@ Option Explicit
 'MsgBox(str)
 
 'path = "weibu/tb8766p1_64_bsp/M863Y_YUKE_066/config"
-'str = Replace(path, "\", "/")
+'str = relpaceSlashInPath(path)
 'If InStr(str, "/") > 0 Then
 '    str = Replace(str, Left(str, InStrRev(str, "/")), "")
 'Else

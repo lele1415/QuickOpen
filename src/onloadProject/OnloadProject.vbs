@@ -60,11 +60,11 @@ End Sub
 
 Sub findProduct()
 	window.clearTimeout(idTimer)
-	If Not oFso.FolderExists(mIp.Infos.WeibuSdkPath) Then
-		MsgBox "Not found: " & mIp.Infos.WeibuSdkPath
+	If Not isFolderExists("weibu") Then
+		MsgBox "Not found: weibu/"
 		Exit Sub
 	End If
-	Set vaTargetProduct = searchFolder(mIp.Infos.WeibuSdkPath, "_bsp", _
+	Set vaTargetProduct = searchFolder("weibu", "_bsp", _
 		    SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub
 
@@ -86,7 +86,7 @@ End Sub
 
 Sub findProject()
 	window.clearTimeout(idTimer)
-	Set vaCustomProject = searchFolder(mIp.Infos.ProductSdkPath, "", _
+	Set vaCustomProject = searchFolder(mIp.Infos.ProductPath, "", _
 		    SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 	If vaCustomProject.Bound = -1 Then MsgBox("No project found!") : Exit Sub
 

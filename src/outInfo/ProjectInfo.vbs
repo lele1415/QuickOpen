@@ -28,21 +28,21 @@ End Function
 
 Sub getProjectConfigMk()
     If mIp.hasProjectAlps() Then
-        pMMIProjectConfigMk = mIp.Infos.ProjectSdkPath & "/config/ProjectConfig.mk"
-        If Not oFso.FileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
+        pMMIProjectConfigMk = mIp.Infos.ProjectPath & "/config/ProjectConfig.mk"
+        If Not isFileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
 
-        pDriverProjectConfigMk = mIp.Infos.ProductSdkPath & "/" & mIp.Infos.DriverProject & "/config/ProjectConfig.mk"
-        If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
+        pDriverProjectConfigMk = mIp.Infos.ProductPath & "/" & mIp.Infos.DriverProject & "/config/ProjectConfig.mk"
+        If Not isFileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
     Else
-        pMMIProjectConfigMk = mIp.Infos.getOverlaySdkPath("device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
-        If Not oFso.FileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
+        pMMIProjectConfigMk = mIp.Infos.getOverlayPath("device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
+        If Not isFileExists(pMMIProjectConfigMk) Then pMMIProjectConfigMk = ""
 
-        pDriverProjectConfigMk = mIp.Infos.getDriverOverlaySdkPath("device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
-        If Not oFso.FileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
+        pDriverProjectConfigMk = mIp.Infos.getDriverOverlayPath("device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk")
+        If Not isFileExists(pDriverProjectConfigMk) Then pDriverProjectConfigMk = ""
     End If
     
-    pDeviceProjectConfigMk = mIp.Infos.getPathWithDriveSdk("device/mediateksample/") & mIp.Infos.Product & "/ProjectConfig.mk"
-    If Not oFso.FileExists(pDeviceProjectConfigMk) Then pDeviceProjectConfigMk = ""
+    pDeviceProjectConfigMk = "device/mediateksample/" & mIp.Infos.Product & "/ProjectConfig.mk"
+    If Not isFileExists(pDeviceProjectConfigMk) Then pDeviceProjectConfigMk = ""
 End Sub
 
 Sub getProjectInfos()
@@ -79,4 +79,5 @@ End Sub
 Function getPlatform()
     getPlatform = readTextAndGetValue("CUSTOM_HAL_COMBO", pDeviceProjectConfigMk)
 End Function
+
 

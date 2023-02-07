@@ -14,7 +14,7 @@ Sub addSdkPathList()
 End Sub
 
 Sub readSdkPathText()
-    If Not oFso.FileExists(pSdkPathText) Then Exit Sub
+    If Not isFileExists(pSdkPathText) Then Exit Sub
     
     Dim oText, sReadLine
     Set oText = oFso.OpenTextFile(pSdkPathText, FOR_READING)
@@ -48,7 +48,7 @@ Sub getAllSdkPath(oText, sReadLine)
 End Sub
 
 Sub readTextAndDoSomething(path, strFun)
-    If Not oFso.FileExists(path) Then Exit Sub
+    If Not isFileExists(path) Then Exit Sub
     
     Dim oText, sReadLine, exitFlag
     Set oText = oFso.OpenTextFile(path, FOR_READING)

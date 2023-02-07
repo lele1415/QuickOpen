@@ -135,13 +135,13 @@ Sub addFile()
 End Sub
 
 Sub openFolder(path)
-	If oFso.FolderExists(path) Then
+	If isFolderExists(path) Then
 		oWs.Run "explorer.exe " & path
 	End If
 End Sub
 
 Sub openFile(path)
-	If oFso.FileExists(path) Then
+	If isFileExists(path) Then
 		oWs.Run mTextEditorPath & " " & path
 	End If
 End Sub
@@ -151,10 +151,10 @@ End Sub
 Function isValidRootPath(rootPath)
 	If mIp.hasProjectInfos() Then
 	    rootPath = Replace(rootPath, "/", "\")
-		If oFso.FolderExists(rootPath) Then
+		If isFolderExists(rootPath) Then
 			If Right(rootPath, 1) = "\" Then rootPath = Mid(rootPath, 1, Len(rootPath) - 1)
 		    isValidRootPath = True
-		ElseIf oFso.FileExists(rootPath) Then
+		ElseIf isFileExists(rootPath) Then
 		    rootPath = Left(rootPath, InStrRev(rootPath, "\"))
 		    isValidRootPath = True
 	    Else
@@ -184,7 +184,7 @@ End Sub
 Sub updateOpenPath(fileName)
 	Dim path
 	path = Replace(sCrtPath, mIp.Infos.DriveSdk & "\", "")
-	path = Replace(path, "\", "/")
+	path = relpaceSlashInPath(path)
 
 	If fileName <> "" Then
 	    path = path & "/" & fileName

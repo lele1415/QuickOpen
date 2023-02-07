@@ -13,8 +13,9 @@ Const SEARCH_ALL = 1
 Const SEARCH_RETURN_PATH = 0
 Const SEARCH_RETURN_NAME = 1
 
-Function searchFolder(pRootFolder, str, searchType, searchWhere, searchMode, searchTimes, returnType)
-    If Not oFso.FolderExists(pRootFolder) Then searchFolder = "" : Exit Function
+Function searchFolder(path, str, searchType, searchWhere, searchMode, searchTimes, returnType)
+    Dim pRootFolder : pRootFolder = checkDriveSdkPath(path)
+    If Not isFolderExists(pRootFolder) Then searchFolder = "" : Exit Function
     If searchMode = SEARCH_WHOLE_NAME Then searchTimes = SEARCH_ONE
 
     Dim oRootFolder : Set oRootFolder = oFso.GetFolder(pRootFolder)
@@ -152,7 +153,7 @@ Sub showElement(elementId)
 End Sub
 
 Function initTxtFile(FilePath)
-    If oFso.FileExists(FilePath) Then
+    If isFileExists(FilePath) Then
         Dim TxtFile
         Set TxtFile = oFso.getFile(FilePath)
         TxtFile.Delete
@@ -212,27 +213,24 @@ Sub exitCmdMode()
 End Sub
 
 Function isFileExists(path)
-    If mIp.hasProjectInfos() Then
-        isFileExists = oFso.FileExists(mIp.Infos.getPathWithDriveSdk(path))
-    Else
-        isFileExists = False
-    End If
+    Dim newPath
+    newPath = checkDriveSdkPath(path)
+    isFileExists = oFso.FileExists(newPath)
 End Function
 
 Function isFolderExists(path)
-    If mIp.hasProjectInfos() Then
-        isFolderExists = oFso.FolderExists(mIp.Infos.getPathWithDriveSdk(path))
-    Else
-        isFolderExists = False
-    End If
+    Dim newPath
+    newPath = checkDriveSdkPath(path)
+    isFolderExists = oFso.FolderExists(newPath)
 End Function
 
 Function readTextAndGetValue(keyStr, filePath)
-    If Not oFso.FileExists(filePath) Then Exit Function
+    Dim path : path = checkDriveSdkPath(filePath)
+    If Not isFileExists(path) Then Exit Function
     
     Dim oText, sReadLine, flag
     flag = False
-    Set oText = oFso.OpenTextFile(filePath, FOR_READING)
+    Set oText = oFso.OpenTextFile(path, FOR_READING)
 
     Do Until oText.AtEndOfStream
         sReadLine = Trim(oText.ReadLine)
@@ -253,6 +251,10 @@ Function readTextAndGetValue(keyStr, filePath)
     oText.Close
     Set oText = Nothing
     If Not flag Then readTextAndGetValue = ""
+End Function
+
+Function relpaceSlashInPath(path)
+    relpaceSlashInPath = Replace(path, "\", "/")
 End Function
 
 Function isEndWith(str, endStr)
@@ -276,7 +278,7 @@ End Function
 
 Function getFileNameFromPath(path)
     Dim str
-    str = Replace(path, "\", "/")
+    str = relpaceSlashInPath(path)
     If InStr(str, "/") > 0 Then
         str = Replace(str, Left(str, InStrRev(str, "/")), "")
     Else
@@ -287,7 +289,7 @@ End Function
 
 Function getFolderPath(filePath)
     Dim str
-    str = Replace(filePath, "\", "/")
+    str = relpaceSlashInPath(filePath)
     If InStr(str, "/") > 0 Then
         str = Left(str, InStrRev(str, "/") - 1)
     Else
@@ -298,8 +300,8 @@ End Function
 
 Function getTabStr()
     Dim folderPath
-    folderPath = mIp.Infos.getPathWithDriveSdk(getFolderPath(getOpenPath()))
-    If Not oFso.FolderExists(folderPath) Then getTabStr = "" : Exit Function
+    folderPath = getFolderPath(getOpenPath())
+    If Not isFolderExists(folderPath) Then getTabStr = "" : Exit Function
     
     Dim input, vaFileFolder, sameStartStr
     input = getFileNameFromPath(getOpenPath())
@@ -316,7 +318,7 @@ End Function
 Function getSameStartStrFromArray(folderPath, input, vaStr)
     If vaStr.Bound = -1 Then getSameStartStrFromArray = "" : Exit Function
     If vaStr.Bound = 0 Then
-        If oFso.FolderExists(folderPath & "/" & vaStr.V(0)) Then
+        If isFolderExists(folderPath & "/" & vaStr.V(0)) Then
             getSameStartStrFromArray = vaStr.V(0) & "/" : Exit Function
         Else
             getSameStartStrFromArray = vaStr.V(0) : Exit Function
@@ -424,40 +426,51 @@ Sub showHistoryPath(keyCode)
     End If
 End Sub
 
+Function checkDriveSdkPath(path)
+    If InStr(path, ":\") = 0 And InStr(path, "\\192.168") = 0 Then
+        checkDriveSdkPath = mIp.Infos.getPathWithDriveSdk(path)
+    Else
+        checkDriveSdkPath = path
+    End If
+End Function
+
 Sub runPath(path)
+    Dim p : p = checkDriveSdkPath(path)
     Dim success : success = False
-    path = Replace(path, "/", "\")
-    If oFso.FolderExists(path) Then
-        oWs.Run "explorer.exe " & path
+    p = Replace(p, "/", "\")
+    If isFolderExists(p) Then
+        oWs.Run "explorer.exe " & p
         success = True
-    ElseIf oFso.FileExists(path) Then
-        If isPictureFilePath(path) Or isCompressFilePath(path) Then
-            oWs.Run "explorer.exe " & path
+    ElseIf isFileExists(p) Then
+        If isPictureFilePath(p) Or isCompressFilePath(p) Then
+            oWs.Run "explorer.exe " & p
         Else
-            oWs.Run mTextEditorPath & " " & path
+            oWs.Run mTextEditorPath & " " & p
         End If
         success = True
     Else
-        MsgBox("not found :" & Vblf & path)
+        MsgBox("not found :" & Vblf & p)
     End If
-    If success And InStr(path, mIp.Infos.DriveSdk) > 0 Then Call saveHistoryPath(mIp.cutProject(path))
+    If success And InStr(p, mIp.Infos.DriveSdk) > 0 Then Call saveHistoryPath(mIp.cutProject(p))
 End Sub
 
 Sub runTextPath(path)
-    path = Replace(path, "/", "\")
-    If oFso.FileExists(path) Then
-        oWs.Run mTextEditorPath & " " & path
+    Dim p : p = checkDriveSdkPath(path)
+    p = Replace(p, "/", "\")
+    If isFileExists(p) Then
+        oWs.Run mTextEditorPath & " " & p
     Else
-        MsgBox("not found :" & Vblf & path)
+        MsgBox("not found :" & Vblf & p)
     End If
 End Sub
 
 Sub runFolderPath(path)
-    path = Replace(path, "/", "\")
-    If oFso.FolderExists(path) Then
-        oWs.Run "explorer.exe " & path
+    Dim p : p = checkDriveSdkPath(path)
+    p = Replace(p, "/", "\")
+    If isFolderExists(p) Then
+        oWs.Run "explorer.exe " & p
     Else
-        MsgBox("not found :" & Vblf & path)
+        MsgBox("not found :" & Vblf & p)
     End If
 End Sub
 
@@ -466,7 +479,9 @@ Sub runWebsite(path)
 End Sub
 
 Sub runBeyondCompare(leftPath, rightPath)
-    oWs.Run mBeyondComparePath & " " & leftPath & " " & rightPath
+    Dim lp : lp = checkDriveSdkPath(leftPath)
+    Dim rp : rp = checkDriveSdkPath(rightPath)
+    oWs.Run mBeyondComparePath & " " & lp & " " & rp
 End Sub
 
 Sub CopyString(str)
@@ -573,6 +588,9 @@ Sub setSdk(sdk)
             mIp.Sdk = "mt8766_r\alps2"
             Call onSdkPathChange()
         End If
+    ElseIf sdk = "8766r" Then
+        mIp.Sdk = "mt8168_r\alps"
+        Call onSdkPathChange()
     End If
 End Sub
 
@@ -587,4 +605,19 @@ Sub applyProjectPath()
         Call onProjectChange()
     End if
 End Sub
+
+Function strExistInFile(filePath, str)
+    Dim oText, path, sLine
+    path = checkDriveSdkPath(filePath)
+    Set oText = oFso.OpenTextFile(path, FOR_READING)
+
+    Do Until oText.AtEndOfStream
+        sLine = oText.ReadLine
+        If InStr(sLine, str) > 0 Then
+            strExistInFile = True : Exit Function
+        End If
+    Loop
+
+    strExistInFile = False
+End Function
 

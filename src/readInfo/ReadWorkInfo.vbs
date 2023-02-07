@@ -5,7 +5,7 @@ Dim pProjectText : pProjectText = oWs.CurrentDirectory & "\res\project.ini"
 Dim vaWorksInfo : Set vaWorksInfo = New VariableArray
 
 Sub readWorksInfoText()
-    If Not oFso.FileExists(pProjectText) Then Exit Sub
+    If Not isFileExists(pProjectText) Then Exit Sub
     
     Dim oText, sReadLine
     Set oText = oFso.OpenTextFile(pProjectText, FOR_READING, False, True)

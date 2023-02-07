@@ -94,23 +94,23 @@ Sub CopyCommitInfo(what)
         Exit Sub
 
     ElseIf what = "lg" Then
-        commandFinal = "Logo [" & mIp.Infos.Project & "] : ¿ÍÖÆ¿ª»úlogo"
+        commandFinal = "Logo [" & mIp.Infos.Project & "] : å®¢åˆ¶å¼€æœºlogo"
     ElseIf what = "ani" Then
-        commandFinal = "BootAnimation [" & mIp.Infos.Project & "] : ¿ÍÖÆ¿ª»ú¶¯»­"
+        commandFinal = "BootAnimation [" & mIp.Infos.Project & "] : å®¢åˆ¶å¼€æœºåŠ¨ç”»"
     ElseIf what = "wp" Then
-        commandFinal = "Wallpaper [" & mIp.Infos.Project & "] : ¿ÍÖÆÄ¬ÈÏ±ÚÖ½"
+        commandFinal = "Wallpaper [" & mIp.Infos.Project & "] : å®¢åˆ¶é»˜è®¤å£çº¸"
     ElseIf what = "loc" Then
-        commandFinal = "Locale [" & mIp.Infos.Project & "] : Ä¬ÈÏÓïÑÔ"
+        commandFinal = "Locale [" & mIp.Infos.Project & "] : é»˜è®¤è¯­è¨€"
     ElseIf what = "tz" Then
-        commandFinal = "Timezone [" & mIp.Infos.Project & "] : Ä¬ÈÏÊ±Çø"
+        commandFinal = "Timezone [" & mIp.Infos.Project & "] : é»˜è®¤æ—¶åŒº"
     ElseIf what = "di" Then
-        commandFinal = "DisplayId [" & mIp.Infos.Project & "] : °æ±¾ºÅ"
+        commandFinal = "DisplayId [" & mIp.Infos.Project & "] : ç‰ˆæœ¬å·"
     ElseIf what = "bn" Then
         commandFinal = "BuildNumber [" & mIp.Infos.Project & "] : build number "
     ElseIf what = "bm" Then
-        commandFinal = "MMI [" & mIp.Infos.Project & "] : Æ·ÅÆ£¬ĞÍºÅ"
+        commandFinal = "MMI [" & mIp.Infos.Project & "] : å“ç‰Œï¼Œå‹å·"
     ElseIf what = "bwm" Then
-        commandFinal = "MMI [" & mIp.Infos.Project & "] : À¶ÑÀ¡¢WiFiÈÈµã¡¢WiFiÖ±Á¬¡¢ÅÌ·û"
+        commandFinal = "MMI [" & mIp.Infos.Project & "] : è“ç‰™ã€WiFiçƒ­ç‚¹ã€WiFiç›´è¿ã€ç›˜ç¬¦"
     ElseIf what = "mmi" Then
         commandFinal = "MMI [" & mIp.Infos.Project & "] : "
     ElseIf what = "st" Then
@@ -119,26 +119,30 @@ Sub CopyCommitInfo(what)
         commandFinal = "SystemUI [" & mIp.Infos.Project & "] : "
     ElseIf what = "lac" Then
         commandFinal = "Launcher [" & mIp.Infos.Project & "] : "
+    ElseIf what = "cam" Then
+        commandFinal = "Camera [" & mIp.Infos.Project & "] : "
     ElseIf what = "bt" Then
-        commandFinal = "Bluetooth [" & mIp.Infos.Project & "] : Ä¬ÈÏÀ¶ÑÀÃû³Æ"
+        commandFinal = "Bluetooth [" & mIp.Infos.Project & "] : é»˜è®¤è“ç‰™åç§°"
     ElseIf what = "wfap" Then
-        commandFinal = "WiFi [" & mIp.Infos.Project & "] : Ä¬ÈÏWiFiÈÈµãÃû³Æ"
+        commandFinal = "WiFi [" & mIp.Infos.Project & "] : é»˜è®¤WiFiçƒ­ç‚¹åç§°"
     ElseIf what = "wfdrt" Then
-        commandFinal = "WiFi [" & mIp.Infos.Project & "] : Ä¬ÈÏWiFiÖ±Á¬Ãû³Æ"
+        commandFinal = "WiFi [" & mIp.Infos.Project & "] : é»˜è®¤WiFiç›´è¿åç§°"
     ElseIf what = "mtp" Then
-        commandFinal = "MTP [" & mIp.Infos.Project & "] : Ä¬ÈÏÅÌ·ûÃû³Æ"
+        commandFinal = "MTP [" & mIp.Infos.Project & "] : é»˜è®¤ç›˜ç¬¦åç§°"
     ElseIf what = "brt" Then
-        commandFinal = "Brightness [" & mIp.Infos.Project & "] : Ä¬ÈÏÁÁ¶È"
+        commandFinal = "Brightness [" & mIp.Infos.Project & "] : é»˜è®¤äº®åº¦"
     ElseIf what = "ad" Then
-        commandFinal = "Audio [" & mIp.Infos.Project & "] : Ä¬ÈÏÒôÁ¿"
+        commandFinal = "Audio [" & mIp.Infos.Project & "] : é»˜è®¤éŸ³é‡"
     ElseIf what = "slp" Then
-        commandFinal = "Settings [" & mIp.Infos.Project & "] : Ä¬ÈÏĞİÃßÊ±¼ä"
+        commandFinal = "Settings [" & mIp.Infos.Project & "] : é»˜è®¤ä¼‘çœ æ—¶é—´"
     ElseIf what = "hp" Then
-        commandFinal = "Browser [" & mIp.Infos.Project & "] : Ä¬ÈÏÍøÖ·"
+        commandFinal = "Browser [" & mIp.Infos.Project & "] : é»˜è®¤ç½‘å€"
     ElseIf what = "bat" Then
-        commandFinal = "Battery [" & mIp.Infos.Project & "] : µç³Ø¼ì²âÈİÁ¿"
+        commandFinal = "Battery [" & mIp.Infos.Project & "] : ç”µæ± æ£€æµ‹å®¹é‡"
     ElseIf what = "app" Then
         commandFinal = "App [" & mIp.Infos.Project & "] : "
+    Else
+        commandFinal = what & " [" & mIp.Infos.Project & "] : "
     End If
 	Call CopyQuoteString("""git add weibu;git commit -m ""&Chr(34)&""" & commandFinal & """&Chr(34)")
 End Sub
@@ -188,7 +192,7 @@ Sub MkdirWeibuFolderPath()
             commandFinal = mkdirCmd & cpCmd
     End If
 
-    commandFinal = Replace(commandFinal, "\", "/")
+    commandFinal = relpaceSlashInPath(commandFinal)
     Call CopyString(commandFinal)
 End Sub
 
@@ -198,7 +202,7 @@ Sub copyExportToolsPathCmd()
 End Sub
 
 Sub CopyPathInWindows()
-    If oFso.FileExists(mIp.Infos.getOverlaySdkPath(getOpenPath())) Then
+    If isFileExists(mIp.Infos.getOverlayPath(getOpenPath())) Then
         commandFinal = mIp.Infos.getPathWithDriveSdk(Replace(mIp.Infos.getOverlayPath(getOpenPath()), "/", "\"))
     Else
         commandFinal = mIp.Infos.getPathWithDriveSdk(Replace(getOpenPath(), "/", "\"))
@@ -207,10 +211,17 @@ Sub CopyPathInWindows()
 End Sub
 
 Sub CopyPathInLinux()
-    If oFso.FileExists(mIp.Infos.getOverlaySdkPath(getOpenPath())) Then
-        commandFinal = mIp.Infos.getOverlaySdkPath(getOpenPath())
+    If isFileExists(mIp.Infos.getOverlayPath(getOpenPath())) Then
+        commandFinal = mIp.Infos.Sdk & "\" & mIp.Infos.getOverlayPath(getOpenPath())
     Else
         commandFinal = mIp.Infos.Sdk & "\" & getOpenPath()
     End If
     Call CopyString(commandFinal)
+End Sub
+
+Sub copyCdSdkCommand()
+    Dim path, arr
+    arr = Split(mIp.Infos.DriveSdk, ":\")
+    path = relpaceSlashInPath(arr(1))
+    Call CopyString("cd " & path)
 End Sub

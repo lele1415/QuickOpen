@@ -554,23 +554,16 @@ End Class
 
 
 
-Function getWeibuSdkPath(Sdk)
-    getWeibuSdkPath = Sdk & "\weibu"
-End Function
-
 Function getOutPath(Product)
     getOutPath = "out/target/product/" & Product
 End Function
 
-Function getOutSdkPath(Sdk, Product)
-    getOutSdkPath = Sdk & "\out\target\product\" & Product
-End Function
-
-Function getDownloadOutPath(Sdk, Product)
-    If oFso.FolderExists(getOutSdkPath(Sdk, Product) & "\merged") Then
-        getDownloadOutPath = getOutSdkPath(Sdk, Product) & "\merged"
+Function getDownloadOutPath(Product)
+    Dim outPath : outPath = mIp.Infos.getPathWithDriveSdk(getOutPath(Product))
+    If isFolderExists(outPath & "\merged") Then
+        getDownloadOutPath = outPath & "\merged"
     Else
-        getDownloadOutPath = getOutSdkPath(Sdk, Product)
+        getDownloadOutPath = outPath
     End If
 End Function
 
@@ -578,17 +571,10 @@ Function getProductPath(Product)
     getProductPath = "weibu/" & Product
 End Function
 
-Function getProductSdkPath(Sdk, Product)
-    getProductSdkPath = Sdk & "/" & getProductPath(Product)
-End Function
-
 Function getProjectPath(Product, Project)
     getProjectPath = "weibu/" & Product & "/" & Project
 End Function
 
-Function getProjectSdkPath(Sdk, Product, Project)
-    getProjectSdkPath = Sdk & "/" & getProjectPath(Product, Project)
-End Function
 
 Sub msgboxPathNotExist(path)
     If Trim(path) <> "" Then
@@ -652,36 +638,20 @@ Class ProjectInfos
         DriveSdk = mDrive & mSdk
     End Property
 
-    Public Property Get WeibuSdkPath
-        WeibuSdkPath = getWeibuSdkPath(DriveSdk)
-    End Property
-
     Public Property Get OutPath
         OutPath = getOutPath(Product)
     End Property
 
-    Public Property Get OutSdkPath
-        OutSdkPath = getOutSdkPath(DriveSdk, Product)
-    End Property
-
     Public Property Get DownloadOutPath
-        DownloadOutPath = getDownloadOutPath(DriveSdk, Product)
+        DownloadOutPath = getDownloadOutPath(Product)
     End Property
 
     Public Property Get ProductPath
         ProductPath = getProductPath(Product)
     End Property
 
-    Public Property Get ProductSdkPath
-        ProductSdkPath = getProductSdkPath(DriveSdk, Product)
-    End Property
-
     Public Property Get ProjectPath
         ProjectPath = getProjectPath(Product, Project)
-    End Property
-
-    Public Property Get ProjectSdkPath
-        ProjectSdkPath = getProjectSdkPath(DriveSdk, Product, Project)
     End Property
 
     Public Property Get ProjectAlps
@@ -696,10 +666,6 @@ Class ProjectInfos
         DriverProjectPath = getProjectPath(Product, DriverProject)
     End Property
 
-    Public Property Get DriverProjectSdkPath
-        DriverProjectSdkPath = getProjectSdkPath(DriveSdk, Product, DriverProject)
-    End Property
-
     Public Function getPathWithDriveSdk(path)
         getPathWithDriveSdk = DriveSdk & "/" & path
     End Function
@@ -708,16 +674,8 @@ Class ProjectInfos
         getOverlayPath = ProjectPath & ProjectAlps & "/" & path
     End Function
 
-    Public Function getOverlaySdkPath(path)
-        getOverlaySdkPath = ProjectSdkPath & ProjectAlps & "/" & path
-    End Function
-
     Public Function getDriverOverlayPath(path)
         getDriverOverlayPath = DriverProjectPath & ProjectAlps & "/" & path
-    End Function
-
-    Public Function getDriverOverlaySdkPath(path)
-        getDriverOverlaySdkPath = DriverProjectSdkPath & ProjectAlps & "/" & path
     End Function
 
     Sub getBootLogo()
@@ -727,8 +685,8 @@ Class ProjectInfos
 
     Sub getFakeOrientation()
         Dim csciPath
-        csciPath = DriverProjectSdkPath & "/config/csci.ini"
-        If Not oFso.FileExists(csciPath) Then : Exit Sub
+        csciPath = checkDriveSdkPath(DriverProjectPath & "/config/csci.ini")
+        If Not isFileExists(csciPath) Then : Exit Sub
 
         Dim oText, sReadLine
         Set oText = oFso.OpenTextFile(csciPath, FOR_READING)
@@ -743,58 +701,20 @@ Class ProjectInfos
     End Sub
 
     Sub getSysTargetProject()
-        Dim fullMkPath, sysTarget
-        fullMkPath = getPathWithDriveSdk("device/mediateksample/" & Product & "/full_" & Product & ".mk")
-        If Not oFso.FileExists(fullMkPath) Then Exit Sub
-
-        Dim oText, sReadLine
-        Set oText = oFso.OpenTextFile(fullMkPath, FOR_READING)
-
-        Do Until oText.AtEndOfStream
-            sReadLine = oText.ReadLine
-            If InStr(sReadLine, "SYS_TARGET_PROJECT") > 0 And InStr(sReadLine, "=") > 0 Then
-                sysTarget = readTextAndGetValue("SYS_TARGET_PROJECT", fullMkPath)
-                'If InStr(Sdk, "8168") > 0 Then
-                ''    sysTarget = Replace(sysTarget, "_h", "")
-                'End If
-                Exit Do
-            End If
-        Loop
-
-        oText.Close
-        Set oText = Nothing
-
-        mSysTarget = sysTarget
+        Dim fullMkPath
+        fullMkPath = "device/mediateksample/" & Product & "/full_" & Product & ".mk"
+        If Not isFileExists(fullMkPath) Then Exit Sub
+        mSysTarget = readTextAndGetValue("SYS_TARGET_PROJECT", fullMkPath)
     End Sub
 
     Sub getKernelInfos()
-        Dim projectConfigPath, kernelVer, k64Support
-        projectConfigPath = getPathWithDriveSdk("/device/mediateksample/" & Product & "/ProjectConfig.mk")
-        If Not oFso.FileExists(projectConfigPath) Then MsgBox(projectConfigPath) : Exit Sub
+        Dim projectConfigPath, k64Support
+        projectConfigPath = "/device/mediateksample/" & Product & "/ProjectConfig.mk"
+        If Not isFileExists(projectConfigPath) Then MsgBox(projectConfigPath) : Exit Sub
 
-        Dim oText, sReadLine
-        Set oText = oFso.OpenTextFile(projectConfigPath, FOR_READING)
+        mKernelVer = readTextAndGetValue("LINUX_KERNEL_VERSION", projectConfigPath)
+        k64Support = readTextAndGetValue("MTK_K64_SUPPORT", projectConfigPath)
 
-        Do Until oText.AtEndOfStream
-            sReadLine = oText.ReadLine
-            If InStr(sReadLine, "LINUX_KERNEL_VERSION") > 0 And InStr(sReadLine, "=") > 0 Then
-                kernelVer = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
-                Exit Do
-            End If
-        Loop
-
-        Do Until oText.AtEndOfStream
-            sReadLine = oText.ReadLine
-            If InStr(sReadLine, "MTK_K64_SUPPORT") > 0 And InStr(sReadLine, "=") > 0 Then
-                k64Support = Trim(Mid(sReadLine, InStr(sReadLine, "=") + 1))
-                Exit Do
-            End If
-        Loop
-
-        oText.Close
-        Set oText = Nothing
-
-        mKernelVer = kernelVer
         If k64Support = "yes" Then
             mTargetArch = "arm64"
         ElseIf k64Support = "no" Then
@@ -935,8 +855,8 @@ Class ProjectInputs
 
     Public Sub clearWorkInfos()
         Work = ""
-        Firmware = "\\192.168.0.248\安卓固件文件\"
-        Requirements = "\\192.168.0.24\wbshare\客户需求\"
+        Firmware = "\\192.168.0.248\瀹夊崜鍥轰欢鏂囦欢\"
+        Requirements = "\\192.168.0.24\wbshare\瀹㈡埛闇�姹俓"
         Zentao = "http://192.168.0.29:3000/zentao/task-view-1.html"
     End Sub
 
@@ -950,7 +870,7 @@ Class ProjectInputs
         If Trim(getOpenPath()) = "" Then Exit Sub
         If hasProjectInfos() Then
             Call replaceSlash()
-            Call setOpenPath(Replace(getOpenPath(), Replace(mInfos.DriveSdk, "\", "/") & "/", ""))
+            Call setOpenPath(Replace(getOpenPath(), relpaceSlashInPath(mInfos.DriveSdk) & "/", ""))
         End If
     End Sub
 
@@ -964,8 +884,8 @@ Class ProjectInputs
     End Sub
 
     Public Function cutProject(path)
-        path = Replace(path, "\", "/")
-        path = Replace(path, Replace(mInfos.DriveSdk, "\", "/") & "/", "")
+        path = relpaceSlashInPath(path)
+        path = Replace(path, relpaceSlashInPath(mInfos.DriveSdk) & "/", "")
         path = Replace(path, mInfos.ProjectPath & mInfos.ProjectAlps & "/", "")
         path = Replace(path, mInfos.DriverProjectPath & mInfos.ProjectAlps & "/", "")
         cutProject = path
@@ -979,7 +899,7 @@ Class ProjectInputs
         'Call mIp.cutSdkInOpenPath()
 
         mInfos.Sdk = Sdk
-        If oFso.FolderExists(mInfos.DriveSdk) Then
+        If isFolderExists(mInfos.DriveSdk) Then
             onSdkChange = True
         Else
             msgboxPathNotExist(mInfos.DriveSdk)
@@ -991,12 +911,12 @@ Class ProjectInputs
 
     Public Function onProductChange()
         mInfos.Product = Product
-        If oFso.FolderExists(mInfos.ProductSdkPath) Then
+        If isFolderExists(mInfos.ProductPath) Then
             Call mInfos.getSysTargetProject()
             Call mInfos.getKernelInfos()
             onProductChange = True
         Else
-            msgboxPathNotExist(mInfos.ProductSdkPath)
+            msgboxPathNotExist(mInfos.ProductPath)
             Call setElementValue(getProductInputId(), "")
             mInfos.Product = ""
             onProductChange = False
@@ -1008,10 +928,10 @@ Class ProjectInputs
 
         mInfos.Project = Project
         mInfos.ProjectAlps = ""
-        If oFso.FolderExists(mInfos.ProjectSdkPath) Then
+        If isFolderExists(mInfos.ProjectPath) Then
             If InStr(mInfos.Sdk, "_r") = 0 _
-                    Or oFso.FolderExists(mInfos.ProjectSdkPath & "/alps") _
-                    Or oFso.FolderExists(mInfos.ProjectSdkPath & "/config") Then
+                    Or isFolderExists(mInfos.ProjectPath & "/alps") _
+                    Or isFolderExists(mInfos.ProjectPath & "/config") Then
                 mInfos.ProjectAlps = "/alps"
             Else
                 mInfos.ProjectAlps = ""
@@ -1020,7 +940,7 @@ Class ProjectInputs
             Call mInfos.getBootLogo()
             onProjectChange = True
         Else
-            msgboxPathNotExist(mInfos.ProjectSdkPath)
+            msgboxPathNotExist(mInfos.ProjectPath)
             Call setElementValue(getProjectInputId(), "")
             mInfos.Project = ""
             onProjectChange = False

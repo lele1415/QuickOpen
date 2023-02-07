@@ -21,7 +21,7 @@ Sub getBuildProp()
     pSystemBuildProp = outProductPath & "/system/build.prop"
     pVendorBuildProp = outProductPath & "/vendor/build.prop"
     pProductBuildProp = outProductPath & "/product/build.prop"
-    If Not oFso.FileExists(pProductBuildProp) Then
+    If Not isFileExists(pProductBuildProp) Then
         pProductBuildProp = outProductPath & "/product/etc/build.prop"
     End If
 End Sub

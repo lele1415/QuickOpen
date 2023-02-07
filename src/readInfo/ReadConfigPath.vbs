@@ -3,7 +3,7 @@ Option Explicit
 Dim mTextEditorPath, mBeyondComparePath, mBrowserPath
 
 Sub readConfigText()
-    If Not oFso.FileExists(pConfigText) Then Exit Sub
+    If Not isFileExists(pConfigText) Then Exit Sub
     
     Dim oText, sReadLine
     Set oText = oFso.OpenTextFile(pConfigText, FOR_READING, False, True)
@@ -26,8 +26,8 @@ End Sub
 Sub checkConfigInfos()
     Dim oText
     Dim count : count = 0
-    If Not oFso.FileExists(Replace(mTextEditorPath, """", "")) Then
-        Do Until (oFso.FileExists(mTextEditorPath) Or count > 5)
+    If Not isFileExists(Replace(mTextEditorPath, """", "")) Then
+        Do Until (isFileExists(mTextEditorPath) Or count > 5)
             mTextEditorPath = InputBox("Text editor path : ", "Please input")
             count = count + 1
         Loop
