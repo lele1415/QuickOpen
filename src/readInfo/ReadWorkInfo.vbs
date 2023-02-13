@@ -25,6 +25,11 @@ Sub applyLastWorkInfo()
     Dim oInfos
     If vaWorksInfo.Bound > -1 Then
         Set oInfos = vaWorksInfo.V(vaWorksInfo.Bound)
+        if Not checkProjectExist(oInfos.Sdk, oInfos.Product, oInfos.Project) Then
+            Call mIp.clearSdkInfos()
+            Call mIp.clearWorkInfos()
+            Exit Sub
+        End If
         mIp.Work = oInfos.Work
         mIp.Sdk = oInfos.Sdk
         mIp.Product = oInfos.Product

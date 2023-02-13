@@ -225,3 +225,24 @@ Sub copyCdSdkCommand()
     path = relpaceSlashInPath(arr(1))
     Call CopyString("cd " & path)
 End Sub
+
+Function getSedCmd(cmdStr, searchStr, replaceStr, newStr, filePath)
+    If isArray(filePath) Then
+        Dim i, str
+        str = cmdStr & "sed -i '/" & searchStr & "/s/" & replaceStr & "/" & newStr & "/'"
+        For i = 0 To UBound(filePath)
+            str = str & " " & filePath(i)
+        Next
+        getSedCmd = str & ";"
+    Else
+        getSedCmd = cmdStr & "sed -i '/" & searchStr & "/s/" & replaceStr & "/" & newStr & "/' " & mIp.Infos.getOverlayPath(filePath) & ";"
+    End If
+End Function
+
+Function getGitDiffCmd(cmdStr, filePath)
+    getGitDiffCmd = cmdStr & "git diff " & mIp.Infos.getOverlayPath(filePath) & ";"
+End Function
+
+Function getGitDiff2Cmd(cmdStr, filePath)
+    getGitDiff2Cmd = cmdStr & "git diff --no-index " & filePath & " " & mIp.Infos.getOverlayPath(filePath) & ";"
+End Function

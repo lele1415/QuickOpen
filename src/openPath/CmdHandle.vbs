@@ -115,6 +115,8 @@ Function handleEditTextCmd()
     If InStr(mCmdInput.text, "tz=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
     If InStr(mCmdInput.text, "loc=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
     If InStr(mCmdInput.text, "ftd=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
+    If InStr(mCmdInput.text, "gmsv=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
+    If InStr(mCmdInput.text, "sp=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
     handleEditTextCmd = False
 End Function
 
@@ -237,43 +239,34 @@ Function getMultiMkdirStr(arr, what)
 		End If
 
 	    If what = "lg" Then
-	        str =  str & "cp ../File/logo.bmp " & ovlFile & ";"
-		ElseIf what = "ani" And InStr(path, "bootanimation.zip") > 0 Then
-	        str =  str & "cp ../File/bootanimation.zip " & ovlFile & ";"
+	        str =  str & "cp ../File/logo.bmp " & ovlFolder & ";"
+		ElseIf what = "ani" Then
+		    If InStr(path, "bootanimation.zip") > 0 Then
+	            str =  str & "cp ../File/bootanimation.zip " & ovlFolder & ";"
+			ElseIf InStr(path, "products.mk") > 0 And Not isFileExists(ovlFile) Then
+			    str =  str & "cp " & path & " " & ovlFolder & ";"
+				str =  getSedCmd(str, "bootanimation", "#", "", path)
+				str =  getGitDiff2Cmd(str, path)
+			End If
 		ElseIf what = "wp" Then
 		    If InStr(path, "default_wallpaper.png") > 0 Then
-	            str =  str & "cp ../File/default_wallpaper.png " & ovlFile & ";"
+	            str =  str & "cp ../File/default_wallpaper.png " & ovlFolder & ";"
 			ElseIf InStr(path, "default_wallpaper.jpg") > 0 Then
-	            str =  str & "cp ../File/default_wallpaper.jpg " & ovlFile & ";"
+	            str =  str & "cp ../File/default_wallpaper.jpg " & ovlFolder & ";"
 			End If
 		Else
-		    str =  str & "cp " & path & " " & ovlFile & ";"
+		    str =  str & "cp " & path & " " & ovlFolder & ";"
 		End If
 	Next
 	getMultiMkdirStr = str
 End Function
 
 Sub modBuildNumber(number)
-	Dim sysPath, vndPath, sysExist, vndExist, sedStr, R_bnStr, S_bnStr, bnStr, commandStr
-	sysPath = "device/mediatek/system/common/BoardConfig.mk"
-	vndPath = "device/mediatek/vendor/common/BoardConfig.mk"
-	sysExist = False
-	vndExist = False
-	R_bnStr = "BUILD_NUMBER_WEIBU"
-	S_bnStr = "WEIBU_BUILD_NUMBER"
-
-	If isFileExists(mIp.Infos.getOverlayPath(sysPath)) Then sysExist = True
-	If isFileExists(mIp.Infos.getOverlayPath(vndPath)) Then vndExist = True
-	If Not sysExist And Not vndExist Then MsgBox("Not found BoardConfig.mk overlay") : Exit Sub
-    If InStr(mIp.Infos.Sdk, "_r") Then bnStr = R_bnStr
-    If InStr(mIp.Infos.Sdk, "_s") Then bnStr = S_bnStr
-    If bnStr = "" Then MsgBox("Not found _r OR _s in SDK name") : Exit Sub
-
-	sedStr = "sed -i '/" & bnStr & "/s/[0-9]\+/" & number & "/' "
-    If sysExist Then commandStr = sedStr & mIp.Infos.getOverlayPath(sysPath)
-    If vndExist Then commandStr = commandStr & " " & mIp.Infos.getOverlayPath(vndPath)
-    
-    Call CopyString(commandStr)
+    If InStr(mIp.Infos.Sdk, "8168_s") > 0 Then
+	    Call cpFileAndSetValue(Array("bn2", number))
+	Else
+	    Call cpFileAndSetValue(Array("bn", number))
+	End If
 End Sub
 
 Sub modDisplayIdForOtaTest()
@@ -323,6 +316,66 @@ Sub modSystemprop(whatArr)
 		cmdStr = cmdStr & ";git diff " & systempropPath
 	    Call CopyString(cmdStr)
 	End If
+End Sub
+
+Sub cpFileAndSetValue(whatArr)
+    Dim filePath(), folderPath(), keyStr(), eqStr(), valueStr(), cmdStr
+    If whatArr(0) = "gmsv" Then
+	    ReDim filePath(0) : ReDim folderPath(0) : ReDim keyStr(0) : ReDim eqStr(0) : ReDim valueStr(0)
+	    filePath(0) = "vendor/partner_gms/products/gms_package_version.mk"
+		keyStr(0) = "GMS_PACKAGE_VERSION_ID"
+		eqStr(0) = " := "
+		valueStr(0) = whatArr(1)
+	ElseIf whatArr(0) = "sp" Then
+	    ReDim filePath(1) : ReDim folderPath(1) : ReDim keyStr(1) : ReDim eqStr(1) : ReDim valueStr(1)
+	    filePath(0) = "build/make/core/version_defaults.mk"
+		keyStr(0) = "PLATFORM_SECURITY_PATCH"
+		eqStr(0) = " := "
+		valueStr(0) = whatArr(1)
+
+	    filePath(1) = "vendor/mediatek/proprietary/buildinfo_vnd/device.mk"
+		keyStr(1) = "VENDOR_SECURITY_PATCH"
+		eqStr(1) = " := "
+		valueStr(1) = whatArr(1)
+	ElseIf whatArr(0) = "bn" Then
+	    ReDim filePath(0) : ReDim folderPath(0) : ReDim keyStr(0) : ReDim eqStr(0) : ReDim valueStr(0)
+	    filePath(0) = "device/mediatek/system/common/BoardConfig.mk"
+		If InStr(mIp.Infos.Sdk, "_r") > 0 Then
+		    keyStr(0) = "BUILD_NUMBER_WEIBU"
+		Else
+	        keyStr(0) = "WEIBU_BUILD_NUMBER"
+		End If
+		eqStr(0) = " := "
+		valueStr(0) = whatArr(1)
+	ElseIf whatArr(0) = "bn2" Then
+	    ReDim filePath(1) : ReDim folderPath(1) : ReDim keyStr(1) : ReDim eqStr(1) : ReDim valueStr(1)
+	    filePath(0) = "device/mediatek/system/common/BoardConfig.mk"
+		keyStr(0) = "WEIBU_BUILD_NUMBER"
+		eqStr(0) = " := "
+		valueStr(0) = whatArr(1)
+
+		filePath(1) = "device/mediatek/vendor/common/BoardConfig.mk"
+		keyStr(1) = "WEIBU_BUILD_NUMBER"
+		eqStr(1) = " := "
+		valueStr(1) = whatArr(1)
+	End If
+
+    Dim i, searchStr, replaceStr, newStr
+	For i = 0 To UBound(filePath)
+        folderPath(i) = getFolderPath(filePath(i))
+
+		If Not isFileExists(mIp.Infos.getOverlayPath(filePath(i))) Then
+			cmdStr = cmdStr & "mkdir -p " & mIp.Infos.getOverlayPath(folderPath(i)) & ";"
+			cmdStr = cmdStr & "cp " & filePath(i) & " " & mIp.Infos.getOverlayPath(folderPath(i)) & ";"
+			cmdStr = getSedCmd(cmdStr, keyStr(i) & eqStr(i), eqStr(i) & ".*$", eqStr(i) & valueStr(i), filePath(i))
+			cmdStr = getGitDiff2Cmd(cmdStr, filePath(i))
+		Else
+		    cmdStr = getSedCmd(cmdStr, keyStr(i) & eqStr(i), eqStr(i) & ".*$", eqStr(i) & valueStr(i), filePath(i))
+			cmdStr = getGitDiffCmd(cmdStr, filePath(i))
+		End If
+	Next
+
+	Call CopyString(cmdStr)
 End Sub
 
 Sub mkdirLogo()

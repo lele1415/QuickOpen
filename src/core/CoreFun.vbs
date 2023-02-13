@@ -621,3 +621,34 @@ Function strExistInFile(filePath, str)
     strExistInFile = False
 End Function
 
+Function checkProjectExist(sdk, product, project)
+    Call setDrive("x")
+    If Not checkDrive(sdk, product, project) Then
+        Call setDrive("z")
+        If Not checkDrive(sdk, product, project) Then
+            Call setDrive("z6")
+            If Not checkDrive(sdk, product, project) Then 
+                MsgBox("Not exist: " & path)
+	            checkProjectExist = False
+                Exit Function
+            End If
+        End If
+    End If
+
+    checkProjectExist = True
+End Function
+
+Function checkDrive(sdk, product, project)
+    Dim path
+	path = mDrive & sdk
+	If isFolderExists(path) Then
+	    path = path & "\weibu\" & product & "\" & project
+		If isFolderExists(path) Then
+		    checkDrive = True
+			Exit Function
+		ENd If
+	End If
+
+    checkDrive = False
+End Function
+

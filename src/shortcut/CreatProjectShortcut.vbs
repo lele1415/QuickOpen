@@ -78,6 +78,7 @@ Sub applyProjectInfo(obj)
 End Sub
 
 Sub applyShortcut(work, sdk, product, project, firmware, requirements, zentao)
+	If Not checkProjectExist(sdk, product, project) Then Exit Sub
 	Call hideAllShortcuts()
 	
 	mIp.Work = work
