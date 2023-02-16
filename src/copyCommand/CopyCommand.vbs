@@ -147,6 +147,45 @@ Sub CopyCommitInfo(what)
 	Call CopyQuoteString("""git add weibu;git commit -m ""&Chr(34)&""" & commandFinal & """&Chr(34)")
 End Sub
 
+Sub CopyAdbPushCmd(which)
+    Dim outPath, sourcePath, targetPath, finalStr
+	outPath = mIp.Infos.getPathWithDriveSdk(mIp.Infos.OutPath)
+    If which = "su" Then
+	    sourcePath = outPath & "\system\system_ext\priv-app\MtkSystemUI"
+		targetPath = "/system/system_ext/priv-app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+	ElseIf which = "st" Then
+	    sourcePath = outPath & "\system\system_ext\priv-app\MtkSettings"
+		targetPath = "/system/system_ext/priv-app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+	ElseIf which = "sl" Then
+	    sourcePath = outPath & "\system\system_ext\priv-app\SearchLauncherQuickStep"
+		targetPath = "/system/system_ext/priv-app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+	ElseIf which = "cam" Then
+	    sourcePath = outPath & "\system\system_ext\app\Camera"
+		targetPath = "/system/system_ext/app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+    ElseIf which = "sv" Then
+	    sourcePath = outPath & "\system\framework\services.jar"
+		targetPath = "/system/framework"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+        sourcePath = outPath & "\system\framework\services.jar.bprof"
+		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
+        sourcePath = outPath & "\system\framework\services.jar.prof"
+		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
+        
+        sourcePath = outPath & "\system\framework\oat\arm64\services.art"
+        targetPath = "/system/framework/oat/arm64"
+		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
+        sourcePath = outPath & "\system\framework\oat\arm64\services.odex"
+		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
+        sourcePath = outPath & "\system\framework\oat\arm64\services.vdex"
+		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
+	End If
+	Call CopyString(finalStr)
+End Sub
+
 Sub CopyDriverCommitInfo()
     If Not mIp.hasProjectInfos() Then Exit Sub
 	commandFinal = "[" & mIp.Infos.DriverProject & "] : "

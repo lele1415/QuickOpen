@@ -64,8 +64,13 @@ Sub findProduct()
 		MsgBox "Not found: weibu/"
 		Exit Sub
 	End If
-	Set vaTargetProduct = searchFolder("weibu", "_bsp", _
-		    SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+	If isT0SdkSys() Then
+	    Set vaTargetProduct = searchFolder("weibu", "mssi_", _
+		        SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+	Else
+	    Set vaTargetProduct = searchFolder("weibu", "_bsp", _
+		        SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+	End If
 	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub
 
 	Call vaTargetProduct.SortArray()
@@ -139,6 +144,5 @@ Function getSdkSimpleName()
 	Dim str
 	str = Replace(mIp.Infos.Sdk, "/", "\")
 	If InStr(str, "\alps") > 0 Then str = Left(str, InStrRev(str, "\alps") - 1)
-	str = Replace(str, Left(str, InStrRev(str, "\")), "")
 	getSdkSimpleName = str
 End Function

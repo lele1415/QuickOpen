@@ -559,11 +559,15 @@ Function getOutPath(Product)
 End Function
 
 Function getDownloadOutPath(Product)
-    Dim outPath : outPath = mIp.Infos.getPathWithDriveSdk(getOutPath(Product))
-    If isFolderExists(outPath & "\merged") Then
-        getDownloadOutPath = outPath & "\merged"
-    Else
-        getDownloadOutPath = outPath
+    If isT0Sdk() Then
+        getDownloadOutPath = mDrive & Left(mIp.Infos.Sdk, InStr(mIp.Infos.Sdk, "\")) & "merged"
+    ELse
+        Dim outPath : outPath = mIp.Infos.getPathWithDriveSdk(getOutPath(Product))
+        If isFolderExists(outPath & "\merged") Then
+            getDownloadOutPath = outPath & "\merged"
+        Else
+            getDownloadOutPath = outPath
+        End If
     End If
 End Function
 
@@ -584,7 +588,7 @@ End Sub
 
 Class ProjectInfos
     Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao, mTaskNum
-    Private mProjectAlps, mBootLogo, mSysTarget, mKernelVer, mTargetArch
+    Private mProjectAlps, mBootLogo, mSysTarget, mVndTarget, mKernelVer, mTargetArch
 
     Public Property Get Work
         Work = mWork
@@ -604,6 +608,10 @@ Class ProjectInfos
 
     Public Property Get SysTarget
         SysTarget = mSysTarget
+    End Property
+    
+    Public Property Get VndTarget
+        VndTarget = mVndTarget
     End Property
 
     Public Property Get KernelVer
@@ -707,10 +715,16 @@ Class ProjectInfos
         mSysTarget = readTextAndGetValue("SYS_TARGET_PROJECT", fullMkPath)
     End Sub
 
+    Sub getVndTargetProject()
+        If InStr(Sdk, "t0\vnd") > 0 Then
+            mVndTarget = Product
+        End If
+    End Sub
+
     Sub getKernelInfos()
         Dim projectConfigPath, k64Support
         projectConfigPath = "/device/mediateksample/" & Product & "/ProjectConfig.mk"
-        If Not isFileExists(projectConfigPath) Then MsgBox(projectConfigPath) : Exit Sub
+        If Not isFileExists(projectConfigPath) Then Exit Sub
 
         mKernelVer = readTextAndGetValue("LINUX_KERNEL_VERSION", projectConfigPath)
         k64Support = readTextAndGetValue("MTK_K64_SUPPORT", projectConfigPath)
@@ -857,7 +871,7 @@ Class ProjectInputs
         Work = ""
         Firmware = "\\192.168.0.248\安卓固件文件\"
         Requirements = "\\192.168.0.24\wbshare\客户需求\"
-        Zentao = "http://192.168.0.29:3000/zentao/task-view-1.html"
+        Zentao = "http://192.168.0.29:3000/zentao/task-view-" & getTaskNum(Project) & ".html"
     End Sub
 
     Public Sub clearSdkInfos()
@@ -913,6 +927,7 @@ Class ProjectInputs
         mInfos.Product = Product
         If isFolderExists(mInfos.ProductPath) Then
             Call mInfos.getSysTargetProject()
+            Call mInfos.getVndTargetProject()
             Call mInfos.getKernelInfos()
             onProductChange = True
         Else

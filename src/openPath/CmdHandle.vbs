@@ -175,10 +175,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "outp" Then Call CommandOfOut() : Exit Function
 	If mCmdInput.text = "winp" Then Call CopyPathInWindows() : Exit Function
 	If mCmdInput.text = "lnxp" Then Call CopyPathInLinux() : Exit Function
-	If mCmdInput.text = "ps-su" Then Call CopyAdbPushCmd("su") : Exit Function
-	If mCmdInput.text = "ps-st" Then Call CopyAdbPushCmd("st") : Exit Function
-	If mCmdInput.text = "ps-sl" Then Call CopyAdbPushCmd("sl") : Exit Function
-	If mCmdInput.text = "ps-cam" Then Call CopyAdbPushCmd("cam") : Exit Function
+	If InStr(mCmdInput.text, "ps-") = 1 Then Call CopyAdbPushCmd(Replace(mCmdInput.text, "ps-", "")) : Exit Function
 	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
 	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
@@ -199,6 +196,12 @@ Function handleProjectCmd()
 	ElseIf mCmdInput.text = "z" Or mCmdInput.text = "z6" Or mCmdInput.text = "x" Then
 	    Call setDrive(mCmdInput.text)
 		Exit Function
+	ElseIf mCmdInput.text = "s" And isT0SdkVnd() Then
+	    Call setT0SdkSys()
+		Exit Function
+	ElseIf mCmdInput.text = "v" And isT0SdkSys() Then
+	    Call setT0SdkVnd()
+		Exit Function
 	ElseIf mCmdInput.text = "8766s" Or mCmdInput.text = "8168s" Or mCmdInput.text = "8766r" Or mCmdInput.text = "8168r" Then
 	    Call setSdk(mCmdInput.text)
 		Exit Function
@@ -211,19 +214,21 @@ End Function
 
 Function handleCurrentDictCmd()
 	handleCurrentDictCmd = True
-	If mCmdInput.text = "s" Then Call runPath(pSdkPathText) : Exit Function
-	If mCmdInput.text = "p" Then Call runPath(pPathText) : Exit Function
-	If mCmdInput.text = "c" Then Call runPath(pConfigText) : Exit Function
+	If mCmdInput.text = "sdk" Then Call runPath(pSdkPathText) : Exit Function
+	If mCmdInput.text = "path" Then Call runPath(pPathText) : Exit Function
+	If mCmdInput.text = "config" Then Call runPath(pConfigText) : Exit Function
 	If mCmdInput.text = "op" Then Call runPath(oWs.CurrentDirectory) : Exit Function
 	handleCurrentDictCmd = False
 End Function
 
 Sub setPathFromCmd(path)
+	Call checkT0Path(path)
 	Call setOpenPath(path)
 	Call onOpenPathChange()
 End Sub
 
 Sub setPathFromCmdAndCopyKey(key, path)
+	Call checkT0Path(path)
 	Call setOpenPath(path)
 	Call onOpenPathChange()
 	mSaveString.str = key
@@ -420,29 +425,19 @@ Sub mkdirWallpaper(go)
     Call CopyString(finalStr)
 End Sub
 
-Sub CopyAdbPushCmd(which)
-    Dim outPath, sourcePath, targetPath, finalStr
-	outPath = mIp.Infos.getPathWithDriveSdk(mIp.Infos.OutPath)
-    If which = "su" Then
-	    sourcePath = outPath & "\system\system_ext\priv-app\MtkSystemUI"
-		targetPath = "/system/system_ext/priv-app/"
-		finalStr = "adb push " & sourcePath & " " & targetPath
-	ElseIf which = "st" Then
-	    sourcePath = outPath & "\system\system_ext\priv-app\MtkSettings"
-		targetPath = "/system/system_ext/priv-app/"
-		finalStr = "adb push " & sourcePath & " " & targetPath
-	ElseIf which = "sl" Then
-	    sourcePath = outPath & "\system\system_ext\priv-app\SearchLauncherQuickStep"
-		targetPath = "/system/system_ext/priv-app/"
-		finalStr = "adb push " & sourcePath & " " & targetPath
-	ElseIf which = "cam" Then
-	    sourcePath = outPath & "\system\system_ext\app\Camera"
-		targetPath = "/system/system_ext/app/"
-		finalStr = "adb push " & sourcePath & " " & targetPath
-	End If
-	Call CopyString(finalStr)
-End Sub
-
 Function getGmsVersion()
     getGmsVersion = readTextAndGetValue("GMS_PACKAGE_VERSION_ID", "vendor/partner_gms/products/gms_package_version.mk")
 End Function
+
+Sub checkT0Path(path)
+    If isT0SdkSys() Then
+		If InStr(path, "bootable") > 0 Or _
+				InStr(path, "vnd") > 0 Or _
+				InStr(path, "FrameworkResOverlay") > 0 Or _
+				InStr(path, "trustzone") > 0 Then
+			Call setT0SdkVnd()
+		ElseIf InStr(path, "btif_dm.cc") > 0 Then
+			path = "vendor/mediatek/proprietary/packages/modules/Bluetooth/system/btif/src/btif_dm.cc"
+		End If
+	End If
+End Sub

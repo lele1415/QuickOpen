@@ -622,15 +622,17 @@ Function strExistInFile(filePath, str)
 End Function
 
 Function checkProjectExist(sdk, product, project)
-    Call setDrive("x")
     If Not checkDrive(sdk, product, project) Then
-        Call setDrive("z")
+        Call setDrive("x")
         If Not checkDrive(sdk, product, project) Then
-            Call setDrive("z6")
-            If Not checkDrive(sdk, product, project) Then 
-                MsgBox("Not exist: " & path)
-	            checkProjectExist = False
-                Exit Function
+            Call setDrive("z")
+            If Not checkDrive(sdk, product, project) Then
+                Call setDrive("z6")
+                If Not checkDrive(sdk, product, project) Then 
+                    MsgBox("Not exist: " & path)
+                    checkProjectExist = False
+                    Exit Function
+                End If
             End If
         End If
     End If
@@ -651,4 +653,56 @@ Function checkDrive(sdk, product, project)
 
     checkDrive = False
 End Function
+
+Function getTaskNum(project)
+    Dim arr, str
+    If project <> "" Then
+        arr = Split(Replace(project, "-", "_"), "_")
+        For Each str In arr
+            If isNumeric(str) And Len(str) < 4 Then
+                getTaskNum = str
+                Exit Function
+            End If
+        Next
+    End If
+    getTaskNum = "1"
+End Function
+
+Function isT0Sdk()
+    If InStr(mIp.Infos.Sdk, "_t0\") > 0 Then
+        isT0Sdk = True
+    Else
+        isT0Sdk = False
+    End If
+End Function
+
+Function isT0SdkSys()
+    If InStr(mIp.Infos.Sdk, "_t0\sys") > 0 Then
+        isT0SdkSys = True
+    Else
+        isT0SdkSys = False
+    End If
+End Function
+
+Function isT0SdkVnd()
+    If InStr(mIp.Infos.Sdk, "_t0\vnd") > 0 Then
+        isT0SdkVnd = True
+    Else
+        isT0SdkVnd = False
+    End If
+End Function
+
+Sub setT0SdkSys()
+    mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
+    mIp.Product = mIp.Infos.SysTarget
+    mIp.Project = mIp.Infos.Project & "-MMI"
+    Call createWorkName()
+End Sub
+
+Sub setT0SdkVnd()
+    mIp.Sdk = Replace(mIp.Infos.Sdk, "sys", "vnd")
+    mIp.Product = mIp.Infos.VndTarget
+    mIp.Project = Replace(mIp.Infos.Project , "-MMI", "")
+    Call createWorkName()
+End Sub
 
