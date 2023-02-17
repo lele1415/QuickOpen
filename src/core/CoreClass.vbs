@@ -675,7 +675,11 @@ Class ProjectInfos
     End Property
 
     Public Function getPathWithDriveSdk(path)
-        getPathWithDriveSdk = DriveSdk & "/" & path
+        If InStr(path, "../") = 1 Then
+            getPathWithDriveSdk = Left(DriveSdk, InStrRev(DriveSdk, "\")) & Right(path, Len(path) - 3)
+        Else
+            getPathWithDriveSdk = DriveSdk & "/" & path
+        End If
     End Function
 
     Public Function getOverlayPath(path)

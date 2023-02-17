@@ -486,20 +486,14 @@ End Sub
 
 Sub CopyString(str)
     If Len(str) > 452 Then
-        MsgBox("String is too long!(max length 452)")
-        setOpenPath(str)
+        'MsgBox("String is too long!(max length 452)")
+        setOpenPath(Replace(str, "&Chr(34)&""", ""))
+        oWs.SendKeys "+{TAB}"
+        oWs.SendKeys "^a"
+        oWs.SendKeys "^x"
         Exit Sub
     End If
     oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(Window.Close)"
-End Sub
-
-Sub CopyQuoteString(str)
-    If Len(str) > 452 Then
-        MsgBox("String is too long!(max length 452)")
-        setOpenPath(str)
-        Exit Sub
-    End If
-    oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text""," & str & ")(Window.Close)"
 End Sub
 
 Sub onInputListClick(divId, str)
@@ -695,7 +689,7 @@ End Function
 Sub setT0SdkSys()
     mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
     mIp.Product = mIp.Infos.SysTarget
-    mIp.Project = mIp.Infos.Project & "-MMI"
+    If InStr(mIp.Infos.Project, "-MMI") = 0 Then mIp.Project = mIp.Infos.Project & "-MMI"
     Call createWorkName()
 End Sub
 
@@ -706,3 +700,10 @@ Sub setT0SdkVnd()
     Call createWorkName()
 End Sub
 
+Function checkBackslash(str)
+    str = Replace(str, "/", "\/")
+    str = Replace(str, "[", "\[")
+    str = Replace(str, "]", "\]")
+    str = Replace(str, ".", "\.")
+    checkBackslash = str
+End Function

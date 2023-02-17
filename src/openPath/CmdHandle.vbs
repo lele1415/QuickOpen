@@ -115,8 +115,7 @@ Function handleEditTextCmd()
     If InStr(mCmdInput.text, "tz=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
     If InStr(mCmdInput.text, "loc=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
     If InStr(mCmdInput.text, "ftd=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
-    If InStr(mCmdInput.text, "gmsv=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
-    If InStr(mCmdInput.text, "sp=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
+    If InStr(mCmdInput.text, "=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
     handleEditTextCmd = False
 End Function
 
@@ -180,6 +179,10 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
 	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
 	If mCmdInput.text = "ss" Then Call mSaveString.copy() : Exit Function
+	If mCmdInput.text = "mouo" Then Call mvOut("user", "out") : Exit Function
+	If mCmdInput.text = "moui" Then Call mvOut("user", "in") : Exit Function
+	If mCmdInput.text = "modo" Then Call mvOut("debug", "out") : Exit Function
+	If mCmdInput.text = "modi" Then Call mvOut("debug", "in") : Exit Function
     handleCopyCommandCmd = False
 End Function
 
@@ -234,195 +237,12 @@ Sub setPathFromCmdAndCopyKey(key, path)
 	mSaveString.str = key
 End Sub
 
-Function getMultiMkdirStr(arr, what)
-    Dim str, path, ovlFolder, ovlFile
-    For Each path In arr
-	    ovlFolder = mIp.Infos.getOverlayPath(getFolderPath(path))
-	    ovlFile = mIp.Infos.getOverlayPath(path)
-	    If (Not (what = "lg" And InStr(path, "_kernel.bmp") > 0)) And (Not isFolderExists(ovlFolder)) Then
-	        str =  str & "mkdir -p " & ovlFolder & ";"
-		End If
-
-	    If what = "lg" Then
-	        str =  str & "cp ../File/logo.bmp " & ovlFolder & ";"
-		ElseIf what = "ani" Then
-		    If InStr(path, "bootanimation.zip") > 0 Then
-	            str =  str & "cp ../File/bootanimation.zip " & ovlFolder & ";"
-			ElseIf InStr(path, "products.mk") > 0 And Not isFileExists(ovlFile) Then
-			    str =  str & "cp " & path & " " & ovlFolder & ";"
-				str =  getSedCmd(str, "bootanimation", "#", "", path)
-				str =  getGitDiff2Cmd(str, path)
-			End If
-		ElseIf what = "wp" Then
-		    If InStr(path, "default_wallpaper.png") > 0 Then
-	            str =  str & "cp ../File/default_wallpaper.png " & ovlFolder & ";"
-			ElseIf InStr(path, "default_wallpaper.jpg") > 0 Then
-	            str =  str & "cp ../File/default_wallpaper.jpg " & ovlFolder & ";"
-			End If
-		Else
-		    str =  str & "cp " & path & " " & ovlFolder & ";"
-		End If
-	Next
-	getMultiMkdirStr = str
-End Function
-
 Sub modBuildNumber(number)
     If InStr(mIp.Infos.Sdk, "8168_s") > 0 Then
 	    Call cpFileAndSetValue(Array("bn2", number))
 	Else
 	    Call cpFileAndSetValue(Array("bn", number))
 	End If
-End Sub
-
-Sub modDisplayIdForOtaTest()
-	Dim buildinfo, keyStr, sedStr
-	buildinfo = mIp.Infos.ProjectPath & "/config/buildinfo.sh"
-	If Not isFileExists(buildinfo) Then buildinfo = mIp.Infos.DriverProjectPath & "/config/buildinfo.sh"
-	If Not isFileExists(buildinfo) Then buildinfo = mIp.Infos.getOverlayPath("build/make/tools/buildinfo.sh")
-	If Not isFileExists(buildinfo) Then MsgBox("No buildinfo.sh found in overlay") : Exit Sub
-
-	keyStr = "ro.build.display.id"
-	If InStr(buildinfo, "/config/") Then
-	    sedStr = "sed -i '/" & keyStr & "/s/$/-OTA_test/' " & buildinfo
-	    Call CopyString(sedStr)
-	Else
-	    sedStr = """sed -i '/" & keyStr & "/s/\""&Chr(34)&""$/-OTA_test\""&Chr(34)&""/' " & buildinfo & """"
-	    Call CopyQuoteString(sedStr)
-	End If
-End Sub
-
-Sub modSystemprop(whatArr)
-    Dim systempropPath, cmdStr, keyStr, valueStr
-	systempropPath = mIp.Infos.ProjectPath & "/config/system.prop"
-
-    valueStr = whatArr(1)
-	If whatArr(0) = "tz" Then
-	    keyStr = "persist.sys.timezone"
-		valueStr = Replace(valueStr, "/", "\/")
-	ElseIf whatArr(0) = "loc" Then
-	    keyStr = "persist.sys.locale"
-	ElseIf whatArr(0) = "ftd" Then
-	    keyStr = "ro.weibu.factorytest.disable_" & whatArr(1)
-		valueStr = "1"
-	Else
-	    Exit Sub
-	End If
-
-    If Not isFileExists(systempropPath) Then
-	    cmdStr = """echo -e ""&Chr(34)&""" & keyStr & "=" & valueStr & """&Chr(34)&""\n > " & systempropPath
-		cmdStr = cmdStr & ";git diff " & systempropPath
-	    Call CopyQuoteString(cmdStr)
-	Else
-	    If strExistInFile(systempropPath, keyStr) Then
-		    cmdStr = "sed -i '/" & keyStr & "/s/.*/" & keyStr & "=" & valueStr & "/' " & systempropPath
-		Else
-	        cmdStr = "sed -i '$a " & keyStr & "=" & valueStr & "' " & systempropPath
-		End If
-		cmdStr = cmdStr & ";git diff " & systempropPath
-	    Call CopyString(cmdStr)
-	End If
-End Sub
-
-Sub cpFileAndSetValue(whatArr)
-    Dim filePath(), folderPath(), keyStr(), eqStr(), valueStr(), cmdStr
-    If whatArr(0) = "gmsv" Then
-	    ReDim filePath(0) : ReDim folderPath(0) : ReDim keyStr(0) : ReDim eqStr(0) : ReDim valueStr(0)
-	    filePath(0) = "vendor/partner_gms/products/gms_package_version.mk"
-		keyStr(0) = "GMS_PACKAGE_VERSION_ID"
-		eqStr(0) = " := "
-		valueStr(0) = whatArr(1)
-	ElseIf whatArr(0) = "sp" Then
-	    ReDim filePath(1) : ReDim folderPath(1) : ReDim keyStr(1) : ReDim eqStr(1) : ReDim valueStr(1)
-	    filePath(0) = "build/make/core/version_defaults.mk"
-		keyStr(0) = "PLATFORM_SECURITY_PATCH"
-		eqStr(0) = " := "
-		valueStr(0) = whatArr(1)
-
-	    filePath(1) = "vendor/mediatek/proprietary/buildinfo_vnd/device.mk"
-		keyStr(1) = "VENDOR_SECURITY_PATCH"
-		eqStr(1) = " := "
-		valueStr(1) = whatArr(1)
-	ElseIf whatArr(0) = "bn" Then
-	    ReDim filePath(0) : ReDim folderPath(0) : ReDim keyStr(0) : ReDim eqStr(0) : ReDim valueStr(0)
-	    filePath(0) = "device/mediatek/system/common/BoardConfig.mk"
-		If InStr(mIp.Infos.Sdk, "_r") > 0 Then
-		    keyStr(0) = "BUILD_NUMBER_WEIBU"
-		Else
-	        keyStr(0) = "WEIBU_BUILD_NUMBER"
-		End If
-		eqStr(0) = " := "
-		valueStr(0) = whatArr(1)
-	ElseIf whatArr(0) = "bn2" Then
-	    ReDim filePath(1) : ReDim folderPath(1) : ReDim keyStr(1) : ReDim eqStr(1) : ReDim valueStr(1)
-	    filePath(0) = "device/mediatek/system/common/BoardConfig.mk"
-		keyStr(0) = "WEIBU_BUILD_NUMBER"
-		eqStr(0) = " := "
-		valueStr(0) = whatArr(1)
-
-		filePath(1) = "device/mediatek/vendor/common/BoardConfig.mk"
-		keyStr(1) = "WEIBU_BUILD_NUMBER"
-		eqStr(1) = " := "
-		valueStr(1) = whatArr(1)
-	End If
-
-    Dim i, searchStr, replaceStr, newStr
-	For i = 0 To UBound(filePath)
-        folderPath(i) = getFolderPath(filePath(i))
-
-		If Not isFileExists(mIp.Infos.getOverlayPath(filePath(i))) Then
-			cmdStr = cmdStr & "mkdir -p " & mIp.Infos.getOverlayPath(folderPath(i)) & ";"
-			cmdStr = cmdStr & "cp " & filePath(i) & " " & mIp.Infos.getOverlayPath(folderPath(i)) & ";"
-			cmdStr = getSedCmd(cmdStr, keyStr(i) & eqStr(i), eqStr(i) & ".*$", eqStr(i) & valueStr(i), filePath(i))
-			cmdStr = getGitDiff2Cmd(cmdStr, filePath(i))
-		Else
-		    cmdStr = getSedCmd(cmdStr, keyStr(i) & eqStr(i), eqStr(i) & ".*$", eqStr(i) & valueStr(i), filePath(i))
-			cmdStr = getGitDiffCmd(cmdStr, filePath(i))
-		End If
-	Next
-
-	Call CopyString(cmdStr)
-End Sub
-
-Sub mkdirLogo()
-    Dim lg_fd, lg_u, lg_k
-    lg_fd = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
-    lg_u = Replace(lg_fd & "[boot_logo]_uboot.bmp", "[boot_logo]", mIp.Infos.BootLogo)
-    lg_k = Replace(lg_fd & "[boot_logo]_kernel.bmp", "[boot_logo]", mIp.Infos.BootLogo)
-
-    Dim arr, finalStr
-    arr = Array(lg_u, lg_k)
-    finalStr = getMultiMkdirStr(arr, "lg")
-    Call CopyString(finalStr)
-End Sub
-
-Sub mkdirBootAnimation()
-    Dim ani_media, ani_product
-    ani_media = "vendor/weibu_sz/media/bootanimation.zip"
-    ani_product = "vendor/weibu_sz/products/products.mk"
-
-    Dim arr, finalStr
-    arr = Array(ani_media, ani_product)
-    finalStr = getMultiMkdirStr(arr, "ani")
-    Call CopyString(finalStr)
-End Sub
-
-Sub mkdirWallpaper(go)
-    Dim wp_gms, wp_go1, wp_go2, wp1, wp2, wp3
-    wp_gms = "vendor/partner_gms/overlay/AndroidSGmsBetaOverlay/res/drawable-nodpi/default_wallpaper.png"
-    wp_go1 = "device/mediatek/common/overlay/ago/frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.jpg"
-    wp_go2 = "device/mediatek/system/common/overlay/ago/frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.jpg"
-    wp1 = "frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.png"
-    wp2 = "frameworks/base/core/res/res/drawable-sw600dp-nodpi/default_wallpaper.png"
-    wp3 = "frameworks/base/core/res/res/drawable-sw720dp-nodpi/default_wallpaper.png"
-
-    Dim arr, finalStr
-    If Not go Then
-        arr = Array(wp_gms, wp1, wp2, wp3)
-    Else
-        arr = Array(wp_go1, wp_go2, wp1, wp2, wp3)
-    End If
-    finalStr = getMultiMkdirStr(arr, "wp")
-    Call CopyString(finalStr)
 End Sub
 
 Function getGmsVersion()

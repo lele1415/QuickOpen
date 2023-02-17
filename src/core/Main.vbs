@@ -3,7 +3,6 @@ Option Explicit
 Const WINDOW_WIDTH = 460
 Const WINDOW_HEIGHT = 850
 Sub Window_OnLoad
-    Call setDefaultWindow()
     Call runInitFuns()
 End Sub
 
@@ -25,6 +24,8 @@ Sub setCmdSmallWindow()
 End Sub
 
 Sub runInitFuns()
+    Call startCmdMode()
+    
     Call readConfigText()
     Call readWorksInfoText()
 
