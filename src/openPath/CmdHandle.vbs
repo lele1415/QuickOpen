@@ -96,6 +96,7 @@ Function handleProp()
 	If mCmdInput.text = "vol_call" Then Call mCmdInput.setText("ro.config.vc_call_vol_default") : Exit Function
 	If mCmdInput.text = "sku" Then Call mCmdInput.setText("ro.boot.hardware.sku") : Exit Function
 	If mCmdInput.text = "hardware" Then Call mCmdInput.setText("ro.boot.hardware.revision") : Exit Function
+	If mCmdInput.text = "date" Then Call mCmdInput.setText("$(date +%Y%m%d)") : Exit Function
 	handleProp = False
 End Function
 
