@@ -454,7 +454,7 @@ Sub cpFileAndSetValue(whatArr)
 		eqStr = " := "
 		searchStr = keyStr & eqStr
 		valueStr = whatArr(1)
-		cmdStr = getCpAndSedCmdStr(filePath, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
 
 	    filePath = "vendor/mediatek/proprietary/buildinfo_vnd/device.mk"
 		keyStr = "VENDOR_SECURITY_PATCH"
