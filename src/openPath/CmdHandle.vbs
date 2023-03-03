@@ -103,8 +103,9 @@ Function handleGetInfo()
 	If mCmdInput.text = "getfp" Then Call setOpenPath(getOutInfo("ro.system.build.fingerprint")) : Exit Function
 	If mCmdInput.text = "getsp" Then Call setOpenPath(getOutInfo("ro.build.version.security_patch")) : Exit Function
 	If mCmdInput.text = "getbo" Then Call setOpenPath(getOutInfo("ro.build.version.base_os")) : Exit Function
-	If mCmdInput.text = "getplf" Then Call setOpenPath(getPlatform()) : Exit Function
-	If mCmdInput.text = "getgmsv" Then Call setOpenPath(getGmsVersion()) : Exit Function
+	If mCmdInput.text = "getgmsv" Then Call setOpenPath(getOutInfo("ro.com.google.gmsversion")) : Exit Function
+	If mCmdInput.text = "plf" Then Call setOpenPath(getPlatform()) : Exit Function
+	If mCmdInput.text = "gmsv" Then Call setOpenPath(getGmsVersion()) : Exit Function
     handleGetInfo = False
 End Function
 
