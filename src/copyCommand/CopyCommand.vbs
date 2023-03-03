@@ -120,8 +120,12 @@ Sub MkdirWeibuFolderPath()
     commandFinal = ""
 
     If isFileExists(path) Or isFolderExists(path) Then
-        Dim index : index = InStrRev(path, "/")
-        folderPath = Left(path, index)
+        If isFileExists(path) Then
+            Dim index : index = InStrRev(path, "/")
+            folderPath = Left(path, index)
+        Else
+            folderPath = path
+        End If
 
         If isFolderExists(folderPath) Then
 
