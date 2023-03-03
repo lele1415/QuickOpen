@@ -506,7 +506,11 @@ Sub cpFileAndSetValue(whatArr)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "a")
 
 	ElseIf whatArr(0) = "brand" Or whatArr(0) = "model" Or whatArr(0) = "manufacturer" Then
-	    filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+	    If isT0SdkSys() Then
+            filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
+        Else
+	        filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+        End If
         keyStr = "PRODUCT_" & UCase(whatArr(0))
         eqStr = " := "
 		searchStr = keyStr & eqStr
@@ -514,7 +518,11 @@ Sub cpFileAndSetValue(whatArr)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
 
     ElseIf whatArr(0) = "name" Or whatArr(0) = "device" Then
-	    filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+        If isT0SdkSys() Then
+            filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
+        Else
+	        filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+        End If
         keyStr = "PRODUCT_SYSTEM_" & UCase(whatArr(0))
         eqStr = " := "
 		searchStr = keyStr & eqStr
