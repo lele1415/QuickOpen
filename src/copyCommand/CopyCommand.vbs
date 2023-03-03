@@ -32,6 +32,7 @@ Sub getMakeCommand(rmOut, rmBuildprop, ota)
     If ota Then commandFinal = commandFinal & " && " & commandOta
 
     Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub CommandOfLunch()
@@ -61,6 +62,7 @@ Sub getLunchCommand(buildType)
         commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mIp.Infos.Project
     End If
     Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
 End Sub
 
 Function getLunchItemInSplitBuild(buildType)
@@ -95,6 +97,7 @@ Sub CopyCleanCommand()
 	    commandFinal = "git checkout .;git clean -df"
     End If
 	Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub CopyDriverCommitInfo()
@@ -110,6 +113,7 @@ Sub CopyBuildOtaUpdate()
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
     End If
     Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub MkdirWeibuFolderPath()
@@ -148,11 +152,13 @@ Sub MkdirWeibuFolderPath()
 
     commandFinal = relpaceSlashInPath(commandFinal)
     Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub copyExportToolsPathCmd()
     commandFinal = "export PATH=$HOME/Tools:$PATH"
     Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub CopyPathInWindows()
@@ -178,6 +184,7 @@ Sub copyCdSdkCommand()
     arr = Split(mIp.Infos.DriveSdk, ":\")
     path = relpaceSlashInPath(arr(1))
     Call CopyString("cd " & path)
+    Call pasteCmdInXshell()
 End Sub
 
 Function getSedCmd(cmdStr, searchStr, replaceStr, newStr, filePath)
@@ -247,6 +254,7 @@ Sub mkdirLogo()
     arr = Array(lg_u, lg_k)
     finalStr = getMultiMkdirStr(arr, "lg")
     Call CopyString(finalStr)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub mkdirBootAnimation()
@@ -258,6 +266,7 @@ Sub mkdirBootAnimation()
     arr = Array(ani_media, ani_product)
     finalStr = getMultiMkdirStr(arr, "ani")
     Call CopyString(finalStr)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub mkdirWallpaper(go)
@@ -277,6 +286,7 @@ Sub mkdirWallpaper(go)
     End If
     finalStr = getMultiMkdirStr(arr, "wp")
     Call CopyString(finalStr)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub CopyCommitInfo(what)
@@ -284,6 +294,7 @@ Sub CopyCommitInfo(what)
     If what = "" Then
 	    commandFinal = "[" & mIp.Infos.Project & "] : "
         Call CopyString(commandFinal)
+        Call pasteCmdInXshell()
         Exit Sub
 
     ElseIf what = "lg" Then
@@ -338,6 +349,7 @@ Sub CopyCommitInfo(what)
         commandFinal = what & " [" & mIp.Infos.Project & "] : "
     End If
 	Call CopyString("git add weibu;git commit -m ""&Chr(34)&""" & commandFinal & """&Chr(34)&""")
+    Call pasteCmdInXshell()
 End Sub
 
 Sub CopyAdbPushCmd(which)
@@ -377,6 +389,7 @@ Sub CopyAdbPushCmd(which)
 		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
 	End If
 	Call CopyString(finalStr)
+    Call pasteCmdInPowerShell()
 End Sub
 
 Sub CopyQmakeCmd(which)
@@ -405,6 +418,7 @@ Sub modDisplayIdForOtaTest()
 	    sedStr = "sed -i '/" & keyStr & "/s/""&Chr(34)&""$/-OTA_test""&Chr(34)&""/' " & buildinfo
 	    Call CopyString(sedStr)
 	End If
+    Call pasteCmdInXshell()
 End Sub
 
 Sub modSystemprop(whatArr)
@@ -436,6 +450,7 @@ Sub modSystemprop(whatArr)
 		cmdStr = cmdStr & ";git diff " & systempropPath
 	End If
 	Call CopyString(cmdStr)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub cpFileAndSetValue(whatArr)
@@ -558,6 +573,7 @@ Sub cpFileAndSetValue(whatArr)
 
 	End If
 	Call CopyString(cmdStr)
+    Call pasteCmdInXshell()
 End Sub
 
 Function getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, mode)
@@ -696,4 +712,5 @@ Sub mvOut(buildType, where)
         End If
     End If
     Call CopyString(cmdStr)
+    Call pasteCmdInXshell()
 End Sub

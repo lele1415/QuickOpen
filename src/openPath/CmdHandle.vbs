@@ -182,7 +182,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
 	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
-	If mCmdInput.text = "ss" Then Call mSaveString.copy() : Exit Function
+	If mCmdInput.text = "ss" Then Call mSaveString.copy() : Call searchStrInVSCode() : Exit Function
 	If mCmdInput.text = "mouo" Then Call mvOut("user", "out") : Exit Function
 	If mCmdInput.text = "moui" Then Call mvOut("user", "in") : Exit Function
 	If mCmdInput.text = "modo" Then Call mvOut("debug", "out") : Exit Function
@@ -265,4 +265,27 @@ Sub checkT0Path(path)
 			path = "vendor/mediatek/proprietary/packages/modules/Bluetooth/system/btif/src/btif_dm.cc"
 		End If
 	End If
+End Sub
+
+Const TITLE_XSHELL = "Xshell 5 (Free for Home/School)"
+Const TITLE_POWERSHELL = "Windows PowerShell"
+Const TITLE_VSCODE = "Visual Studio Code"
+Sub pasteCmdInXshell()
+    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_XSHELL & """)", 150, "VBScript")
+End Sub
+
+Sub pasteCmdInPowerShell()
+    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_POWERSHELL & """)", 150, "VBScript")
+End Sub
+
+Sub appactivateAndPaste(title)
+    window.clearTimeout(idTimer)
+    Call oWs.appactivate(title)
+	Call oWs.sendkeys("+{INSERT}")
+End Sub
+
+Sub searchStrInVSCode()
+    Call oWs.appactivate(TITLE_VSCODE)
+	Call oWs.sendkeys("^f")
+	Call oWs.sendkeys("^v")
 End Sub
