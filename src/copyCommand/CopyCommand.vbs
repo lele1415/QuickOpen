@@ -152,6 +152,7 @@ Sub MkdirWeibuFolderPath()
 
     commandFinal = relpaceSlashInPath(commandFinal)
     Call CopyString(commandFinal)
+    Call addProjectPath()
     Call pasteCmdInXshell()
 End Sub
 
