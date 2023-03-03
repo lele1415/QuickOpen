@@ -488,12 +488,16 @@ Sub CopyString(str)
     If Len(str) > 452 Then
         'MsgBox("String is too long!(max length 452)")
         setOpenPath(Replace(str, "&Chr(34)&""", ""))
-        oWs.SendKeys "+{TAB}"
-        oWs.SendKeys "^a"
-        oWs.SendKeys "^x"
+        Call CopyOpenPathAllText()
         Exit Sub
     End If
     oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(Window.Close)"
+End Sub
+
+Sub CopyOpenPathAllText()
+    oWs.SendKeys "+{TAB}"
+    oWs.SendKeys "^a"
+    oWs.SendKeys "^x"
 End Sub
 
 Sub onInputListClick(divId, str)

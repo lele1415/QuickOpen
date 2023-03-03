@@ -188,8 +188,57 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "modo" Then Call mvOut("debug", "out") : Exit Function
 	If mCmdInput.text = "modi" Then Call mvOut("debug", "in") : Exit Function
 	If InStr(mCmdInput.text, "qm-") = 1 Then Call CopyQmakeCmd(Replace(mCmdInput.text, "qm-", "")) : Exit Function
+	If mCmdInput.text = "huq" Then Call sendWeiXinMsg("huq") : Exit Function
+	If mCmdInput.text = "zhh" Then Call sendWeiXinMsg("zhh") : Exit Function
+	If mCmdInput.text = "luo" Then Call sendWeiXinMsg("luo") : Exit Function
+	If mCmdInput.text = "getl" Then Call getCommitMsgList() : Exit Function
     handleCopyCommandCmd = False
 End Function
+
+Sub sendWeiXinMsg(who)
+	Call CopyOpenPathAllText()
+    idTimer = window.setTimeout("Call openWeiXin(""" & who & """)", 150, "VBScript")
+End Sub
+
+Sub openWeiXin(who)
+    Select Case who
+	    Case "huq" : who = "huqipeng"
+	    Case "zhh" : who = "zhonghongqiang"
+	    Case "luo" : who = "luoqingjun"
+	End Select
+
+    Call oWs.appactivate("ÆóÒµÎ¢ÐÅ")
+    Call oWs.sendkeys("^f")
+    Call oWs.sendkeys(who & "xiangmuqun")
+	idTimer = window.setTimeout("Call sendEnterKeyInWeiXin(""" & who & """)", 500, "VBScript")
+End Sub
+
+Sub sendEnterKeyInWeiXin(who)
+    window.clearTimeout(idTimer)
+    Call oWs.sendkeys("{ENTER}")
+	idTimer = window.setTimeout("Call writeEnterKeyInWeiXin(""" & who & """)", 500, "VBScript")
+End Sub
+
+Sub writeEnterKeyInWeiXin(who)
+    window.clearTimeout(idTimer)
+	Call oWs.sendkeys("@"&who&"{ENTER}@chengtingrong{ENTER}")
+    Call oWs.sendkeys("{ENTER}")
+	Call oWs.sendkeys("^v")
+End Sub
+
+Sub getCommitMsgList()
+    Dim arr, i, listStr, count
+	listStr = VbLf
+	count = 0
+	arr = Split(getOpenPath(), VbLf)
+	For i = UBound(arr) To 0 Step -1
+	    If InStr(arr(i), "] : ") > 0 Then
+		    count = count + 1
+			listStr = listStr & count & ". " & Right(arr(i), Len(arr(i)) - InStr(arr(i), "] : ") - Len("] : ") + 1) & VbLf
+		End If
+	Next
+	Call setOpenPath(listStr)
+End Sub
 
 Function handleProjectCmd()
 	handleProjectCmd = True
