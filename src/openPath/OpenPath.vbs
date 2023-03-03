@@ -322,7 +322,7 @@ Sub selectForCompare()
     inputPath = getOpenPath()
 
     If isFileExists(inputPath) Or isFolderExists(inputPath) Then
-    	mLeftComparePath = """" & Replace(inputPath, "/", "\") & """"
+    	mLeftComparePath = """" & Replace(mIp.Infos.getPathWithDriveSdk(inputPath), "/", "\") & """"
     	Call hideElement(ID_SELECT_FOR_COMPARE)
     	Call showElement(ID_COMPARE_TO)
     Else
@@ -335,7 +335,7 @@ Sub compareTo()
     inputPath = getOpenPath()
 
     If isFileExists(inputPath) Or isFolderExists(inputPath) Then
-    	mRightComparePath = """" & Replace(inputPath, "/", "\") & """"
+    	mRightComparePath = """" & Replace(mIp.Infos.getPathWithDriveSdk(inputPath), "/", "\") & """"
     	Call hideElement(ID_COMPARE_TO)
     	Call showElement(ID_SELECT_FOR_COMPARE)
     	Call runBeyondCompare(mLeftComparePath, mRightComparePath)
