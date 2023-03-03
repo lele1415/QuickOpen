@@ -183,6 +183,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "moui" Then Call mvOut("user", "in") : Exit Function
 	If mCmdInput.text = "modo" Then Call mvOut("debug", "out") : Exit Function
 	If mCmdInput.text = "modi" Then Call mvOut("debug", "in") : Exit Function
+	If InStr(mCmdInput.text, "qm-") = 1 Then Call CopyQmakeCmd(Replace(mCmdInput.text, "qm-", "")) : Exit Function
     handleCopyCommandCmd = False
 End Function
 

@@ -379,6 +379,17 @@ Sub CopyAdbPushCmd(which)
 	Call CopyString(finalStr)
 End Sub
 
+Sub CopyQmakeCmd(which)
+    Dim cmdStr
+    If which = "sl" Then
+        cmdStr = "qmake SearchLauncherQuickStep"
+    ElseIf which = "lot" Then
+        cmdStr = "qmake GmsSampleIntegration"
+    End If
+    Call CopyString(cmdStr)
+    Call pasteCmdInXshell()
+End Sub
+
 Sub modDisplayIdForOtaTest()
 	Dim buildinfo, keyStr, sedStr
 	buildinfo = mIp.Infos.ProjectPath & "/config/buildinfo.sh"
