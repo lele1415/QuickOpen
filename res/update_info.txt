@@ -1,0 +1,359 @@
+
+2023-03-03
+    CmdHandle: auto write text in WeiXin
+    CopyCommand: add project path after md
+    CmdHandle: auto appactivate shell window and paste command string
+    ReadWorkInfo: cd sys by default when apply T0 work
+    OpenPath: do not replace \ which start with \192.168 or :\
+    OpenPath: fix bug of compare
+    ProjectInfo: get platform with MTK_PLATFORM
+    CopyCommand: fix bug of set sp value
+    CmdHandle: date -> get date string in shell
+    CmdHandle: ci -> csci.ini
+    CmdHandle: calc -> Calculator.java
+    CmdHandle: getgmsv(get from out), gmsv(get from sdk)
+    CmdHandle: add qmake command
+    CopyCommand: do not add \ to .*
+    CopyCommand: support modify T0 product info
+    CopyCommand: fix bug of md logo
+    CopyCommand: fix bug of md fold path end with /
+
+2023-02-17
+    CopyCommand: add T0 lunch command
+    CoreFun: remove CopyQuoteString
+    CmdHandle: add bt, mtp, wfap, wfdrt, brand, model, manufacturer, name, device, brt, bat in cpFileAndSetValue
+    CoreFun: auto copy when string is too long
+    Main: start cmd mode by default
+    CmdHandle: add mv out command
+
+2023-02-16
+    Sdk: Add T0 sdk support
+    Project: Auto get task number from project name
+    CmdHandle: adb push framework service
+
+2023-02-13
+    OnloadProject: check project exist when onload
+    CmdHandle: commands for set gmsversion and security_patch
+
+2023-02-07
+    CmdHandle: command for mod system.prop
+    CoreFun: add isFileExist and isFolderExist funs
+    CoreClass: remove functions with Sdk
+
+2023-01-04
+    ProjectInfo: apply project from weibu path
+    CmdHandle: get saved string with ss
+    CmdHandle: commit strings
+    CmdHandle: adb push commands
+    CmdHandle: get platform and gms version
+
+2022-10-18
+    ProjectInfo: fix bug of get overlay path
+
+2022-09-27
+    Fix bugs
+
+2022-09-05
+    OpenPath: save and read history path
+    CmdHandle: get out prop info
+    CmdMode: change background color to dark, and change focus by press shift+tab
+
+2022-08-30
+    Ver 4.0
+        Add cmd mode (small window)
+    CopyCommand: could mkdir folder only
+    InputList: press up or down key to focus list item
+    InputList: press ESC to hide list
+
+2022-08-29
+    OpenPath: Auto complete file of folder name when press Tab
+    CmdHandle: Add command of mkdir and copy multi files
+
+2022-08-26
+    OpenPath: Add kernel version and target arch to project infos
+    CmdHandle: Add prop handle, ota test and other path
+    CopyString: set string to openpath input if too long
+    CopyCommand: Add sed for split build lunch
+        Add ota build update.zip and export Tools path
+
+2022-08-11
+    Ver 3.8 Add cmd input
+    Ver 3.7
+        CopyCommand: could copy double quote
+        OpenPath: make sed command for modify build number
+
+2022-08-01
+    Ver 3.6
+        OpenPath, CopyCommand: Diff out path and lunch command for 8168 split build
+        OpenPath: Modify key function
+        OpenPath: Add kotlin file for find
+        OpenPath: Add special code
+        Sdk: Add sdk path edit button
+        Others
+
+2022-06-28
+    Ver 3.5 OpenPath: Auto paste and open when press space key
+
+2022-06-27
+    Ver 3.4.1
+        Code: Add Main.vbs for call functions when start
+        CopyCommand: Add rm build.prop
+        Shortcut: apply last work info after delete current
+    Ver 3.4.1
+        Code: Add Main.vbs for call functions when start
+        CopyCommand: Add rm build.prop
+    Ver 3.4
+        OpenPath: Add filelist to find file
+        OpenPath: select file for compare
+        WorkInfo: apply last info when start
+        Shortcut: move top when select
+        HTA: SysMenu="no"
+
+2022-05-20
+    Ver 3.3.7 Explorer : Add button for paste file path to open path textarea
+    Ver 3.3.6 OpenPath : Add buttons for replace \ to / and add or cut path, can compare driver project path
+
+2022-05-19
+    Version 3.3.5 : Fix InputList bug, Add open list button, List not hide when mouse leave, Move Input element out of Div element
+
+2022-05-18
+    Version 3.3.4 : make list when click open button
+    CopyCommand : fix bug of cp path
+    Title: update title version
+    Version 3.3.2 : fix open button list
+    Version 3.3.1 : hide list when leave input parent
+    Version 3.3 : InputList, OpenPath, UI, Others
+
+2022-05-16
+    Version 3.2.1 : Modify UI
+    ProjectInfos : fix bug in getProjectSdkPath
+    Version 3.2 : Add firmware, requirements and zentao to project infos
+    Shortcut : fix bug
+    Version: 3.1.0 Modify project class and read path
+
+2022-04-24
+    Shortcut: single line and add top arrow
+    SdkPath: Do not load product and project if these exit when change sdk path
+    CopyCommand: MsgBox message if cp file exists
+    OpenPath: Add new path, show project infos
+
+2022-04-13
+    Version: 3.0.0 (weibu)
+
+2018-11-09
+    ReadCodePath: Only add exist code path list
+
+2018-09-13
+    Code: add O18167_git
+
+2018-09-12
+    OnloadProject: load other project when no opt found
+    freeze input when loading
+
+2018-08-13
+    OnloadProject: not freeze UI when onloading
+
+2018-08-03
+    CopyCommand: replace "/" to "\" in out path
+    Shortcut: hide all shortcuts after apply one
+    OpenPath: modify for O1 8735
+
+2018-07-24
+    Shortcut:
+      1. Add work name
+      2. Add txt file for load and save
+    Add new code path:
+      O18321_git, O18735B_git, N08735_git
+
+2018-06-06
+    兼容8.1代码
+
+2017-12-18
+    兼容roco/joya_sz替换为mid的代码
+
+2017-10-11
+    Version: 2.4.1
+
+2017-09-15
+    4. Set width of window to 420
+    3. Onload last project by default
+    2. Shortcut info in one line
+    1. reload prj and opt after apply shortcut
+
+2017-08-26
+    Version: v2.4 2017/08/26
+        5. add button for select code or open path
+
+2017-08-25
+    Version: v2.4 2017/08/25
+        4. Fix bug: open wrong path when it had "/" in code path.
+        3. OpenPath: create multistage lists for select path
+
+2017-08-24
+    Version: v2.4 2017/08/24
+        1. UI: modify some names
+        2. OpenPath: add button of copy whole path
+
+2017-08-22
+    Version: v2.3 2017/08/22
+        5. FileExplorer: modified "+" to " + "
+
+2017-08-20
+    Version: v2.3 2017/08/20
+        4. Put code files in order
+        3. Add code path: N08127_git\alps
+        2. Compatible path: device\joya_sz\jasz*
+
+2017-08-16
+    Version: v2.3
+    2017/08/16
+        1. 所有代码路径 和 文本编辑器路径 保存在config.ini文件中
+    Version: v2.2
+
+2017-08-15
+    2017/08/15
+        6. CopyCommand: Add out path
+    Version: v2.2
+
+2017-08-03
+    2017/08/03
+        5. CopyCommand: Add command for lunch
+    Version: v2.2
+
+2017-07-30
+    2017/07/??
+        4. OpenPath: 路径button移动到输入框上方
+    Version: v2.2
+
+2017-07-29
+    2017/07/29
+        2. OpenPath: Add path
+            ..\custom.conf
+            ..\build.prop
+            frameworks\base\packages\SettingsProvider
+            frameworks\base\packages\SettingsProvider\res\values\defaults.xml
+            frameworks\base\packages\SystemUI
+            frameworks\base\core\res\res\values\config.xml
+        3. OpenPath: 改用Dictionary存储所有文件和目录的路径
+
+2017-07-27
+    Version: v2.2
+    2017/07/27
+        1. CodePath: Add N08163 N08167
+
+2017-07-01
+    Version: v2.1
+    2017/07/01
+        4. ReadCodePath: 改为二级选择菜单（Android版本 和 平台）
+
+2017-06-22
+    Version: v2.1
+    2017/06/22
+        3. UI: button的字体改大（14）
+    Version: v2.1
+    2017/06/22
+        2. FileManager: 初始路径按层级分离成多个按钮
+    Version: v2.1
+    2017/06/22
+        1. ShortcutOfCodePrjOpt: 交换 代码路径 和 项目名 的位置
+
+2017-06-17
+    Version: v2.0
+    2017/06/17
+        1. 去掉KK版本部分
+
+2017-04-22
+    Debug: v2.0
+    2017/04/22
+        1. 背景颜色改为黑灰
+        2. 字体颜色改为白色
+        3. 按钮样式修改
+        4. 添加KK版本的 创建切换工程项目的快捷按钮
+        5. 编译命令默认j24
+        6. 添加显示文件目录结构的功能
+
+2017-04-13
+    Debug: v2.0
+    2017/04/13
+        1. 重写: 打开特定文件和目录
+        2. 重写: 拷贝编译命令
+
+2017-04-08
+    Debug: v2.0
+    2017/04/08
+        1. 优化: 读取代码路径
+        2. 重写: 载入工程和项目
+        3. 重写: 创建切换工程项目的快捷按钮
+
+2017-04-01
+    Debug: v2.0
+    2017/04/01
+        模块化分离文件
+        1. 重写读取代码路径
+
+2017-03-31
+    Version: v1.9
+    2017/03/31
+        hta、js、vbs文件分离
+        1. 代码路径在txt文件中保存和读取
+        2. 代码路径选择改为多行显示
+        3. L1区域增加打开文件目录结构功能
+
+2016-12-17
+    Version: v1.8
+    2016/12/17
+        1. 增加打开文件目录结构功能
+        2. 增加浏览工程名列表功能
+        3. 增加浏览modem名称列表功能
+        4. 可添加工程名和代码路径对应的快捷按钮
+        5. 代码结构优化
+
+2016-08-11
+    Version: v1.7
+    2016/08/11
+        1. 增加L1代码兼容
+        2. 修复L1打不开kernel_img问题
+        3. 增加produc_roco.mk文件检查功能
+        4. 代码优化
+
+2016-05-16
+    Version: v1.6
+    2016/05/16
+        1. 完善历史记录功能
+    Version: v1.5
+    2016/0?/??
+        1. 增加获取工程名功能
+        2. 增加检查信息功能
+        3. 增加打开文件历史记录功能
+
+2016-03-17
+    Version: v1.4
+    2016/03/17
+        1. 优化文本框的添加和删除
+        2. 增加打开ProjectConfig.mk和system.prop的按钮
+        3. 扩展代码路径
+        4. 增加生成编译命令功能
+        5. 优化代码结构和报错提示
+
+2016-03-02
+    Version: v1.3
+    2016/03/02
+        1. 打开目录由下拉菜单改为按钮
+        2. 增加打开文件功能
+
+2016-02-22
+    Version: v1.2
+    2016/02/22
+        1. 优化out目录打开
+        2. 增加代码路径
+
+2016-01-29
+    Version: v1.1
+    2016/01/29
+        1. 适配不同分辨率的屏幕
+        2. 路径检测，提示报错
+        3. 优化打开overla目录功能
+
+2015-10-23
+    Version: v1.0
+    2015/10/23
