@@ -48,6 +48,7 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "bi" Then Call setPathFromCmd("build/make/tools/buildinfo.sh") : Exit Function
 	If mCmdInput.text = "mf" Then Call setPathFromCmd("build/make/core/Makefile") : Exit Function
 	If mCmdInput.text = "pc" Then Call setPathFromCmd("device/mediateksample/[product]/ProjectConfig.mk") : Exit Function
+	If mCmdInput.text = "ci" Then Call setPathFromCmd("weibu/[product]/[project-driver]/config/csci.ini") : Exit Function
 	If mCmdInput.text = "dvc" Then Call setPathFromCmd("device/mediatek/system/common/device.mk") : Exit Function
 	If mCmdInput.text = "sc" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/SystemConfig.mk") : Exit Function
 	If mCmdInput.text = "full" Then Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
