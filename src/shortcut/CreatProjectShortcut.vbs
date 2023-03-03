@@ -90,6 +90,7 @@ Sub applyShortcut(work, sdk, product, project, firmware, requirements, zentao)
 	mIp.Zentao = zentao
 	Call upShortcut(work)
 	Call updateProductList()
+	If isT0Sdk() Then setT0SdkSys()
 End Sub
 
 Sub saveWorkToArray()
