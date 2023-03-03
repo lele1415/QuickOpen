@@ -77,7 +77,7 @@ Sub closeProjectInfos()
 End Sub
 
 Function getPlatform()
-    getPlatform = readTextAndGetValue("CUSTOM_HAL_COMBO", pDeviceProjectConfigMk)
+    getPlatform = LCase(readTextAndGetValue("MTK_PLATFORM", pDeviceProjectConfigMk))
 End Function
 
 
