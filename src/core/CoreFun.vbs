@@ -705,5 +705,6 @@ Function checkBackslash(str)
     str = Replace(str, "[", "\[")
     str = Replace(str, "]", "\]")
     str = Replace(str, ".", "\.")
+    str = Replace(str, "\.*", ".*")
     checkBackslash = str
 End Function
