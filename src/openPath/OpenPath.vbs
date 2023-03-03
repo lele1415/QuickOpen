@@ -239,6 +239,7 @@ End Function
 
 Sub replaceOpenPath()
 	Dim path : path = getOpenPath()
+	If InStr(path, ":\") > 0 Or InStr(path, "\\192.168") > 0 Then Exit Sub
 
 	If InStr(path, "..") > 0 Then
 		path = pathDict.Item(path)
