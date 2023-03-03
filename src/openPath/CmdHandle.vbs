@@ -79,6 +79,7 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "pdt" Then Call setPathFromCmd("vendor/weibu_sz/products/products.mk") : Exit Function
 	If mCmdInput.text = "label" Then Call runPath("vendor/mediatek/proprietary/buildinfo_sys/label.ini") : Exit Function
 	If mCmdInput.text = "ftn" Then Call runPath("vendor/mediatek/proprietary/packages/apps/FactoryTest/res/xml/factory.xml") : Exit Function
+	If mCmdInput.text = "calc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/ExactCalculator/src/com/android/calculator2/Calculator.java") : Exit Function
 	HandleFilePathCmd = False
 End Function
 
