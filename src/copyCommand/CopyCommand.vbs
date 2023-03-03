@@ -215,7 +215,7 @@ Function getMultiMkdirStr(arr, what)
 		End If
 
 	    If what = "lg" Then
-	        str =  str & "cp ../File/logo.bmp " & ovlFolder & ";"
+	        str =  str & "cp ../File/logo.bmp " & ovlFile & ";"
 		ElseIf what = "ani" Then
 		    If InStr(path, "bootanimation.zip") > 0 Then
 	            str =  str & "cp ../File/bootanimation.zip " & ovlFolder & ";"
