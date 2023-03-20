@@ -1,4 +1,8 @@
 
+2023-03-20
+    CoreFun: fix bug of history input
+    SDK: support T0 8781 project
+
 2023-03-03
     CmdHandle: auto write text in WeiXin
     CopyCommand: add project path after md
