@@ -400,7 +400,7 @@ Sub saveHistoryPath(path)
     index = vaPathHistory.GetIndexIfExist(path)
     If index > -1 Then Call vaPathHistory.MoveToEnd(index) : Exit Sub
 
-    If vaPathHistory.Bound = 9 Then Call vaPathHistory.PopBySeq(9)
+    If vaPathHistory.Bound = 19 Then Call vaPathHistory.PopBySeq(0)
     Call vaPathHistory.Append(path)
 End Sub
 
@@ -408,7 +408,7 @@ Sub showHistoryPath(keyCode)
     If vaPathHistory.Bound = -1 Then Exit Sub
 
     Dim index
-    index = vaPathHistory.GetIndexIfExist(getOpenPath())
+    index = vaPathHistory.GetIndexIfExist(mIp.cutProject(getOpenPath()))
     If index = -1 Then mCurrentPath = getOpenPath()
 
     If keyCode = KEYCODE_UP Then
