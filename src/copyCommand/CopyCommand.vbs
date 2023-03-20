@@ -55,8 +55,6 @@ Sub getLunchCommand(buildType)
     Dim comboName
     If isT0Sdk() Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
         commandFinal = getLunchItemInSplitBuild(buildType)
-        Call CopyString(commandFinal)
-        Exit Sub
     Else
         comboName = "full_" & mIp.Infos.Product & "-" & buildType
         commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mIp.Infos.Project
@@ -72,8 +70,17 @@ Function getLunchItemInSplitBuild(buildType)
 
     If isT0Sdk() Then
         If isT0SdkVnd() Then Call setT0SdkSys()
-        lunchStr = vndStr & " " & mIp.Infos.DriverProject & " " &  sysStr & " " & mIp.Infos.Project
+        If isT08781() Then
+            Dim halStr, krnStr
+            halStr = "hal_" & mIp.Infos.HalTarget & "-" & buildType
+            krnStr = "krn_" & mIp.Infos.KrnTarget & "-" & buildType
+            vndStr = "vext_" & mIp.Infos.VndTarget & "-" & buildType
+            lunchStr = halStr & " " & krnStr & " "
+        End If
+        lunchStr = lunchStr & vndStr & " " & mIp.Infos.DriverProject & " " &  sysStr & " " & mIp.Infos.Project
+        If isT08781() Then lunchStr = lunchStr & " IS8781"
         commandStr = "sed -i 's/^.*$/" & lunchStr & "/' lunch_item"
+        If isT08781() Then commandStr = commandStr & "_v2"
     Else
         lunchStr = sysStr & " " & vndStr & " " & mIp.Infos.Project
         lunchStr = "lunch_item=""&Chr(34)&""" & lunchStr & """&Chr(34)&"""
@@ -247,7 +254,11 @@ End Function
 
 Sub mkdirLogo()
     Dim lg_fd, lg_u, lg_k
-    lg_fd = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
+    If isT08781() Then
+        lg_fd = "vendor/mediatek/proprietary/external/BootLogo/logo/[boot_logo]/"
+    Else
+        lg_fd = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
+    End If
     lg_u = Replace(lg_fd & "[boot_logo]_uboot.bmp", "[boot_logo]", mIp.Infos.BootLogo)
     lg_k = Replace(lg_fd & "[boot_logo]_kernel.bmp", "[boot_logo]", mIp.Infos.BootLogo)
 
@@ -536,7 +547,11 @@ Sub cpFileAndSetValue(whatArr)
 	    If isT0SdkSys() Then
             filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
         Else
-	        filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+            If isT08781() Then
+	            filePath = "device/mediateksample/" & mIp.Infos.Product & "/vext_" & mIp.Infos.Product & ".mk"
+            Else
+	            filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+            End If
         End If
         keyStr = "PRODUCT_" & UCase(whatArr(0))
         eqStr = " := "
@@ -548,7 +563,11 @@ Sub cpFileAndSetValue(whatArr)
         If isT0SdkSys() Then
             filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
         Else
-	        filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+            If isT08781() Then
+                filePath = "device/mediateksample/" & mIp.Infos.Product & "/vext_" & mIp.Infos.Product & ".mk"
+            Else
+                filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+            End If
         End If
         keyStr = "PRODUCT_SYSTEM_" & UCase(whatArr(0))
         eqStr = " := "
@@ -631,6 +650,11 @@ Sub mvOut(buildType, where)
                     isFolderExists("../merged") Then
                 cmdStr = cmdStr & "mv sys/out " & outPath & "/sys/;"
                 cmdStr = cmdStr & "mv vnd/out " & outPath & "/vnd/;"
+                If isT08781() Then
+                    If isFolderExists("../" & outPath & "/vnd/out_hal") Then MsgBox("vnd out_hal/ is exist!") : Exit Sub
+                    If Not isFolderExists("../vnd/out_hal") Then MsgBox("SDK out_hal/ is not exist!") : Exit Sub
+                    cmdStr = cmdStr & "mv " & outPath & "/vnd/out_hal vnd/;"
+                End If
                 cmdStr = cmdStr & "mv vnd/out_krn " & outPath & "/vnd/;"
                 cmdStr = cmdStr & "mv merged " & outPath & "/;"
             Else
@@ -647,6 +671,11 @@ Sub mvOut(buildType, where)
                         isFolderExists("../" & outPath & "/merged") Then
                     cmdStr = cmdStr & "mv " & outPath & "/sys/out sys/;"
                     cmdStr = cmdStr & "mv " & outPath & "/vnd/out vnd/;"
+                    If isT08781() Then
+                        If isFolderExists("../vnd/out_hal") Then MsgBox("SDK out_hal/ is exist!") : Exit Sub
+                        If Not isFolderExists("../" & outPath & "/vnd/out_hal") Then MsgBox("OUT out_hal/ is not exist!") : Exit Sub
+                        cmdStr = cmdStr & "mv " & outPath & "/vnd/out_hal vnd/;"
+                    End If
                     cmdStr = cmdStr & "mv " & outPath & "/vnd/out_krn vnd/;"
                     cmdStr = cmdStr & "mv " & outPath & "/merged ./;"
                 Else

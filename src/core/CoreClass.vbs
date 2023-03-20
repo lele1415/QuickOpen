@@ -588,7 +588,7 @@ End Sub
 
 Class ProjectInfos
     Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao, mTaskNum
-    Private mProjectAlps, mBootLogo, mSysTarget, mVndTarget, mKernelVer, mTargetArch
+    Private mProjectAlps, mBootLogo, mSysTarget, mVndTarget, mKrnTarget, mHalTarget, mKernelVer, mTargetArch
 
     Public Property Get Work
         Work = mWork
@@ -609,9 +609,17 @@ Class ProjectInfos
     Public Property Get SysTarget
         SysTarget = mSysTarget
     End Property
-    
+
     Public Property Get VndTarget
         VndTarget = mVndTarget
+    End Property
+
+    Public Property Get KrnTarget
+        KrnTarget = mKrnTarget
+    End Property
+
+    Public Property Get HalTarget
+        HalTarget = mHalTarget
     End Property
 
     Public Property Get KernelVer
@@ -720,14 +728,34 @@ Class ProjectInfos
     End Sub
 
     Sub getVndTargetProject()
-        If InStr(Sdk, "t0\vnd") > 0 Then
+        If InStr(Sdk, "t0\vnd") > 0 Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
             mVndTarget = Product
+        ElseIf Not isT0Sdk() Then
+            mVndTarget = ""
+        End If
+    End Sub
+
+    Sub getKrnTargetProject()
+        If InStr(Sdk, "t0\vnd") > 0 Then
+            Dim path : path = "device/mediateksample/" & Product & "/vnd_" & Product & ".mk"
+            mKrnTarget = readTextAndGetValue("KRN_TARGET_PROJECT", path)
+        ElseIf Not isT0Sdk() Then
+            mKrnTarget = ""
+        End If
+    End Sub
+
+    Sub getHalTargetProject()
+        If InStr(Sdk, "t0\vnd") > 0 Then
+            Dim path : path = "device/mediateksample/" & Product & "/vnd_" & Product & ".mk"
+            mHalTarget = readTextAndGetValue("HAL_TARGET_PROJECT", path)
+        ElseIf Not isT0Sdk() Then
+            mHalTarget = ""
         End If
     End Sub
 
     Sub getKernelInfos()
         Dim projectConfigPath, k64Support
-        projectConfigPath = "/device/mediateksample/" & Product & "/ProjectConfig.mk"
+        projectConfigPath = "device/mediateksample/" & Product & "/ProjectConfig.mk"
         If Not isFileExists(projectConfigPath) Then Exit Sub
 
         mKernelVer = readTextAndGetValue("LINUX_KERNEL_VERSION", projectConfigPath)
@@ -932,6 +960,8 @@ Class ProjectInputs
         If isFolderExists(mInfos.ProductPath) Then
             Call mInfos.getSysTargetProject()
             Call mInfos.getVndTargetProject()
+            Call mInfos.getKrnTargetProject()
+            Call mInfos.getHalTargetProject()
             Call mInfos.getKernelInfos()
             onProductChange = True
         Else

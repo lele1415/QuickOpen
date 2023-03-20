@@ -53,7 +53,13 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "sc" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/SystemConfig.mk") : Exit Function
 	If mCmdInput.text = "full" Then Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
 	If mCmdInput.text = "sys" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/sys_[sys_target_project].mk") : Exit Function
-	If mCmdInput.text = "vnd" Then Call setPathFromCmd("device/mediateksample/[product]/vnd_[product].mk") : Exit Function
+	If mCmdInput.text = "vnd" Then
+	    If isT08781() Then
+			Call setPathFromCmd("device/mediateksample/[product]/vext_[product].mk") : Exit Function
+		Else
+			Call setPathFromCmd("device/mediateksample/[product]/vnd_[product].mk") : Exit Function
+		End If
+	End If
 	If mCmdInput.text = "bc" Then Call setPathFromCmd("device/mediatek/system/common/BoardConfig.mk") : Exit Function
 	If mCmdInput.text = "sp" Then Call setPathFromCmd("device/mediatek/system/common/system.prop") : Exit Function
 	If mCmdInput.text = "apn" Then Call setPathFromCmd("device/mediatek/config/apns-conf.xml") : Exit Function

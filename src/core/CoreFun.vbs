@@ -712,3 +712,7 @@ Function checkBackslash(str)
     str = Replace(str, "\.*", ".*")
     checkBackslash = str
 End Function
+
+Function isT08781()
+    isT08781 = InStr(mIp.Infos.VndTarget, "8781") > 0
+End Function
