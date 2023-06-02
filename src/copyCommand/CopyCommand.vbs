@@ -92,6 +92,12 @@ Function getLunchItemInSplitBuild(buildType)
     getLunchItemInSplitBuild = commandStr
 End Function
 
+Sub getT0SysLunchCommand(buildType)
+    commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-" & buildType & " " & mIp.Infos.Project
+    Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
+End Sub
+
 Sub CommandOfOut()
     If Not mIp.hasProjectInfos() Then Exit Sub
     Call CopyString(mIp.Infos.DownloadOutPath)
