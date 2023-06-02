@@ -460,6 +460,17 @@ Sub CopyAdbDumpsysCmd(which)
     Call pasteCmdInPowerShell()
 End Sub
 
+Sub CopyAdbSettingsCmd(which)
+    Dim finalStr
+    If which = "sec" Then
+        finalStr = "adb shell settings put secure clock_seconds 1"
+    ElseIf which = "brt" Then
+        finalStr = "adb shell settings get system screen_brightness"
+    End If
+    Call CopyString(finalStr)
+    Call pasteCmdInPowerShell()
+End Sub
+
 Sub CopyQmakeCmd(which)
     Dim cmdStr
     If which = "sl" Then
