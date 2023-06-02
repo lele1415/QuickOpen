@@ -51,7 +51,10 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "ci" Then Call setPathFromCmd("weibu/[product]/[project-driver]/config/csci.ini") : Exit Function
 	If mCmdInput.text = "dvc" Then Call setPathFromCmd("device/mediatek/system/common/device.mk") : Exit Function
 	If mCmdInput.text = "sc" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/SystemConfig.mk") : Exit Function
-	If mCmdInput.text = "full" Then Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
+	If mCmdInput.text = "full" Then
+		If isT0SdkSys() Then Call setT0SdkVnd()
+		Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
+	End If
 	If mCmdInput.text = "sys" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/sys_[sys_target_project].mk") : Exit Function
 	If mCmdInput.text = "vnd" Then
 	    If isT08781() Then
