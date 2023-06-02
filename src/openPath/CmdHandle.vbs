@@ -186,6 +186,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "winp" Then Call CopyPathInWindows() : Exit Function
 	If mCmdInput.text = "lnxp" Then Call CopyPathInLinux() : Exit Function
 	If InStr(mCmdInput.text, "ps-") = 1 Then Call CopyAdbPushCmd(Replace(mCmdInput.text, "ps-", "")) : Exit Function
+	If InStr(mCmdInput.text, "cl-") = 1 Then Call CopyAdbClearCmd(Replace(mCmdInput.text, "cl-", "")) : Exit Function
 	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
 	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
