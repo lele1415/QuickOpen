@@ -335,11 +335,11 @@ Const TITLE_XSHELL = "Xshell 5 (Free for Home/School)"
 Const TITLE_POWERSHELL = "Windows PowerShell"
 Const TITLE_VSCODE = "Visual Studio Code"
 Sub pasteCmdInXshell()
-    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_XSHELL & """)", 150, "VBScript")
+    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_XSHELL & """)", 500, "VBScript")
 End Sub
 
 Sub pasteCmdInPowerShell()
-    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_POWERSHELL & """)", 150, "VBScript")
+    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_POWERSHELL & """)", 500, "VBScript")
 End Sub
 
 Sub appactivateAndPaste(title)
