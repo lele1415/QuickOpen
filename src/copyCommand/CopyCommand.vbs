@@ -117,6 +117,7 @@ Sub CopyDriverCommitInfo()
     If Not mIp.hasProjectInfos() Then Exit Sub
 	commandFinal = "[" & mIp.Infos.DriverProject & "] : "
 	Call CopyString(commandFinal)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub CopyBuildOtaUpdate()
@@ -164,8 +165,8 @@ Sub MkdirWeibuFolderPath()
     End If
 
     commandFinal = relpaceSlashInPath(commandFinal)
-    Call CopyString(commandFinal)
     Call addProjectPath()
+    Call CopyString(commandFinal)
     Call pasteCmdInXshell()
 End Sub
 
