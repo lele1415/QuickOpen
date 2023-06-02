@@ -402,18 +402,6 @@ Sub CopyAdbPushCmd(which)
 	    sourcePath = outPath & "\system\framework\services.jar"
 		targetPath = "/system/framework"
 		finalStr = "adb push " & sourcePath & " " & targetPath
-        sourcePath = outPath & "\system\framework\services.jar.bprof"
-		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
-        sourcePath = outPath & "\system\framework\services.jar.prof"
-		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
-        
-        sourcePath = outPath & "\system\framework\oat\arm64\services.art"
-        targetPath = "/system/framework/oat/arm64"
-		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
-        sourcePath = outPath & "\system\framework\oat\arm64\services.odex"
-		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
-        sourcePath = outPath & "\system\framework\oat\arm64\services.vdex"
-		finalStr = finalStr & ";adb push " & sourcePath & " " & targetPath
 	End If
 	Call CopyString(finalStr)
     Call pasteCmdInPowerShell()
