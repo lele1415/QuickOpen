@@ -37,8 +37,8 @@ Sub applyLastWorkInfo()
         mIp.Firmware = oInfos.Firmware
         mIp.Requirements = oInfos.Requirements
         mIp.Zentao = oInfos.Zentao
-        Call updateProductList()
         If isT0Sdk() Then setT0SdkSys()
+        Call updateProductList()
     End If
 End Sub
 
