@@ -365,7 +365,9 @@ Function getDriverProjectName(mmiFolderName)
 
     'M863Y_YUKE_066-MMI
     'm863ur200_64-SBYH_A8005A-Nitro_8_MMI
-    If InStr(str, "MMI") > 0 And InStr(str, "-") > 0 Then
+    If InStr(str, "-MMI") > 0 Then
+        str = Replace(str, "-MMI", "")
+    ElseIf InStr(str, "MMI") > 0 And InStr(str, "-") > 0 Then
         str = Left(str, InStrRev(str, "-") - 1)
     Else
         str = mmiFolderName
