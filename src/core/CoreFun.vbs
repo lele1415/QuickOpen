@@ -672,7 +672,7 @@ Function getTaskNum(project)
 End Function
 
 Function isT0Sdk()
-    If InStr(mIp.Infos.Sdk, "_t0\") > 0 Then
+    If InStr(mIp.Infos.Sdk, "_t0") > 0 Then
         isT0Sdk = True
     Else
         isT0Sdk = False
@@ -680,7 +680,7 @@ Function isT0Sdk()
 End Function
 
 Function isT0SdkSys()
-    If InStr(mIp.Infos.Sdk, "_t0\sys") > 0 Then
+    If InStr(mIp.Infos.Sdk, "\sys") > 0 Then
         isT0SdkSys = True
     Else
         isT0SdkSys = False
@@ -688,10 +688,26 @@ Function isT0SdkSys()
 End Function
 
 Function isT0SdkVnd()
-    If InStr(mIp.Infos.Sdk, "_t0\vnd") > 0 Then
+    If InStr(mIp.Infos.Sdk, "\vnd") > 0 Then
         isT0SdkVnd = True
     Else
         isT0SdkVnd = False
+    End If
+End Function
+
+Function isT08168Sdk()
+    If InStr(mIp.Infos.Sdk, "t0_816x") > 0 Then
+        isT08168Sdk = True
+    Else
+        isT08168Sdk = False
+    End If
+End Function
+
+Function isT08168SdkVnd()
+    If InStr(mIp.Infos.Sdk, "t0_816x\vnd") > 0 Then
+        isT08168SdkVnd = True
+    Else
+        isT08168SdkVnd = False
     End If
 End Function
 
