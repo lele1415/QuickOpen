@@ -441,6 +441,25 @@ Sub CopyAdbStartCmd(which)
     Call pasteCmdInPowerShell()
 End Sub
 
+Sub CopyAdbDumpsysCmd(which)
+    Dim finalStr
+    If which = "a" Then
+		finalStr = "adb shell ""&Chr(34)&""dumpsys activity top | grep ACTIVITY | tail -n 1""&Chr(34)&"""
+	ElseIf which = "f" Then
+		finalStr = "adb shell ""&Chr(34)&""dumpsys activity top | grep '#[0-9]: ' | tail -n 1""&Chr(34)&"""
+	ElseIf which = "r" Then
+		finalStr = "adb shell ""&Chr(34)&""dumpsys activity activities | grep '* ActivityRecord{'""&Chr(34)&"""
+	ElseIf which = "temp" Then
+		finalStr = "adb shell dumpsys battery set temp"
+	ElseIf which = "level" Then
+		finalStr = "adb shell dumpsys battery set level"
+	ElseIf which = "su" Then
+		finalStr = "adb shell ""&Chr(34)&""dumpsys activity service com.android.systemui | grep --color""&Chr(34)&"""
+	End If
+	Call CopyString(finalStr)
+    Call pasteCmdInPowerShell()
+End Sub
+
 Sub CopyQmakeCmd(which)
     Dim cmdStr
     If which = "sl" Then
