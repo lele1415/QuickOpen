@@ -259,13 +259,17 @@ Function getMultiMkdirStr(arr, what)
 	getMultiMkdirStr = str
 End Function
 
+Function getLogoPath()
+    If isT08781() Then
+        getLogoPath = "vendor/mediatek/proprietary/external/BootLogo/logo/[boot_logo]/"
+    Else
+        getLogoPath = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
+    End If
+End Function
+
 Sub mkdirLogo()
     Dim lg_fd, lg_u, lg_k
-    If isT08781() Then
-        lg_fd = "vendor/mediatek/proprietary/external/BootLogo/logo/[boot_logo]/"
-    Else
-        lg_fd = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
-    End If
+    lg_fd = getLogoPath()
     lg_u = Replace(lg_fd & "[boot_logo]_uboot.bmp", "[boot_logo]", mIp.Infos.BootLogo)
     lg_k = Replace(lg_fd & "[boot_logo]_kernel.bmp", "[boot_logo]", mIp.Infos.BootLogo)
 

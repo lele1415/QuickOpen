@@ -33,7 +33,7 @@ Function HandleFolderPathCmd()
 	If mCmdInput.text = "fwv" Then Call setPathFromCmd("frameworks/base/core/res/res/values") : Exit Function
 	If mCmdInput.text = "vp" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps") : Exit Function
 	If mCmdInput.text = "lot" Then Call setPathFromCmd("vendor/partner_gms/apps/GmsSampleIntegration") : Exit Function
-	If mCmdInput.text = "lg" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]") : Exit Function
+	If mCmdInput.text = "lg" Then Call setPathFromCmd(getLogoPath()) : Exit Function
 	'If mCmdInput.text = "md" Then Call setPathFromCmd("vendor/weibu_sz/media") : Exit Function
 	If mCmdInput.text = "tee" Then Call setPathFromCmd("vendor/mediatek/proprietary/trustzone/trustkernel/source/build/[product]") : Exit Function
 	HandleFolderPathCmd = False
