@@ -287,20 +287,26 @@ Function getFileNameFromPath(path)
     getFileNameFromPath = str
 End Function
 
-Function getFolderPath(filePath)
-    Dim str
+Function getParentPath(filePath)
+    Dim str, index
     str = relpaceSlashInPath(filePath)
-    If InStr(str, "/") > 0 Then
-        str = Left(str, InStrRev(str, "/") - 1)
+    index = InStrRev(str, "/")
+    Do While index > 0 And index = Len(str)
+        str = Left(str, Len(str) - 1)
+        index = InStrRev(str, "/")
+    Loop
+
+    If index > 0 And index < Len(str) Then
+        str = Left(str, index - 1)
     Else
         str = ""
     End If
-    getFolderPath = str
+    getParentPath = str
 End Function
 
 Function getTabStr()
     Dim folderPath
-    folderPath = getFolderPath(getOpenPath())
+    folderPath = getParentPath(getOpenPath())
     If Not isFolderExists(folderPath) Then getTabStr = "" : Exit Function
     
     Dim input, vaFileFolder, sameStartStr

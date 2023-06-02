@@ -105,7 +105,7 @@ Function getRomPath()
     ElseIf isT0SdkVnd() Then
         alpsStr = "vnd"
     End If
-    getRomPath = Left(mIp.Infos.DriveSdk, InStr(mIp.Infos.DriveSdk, alpsStr) - 1) & "ROM"
+    getRomPath = getParentPath(mIp.Infos.DriveSdk) & "\ROM"
 End Function
 
 Sub CommandOfOut()
@@ -240,7 +240,7 @@ End Function
 Function getMultiMkdirStr(arr, what)
     Dim str, path, ovlFolder, ovlFile
     For Each path In arr
-	    ovlFolder = mIp.Infos.getOverlayPath(getFolderPath(path))
+	    ovlFolder = mIp.Infos.getOverlayPath(getParentPath(path))
 	    ovlFile = mIp.Infos.getOverlayPath(path)
 	    If (Not (what = "lg" And InStr(path, "_kernel.bmp") > 0)) And (Not isFolderExists(ovlFolder)) Then
 	        str =  str & "mkdir -p " & ovlFolder & ";"
@@ -675,7 +675,7 @@ End Sub
 
 Function getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, mode)
     Dim folderPath, cmdStr
-	folderPath = getFolderPath(filePath)
+	folderPath = getParentPath(filePath)
 
 	If Not isFileExists(mIp.Infos.getOverlayPath(filePath)) Then
 		cmdStr = cmdStr & "mkdir -p " & mIp.Infos.getOverlayPath(folderPath) & ";"
