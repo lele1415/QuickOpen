@@ -18,7 +18,7 @@ Function HandleFolderPathCmd()
 	HandleFolderPathCmd = True
 	If mCmdInput.text = "m" Then Call runPath(mIp.Infos.ProjectPath) : Exit Function
 	If mCmdInput.text = "d" Then Call runPath(mIp.Infos.DriverProjectPath) : Exit Function
-	If mCmdInput.text = "rom" Then Call runPath(Left(mIp.Infos.DriveSdk, InStr(mIp.Infos.DriveSdk, "alps") - 1) & "ROM") : Exit Function
+	If mCmdInput.text = "rom" Then Call runPath(getRomPath()) : Exit Function
 	If mCmdInput.text = "out" Then Call runPath(mIp.Infos.OutPath) : Exit Function
 	If mCmdInput.text = "oa" Then Call runPath(mIp.Infos.OutPath & "/obj/APPS") : Exit Function
 	If mCmdInput.text = "os" Then Call runPath(mIp.Infos.OutPath & "/system/system_ext/priv-app") : Exit Function

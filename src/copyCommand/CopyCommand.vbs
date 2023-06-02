@@ -98,6 +98,16 @@ Sub getT0SysLunchCommand(buildType)
     Call pasteCmdInXshell()
 End Sub
 
+Function getRomPath()
+    Dim alpsStr : alpsStr = "alps"
+    If isT0SdkSys() Then
+        alpsStr = "sys"
+    ElseIf isT0SdkVnd() Then
+        alpsStr = "vnd"
+    End If
+    getRomPath = Left(mIp.Infos.DriveSdk, InStr(mIp.Infos.DriveSdk, alpsStr) - 1) & "ROM"
+End Function
+
 Sub CommandOfOut()
     If Not mIp.hasProjectInfos() Then Exit Sub
     Call CopyString(mIp.Infos.DownloadOutPath)
