@@ -728,7 +728,7 @@ Class ProjectInfos
     End Sub
 
     Sub getVndTargetProject()
-        If InStr(Sdk, "t0\vnd") > 0 Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
+        If isT0SdkVnd() Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
             mVndTarget = Product
         ElseIf Not isT0Sdk() Then
             mVndTarget = ""
@@ -736,7 +736,7 @@ Class ProjectInfos
     End Sub
 
     Sub getKrnTargetProject()
-        If InStr(Sdk, "t0\vnd") > 0 Then
+        If isT0SdkVnd() Then
             Dim path : path = "device/mediateksample/" & Product & "/vnd_" & Product & ".mk"
             mKrnTarget = readTextAndGetValue("KRN_TARGET_PROJECT", path)
         ElseIf Not isT0Sdk() Then
@@ -745,7 +745,7 @@ Class ProjectInfos
     End Sub
 
     Sub getHalTargetProject()
-        If InStr(Sdk, "t0\vnd") > 0 Then
+        If isT0SdkVnd() Then
             Dim path : path = "device/mediateksample/" & Product & "/vnd_" & Product & ".mk"
             mHalTarget = readTextAndGetValue("HAL_TARGET_PROJECT", path)
         ElseIf Not isT0Sdk() Then
