@@ -25,6 +25,7 @@ Function HandleFolderPathCmd()
 	If mCmdInput.text = "tf" Then Call runPath(mIp.Infos.OutPath & "/obj/PACKAGING/target_files_intermediates") : Exit Function
 	If mCmdInput.text = "st" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/MtkSettings") : Exit Function
 	If mCmdInput.text = "su" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI") : Exit Function
+	If mCmdInput.text = "cam" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/Camera2") : Exit Function
 	If mCmdInput.text = "ft" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/FactoryTest") : Exit Function
 	If mCmdInput.text = "fm" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/FactoryMode") : Exit Function
 	If mCmdInput.text = "gms" Then Call setPathFromCmd("vendor/partner_gms") : Exit Function
