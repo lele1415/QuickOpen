@@ -82,7 +82,7 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "brt" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/res/values/config.xml") : Exit Function
 	If mCmdInput.text = "lgu" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_uboot.bmp") : Exit Function
 	If mCmdInput.text = "lgk" Then Call setPathFromCmd("vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/[boot_logo]_kernel.bmp") : Exit Function
-	If mCmdInput.text = "ani" Then Call setPathFromCmd("vendor/weibu_sz/media") : Exit Function
+	If mCmdInput.text = "wb" Then Call setPathFromCmd("vendor/weibu_sz") : Exit Function
 	If mCmdInput.text = "pdt" Then Call setPathFromCmd("vendor/weibu_sz/products/products.mk") : Exit Function
 	If mCmdInput.text = "label" Then Call runPath("vendor/mediatek/proprietary/buildinfo_sys/label.ini") : Exit Function
 	If mCmdInput.text = "ftn" Then Call runPath("vendor/mediatek/proprietary/packages/apps/FactoryTest/res/xml/factory.xml") : Exit Function
