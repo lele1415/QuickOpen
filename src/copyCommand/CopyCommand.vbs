@@ -294,7 +294,11 @@ End Sub
 
 Sub mkdirWallpaper(go)
     Dim wp_gms, wp_go1, wp_go2, wp1, wp2, wp3
-    wp_gms = "vendor/partner_gms/overlay/AndroidSGmsBetaOverlay/res/drawable-nodpi/default_wallpaper.png"
+    If isT0Sdk() Then
+        wp_gms = "vendor/partner_gms/overlay/AndroidGmsBetaOverlay/res/drawable-nodpi/default_wallpaper.png"
+    Else
+        wp_gms = "vendor/partner_gms/overlay/AndroidSGmsBetaOverlay/res/drawable-nodpi/default_wallpaper.png"
+    End If
     wp_go1 = "device/mediatek/common/overlay/ago/frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.jpg"
     wp_go2 = "device/mediatek/system/common/overlay/ago/frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.jpg"
     wp1 = "frameworks/base/core/res/res/drawable-nodpi/default_wallpaper.png"
