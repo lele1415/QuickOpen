@@ -68,7 +68,7 @@ body { font-family: sans-serif; color:#f8f8f2;}
 
 <fieldset id="work_fieldset">
 <legend>Work name</legend>
-    <input type="text" id="work_name" onchange="onWorkChange()" size="35">
+    <input type="text" id="work_name" onchange="onInputWorkChange()" size="35">
 </fieldset>
 <br id="br1">
 <fieldset id="project_fieldset">
@@ -79,21 +79,21 @@ body { font-family: sans-serif; color:#f8f8f2;}
     <br>
     <div id="div_shortcut"></div>
 
-    <input type="text" id="input_sdk_path" onchange="onSdkPathChange()"  onclick="onSdkPathInputClick()"size="50" />
+    <input type="text" id="input_sdk_path" onchange="onInputSdkChange()"  onclick="onSdkPathInputClick()"size="50" />
     <input type="button" class="input_button" onclick="openSdkText()" value="Edit" />
     <div class="form_sdk_path" id="parent_sdk_path" style="display:none"></div>
 
-    <input type="text" id="input_product" onchange="onProductChange()" size="20" />
+    <input type="text" id="input_product" onchange="onInputProductChange()" size="20" />
     <div class="form_product" id="parent_product" style="display:none"></div>
     
-    <input type="text" id="input_project" onchange="onProjectChange()" size="60" />
+    <input type="text" id="input_project" onchange="onInputProjectChange()" size="60" />
     <div class="form_project" id="parent_project" style="display:none"></div>
 
-    <input type="text" id="input_firmware" onchange="onFirmwareChange()" size="40" />
+    <input type="text" id="input_firmware" onchange="onInputFirmwareChange()" size="40" />
     <input type="button" class="input_button" onclick="openFirmwareFolder()" value="Firmware" />
-    <input type="text" id="input_requirements" onchange="onRequirementsChange()" size="40" />
+    <input type="text" id="input_requirements" onchange="onInputRequirementsChange()" size="40" />
     <input type="button" class="input_button" onclick="openRequirementsFolder()" value="Requirement" />
-    <input type="text" id="input_zentao" onchange="onZentaoChange()" size="40" />
+    <input type="text" id="input_zentao" onchange="onInputZentaoChange()" size="40" />
     <input type="button" class="input_button" onclick="openZentao()" value="Zentao" />
 
     <input id="button_show_project_infos" type="button" class="input_button" onclick="getProjectInfos()" value="ProjectConfig infos">

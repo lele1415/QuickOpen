@@ -698,10 +698,27 @@ Function isT0SdkVnd()
     End If
 End Function
 
+Function getT0SysProjectFromVnd(vndProject)
+    If InStr(vndProject, "-") > 0 Then
+        Dim i, arrStr, str
+        arrStr = Split(vndProject, "-")
+        For i = 0 To UBound(arrStr)
+            If i = 0 Then
+                str = arrStr(i) & "-MMI"
+            Else
+                str = str & "-" & arrStr(i)
+            End If
+        Next
+        getT0SysProjectFromVnd = str
+    Else
+        getT0SysProjectFromVnd = vndProject & "-MMI"
+    End If
+End Function
+
 Sub setT0SdkSys()
     mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
     mIp.Product = mIp.Infos.SysTarget
-    If InStr(mIp.Infos.Project, "-MMI") = 0 Then mIp.Project = mIp.Infos.Project & "-MMI"
+    mIp.Project = getT0SysProjectFromVnd(mIp.Infos.Project)
     Call createWorkName()
 End Sub
 

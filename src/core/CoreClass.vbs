@@ -815,7 +815,7 @@ End Class
 
 
 Class ProjectInputs
-    Private mInfos
+    Private mInfos, mT0InnerSwitch
 
     Public Sub Class_Initialize
         Set mInfos = New ProjectInfos
@@ -853,6 +853,10 @@ Class ProjectInputs
         Zentao = document.getElementById(getZentaoInputId()).value
     End Property
 
+    Public Property Get T0InnerSwitch
+        T0InnerSwitch = mT0InnerSwitch
+    End Property
+
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
         document.title = value & " " & mDrive
@@ -887,6 +891,10 @@ Class ProjectInputs
     Public Property Let Zentao(value)
         Call setElementValue(getZentaoInputId(), value)
         Call onZentaoChange()
+    End Property
+
+    Public Property Let T0InnerSwitch(value)
+        mT0InnerSwitch = value
     End Property
 
     Public Function hasProjectInfos()
@@ -948,43 +956,45 @@ Class ProjectInputs
         mInfos.Work = Work
     End Sub
 
-    Public Function onSdkChange()
+    Public Sub onSdkChange()
         'Call mIp.cutSdkInOpenPath()
-
         mInfos.Sdk = Sdk
         If isFolderExists(mInfos.DriveSdk) Then
-            onSdkChange = True
+            If mT0InnerSwitch Then Exit Sub
+            Call clearWorkInfos()
+            Call updateProductList()
         Else
             msgboxPathNotExist(mInfos.DriveSdk)
+            Call clearWorkInfos()
             Call setElementValue(getSdkPathInputId(), "")
             mInfos.Sdk = ""
-            onSdkChange = False
         End If
-    End Function
+    End Sub
 
-    Public Function onProductChange()
+    Public Sub onProductChange()
         mInfos.Product = Product
         If isFolderExists(mInfos.ProductPath) Then
+            If mT0InnerSwitch Then Exit Sub
+            Call updateProjectList()
+            Call clearWorkInfos()
             Call mInfos.getSysTargetProject()
             Call mInfos.getVndTargetProject()
             Call mInfos.getKrnTargetProject()
             Call mInfos.getHalTargetProject()
             Call mInfos.getKernelInfos()
-            onProductChange = True
         Else
             msgboxPathNotExist(mInfos.ProductPath)
+            Call clearWorkInfos()
             Call setElementValue(getProductInputId(), "")
             mInfos.Product = ""
-            onProductChange = False
         End If
-    End Function
+    End Sub
 
-    Public Function onProjectChange()
+    Public Sub onProjectChange()
         'Call mIp.cutProjectInOpenPath()
-
         mInfos.Project = Project
-        mInfos.ProjectAlps = ""
         If isFolderExists(mInfos.ProjectPath) Then
+
             If InStr(mInfos.Sdk, "_r") = 0 _
                     Or isFolderExists(mInfos.ProjectPath & "/alps") _
                     Or isFolderExists(mInfos.ProjectPath & "/config") Then
@@ -993,22 +1003,26 @@ Class ProjectInputs
                 mInfos.ProjectAlps = ""
             End If
 
+            If mT0InnerSwitch Then Exit Sub
+
             If isT0SdkVnd() Then
                 mInfos.DriverProject = Project
             ElseIf Not isT0Sdk() Then
                 mInfos.DriverProject = getDriverProjectName(Project)
             End If
 
+            Call clearWorkInfos()
+            Call createWorkName()
             Call getProjectConfigMk()
             Call mInfos.getBootLogo()
-            onProjectChange = True
         Else
             msgboxPathNotExist(mInfos.ProjectPath)
+            Call clearWorkInfos()
             Call setElementValue(getProjectInputId(), "")
             mInfos.Project = ""
-            onProjectChange = False
+            mInfos.ProjectAlps = ""
         End If
-    End Function
+    End Sub
 
     Public Sub onFirmwareChange()
         mInfos.Firmware = Firmware

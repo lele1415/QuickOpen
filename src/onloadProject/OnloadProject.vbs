@@ -15,41 +15,33 @@ Dim idTimer
 
 
 
-Sub onWorkChange()
+Sub onInputWorkChange()
     Call mIp.onWorkChange()
 End Sub
 
-Sub onFirmwareChange()
+Sub onInputFirmwareChange()
     Call mIp.onFirmwareChange()
 End Sub
 
-Sub onRequirementsChange()
+Sub onInputRequirementsChange()
     Call mIp.onRequirementsChange()
 End Sub
 
-Sub onZentaoChange()
+Sub onInputZentaoChange()
     Call mIp.onZentaoChange()
 End Sub
 
-Sub onSdkPathChange()
-    Call mIp.clearWorkInfos()
-    If mIp.onSdkChange() Then
-        Call updateProductList()
-    End If
+Sub onInputSdkChange()
+    Call mIp.onSdkChange()
 End Sub
 
-Sub onProductChange()
-	Call mIp.clearWorkInfos()
-    If mIp.onProductChange() Then
-        Call updateProjectList()
-    End If
+Sub onInputProductChange()
+    Call mIp.onProductChange()
 End Sub
 
-Sub onProjectChange()
-	Call mIp.clearWorkInfos()
-    If mIp.onProjectChange() Then
-        Call createWorkName()
-    End If
+Sub onInputProjectChange()
+    mIp.T0InnerSwitch = False
+    Call mIp.onProjectChange()
 End Sub
 
 Sub updateProductList()
