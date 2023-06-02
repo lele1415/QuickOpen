@@ -411,6 +411,36 @@ Sub CopyAdbPushCmd(which)
     Call pasteCmdInPowerShell()
 End Sub
 
+Sub CopyAdbClearCmd(which)
+    Dim finalStr
+    If which = "su" Then
+		finalStr = "adb shell stop;adb shell start"
+	ElseIf which = "st" Then
+		finalStr = "adb shell pm clear com.android.settings"
+	ElseIf which = "sl" Then
+		finalStr = "adb shell pm clear com.android.launcher3"
+	ElseIf which = "cam" Then
+		finalStr = "adb shell pm clear com.mediatek.camera"
+    ElseIf which = "ft" Then
+		finalStr = "adb shell pm clear com.weibu.factorytest"
+	End If
+	Call CopyString(finalStr)
+    Call pasteCmdInPowerShell()
+End Sub
+
+Sub CopyAdbStartCmd(which)
+    Dim finalStr
+    If which = "ab" Then
+		finalStr = "adb shell am start -a android.settings.DEVICE_INFO_SETTINGS"
+	ElseIf which = "log" Then
+		finalStr = "adb shell am start -n com.debug.loggerui/.MainActivity"
+    ElseIf which = "ft" Then
+		finalStr = "adb shell am start -n com.weibu.factorytest/.FactoryTest"
+	End If
+	Call CopyString(finalStr)
+    Call pasteCmdInPowerShell()
+End Sub
+
 Sub CopyQmakeCmd(which)
     Dim cmdStr
     If which = "sl" Then
@@ -625,129 +655,103 @@ Function getSedStr(cmdStr, filePath, searchStr, eqStr, valueStr, mode)
     End If
 End Function
 
-Sub mvOut(buildType, where)
-    Dim cmdStr, outName, outPath
-    outName = getProjectSimpleName() & "_" & buildType
-    If isT0Sdk() Then
-        outPath = "OUT/" & outName
-        If where = "out" Then
-            If Not isFolderExists("../" & outPath) Then
-                cmdStr = cmdStr & "mkdir " & outPath & ";"
-            End If
-            If Not isFolderExists("../" & outPath & "/sys") Then
-                cmdStr = cmdStr & "mkdir " & outPath & "/sys;"
-            ElseIf isFolderExists("../" & outPath & "/sys/out") Then
-                MsgBox("sys out/ is exist!")
-                Exit Sub
-            End If
-            If Not isFolderExists("../" & outPath & "/vnd") Then
-                cmdStr = cmdStr & "mkdir " & outPath & "/vnd;"
-            ElseIf isFolderExists("../" & outPath & "/vnd/out") Or _
-                    isFolderExists("../" & outPath & "/vnd/out_krn")Then
-                MsgBox("vnd out/ is exist!")
-                Exit Sub
-            End If
-            If isFolderExists("../" & outPath & "/merged") Then
-                MsgBox("merged/ is exist!")
-                Exit Sub
-            End If
-            If isFolderExists("../sys/out") And _
-                    isFolderExists("../vnd/out") And _
-                    isFolderExists("../vnd/out_krn") And _
-                    isFolderExists("../merged") Then
-                cmdStr = cmdStr & "mv sys/out " & outPath & "/sys/;"
-                cmdStr = cmdStr & "mv vnd/out " & outPath & "/vnd/;"
-                If isT08781() Then
-                    If isFolderExists("../" & outPath & "/vnd/out_hal") Then MsgBox("vnd out_hal/ is exist!") : Exit Sub
-                    If Not isFolderExists("../vnd/out_hal") Then MsgBox("SDK out_hal/ is not exist!") : Exit Sub
-                    cmdStr = cmdStr & "mv " & outPath & "/vnd/out_hal vnd/;"
-                End If
-                cmdStr = cmdStr & "mv vnd/out_krn " & outPath & "/vnd/;"
-                cmdStr = cmdStr & "mv merged " & outPath & "/;"
-            Else
-                MsgBox("SDK out/ or merged/ is not exist!")
-            End If
-        ElseIf where = "in" Then
-            If Not isFolderExists("../sys/out") And _
-                    Not isFolderExists("../vnd/out") And _
-                    Not isFolderExists("../vnd/out_krn") And _
-                    Not isFolderExists("../merged") Then
-                If isFolderExists("../" & outPath & "/sys/out") And _
-                        isFolderExists("../" & outPath & "/vnd/out") And _
-                        isFolderExists("../" & outPath & "/vnd/out_krn") And _
-                        isFolderExists("../" & outPath & "/merged") Then
-                    cmdStr = cmdStr & "mv " & outPath & "/sys/out sys/;"
-                    cmdStr = cmdStr & "mv " & outPath & "/vnd/out vnd/;"
-                    If isT08781() Then
-                        If isFolderExists("../vnd/out_hal") Then MsgBox("SDK out_hal/ is exist!") : Exit Sub
-                        If Not isFolderExists("../" & outPath & "/vnd/out_hal") Then MsgBox("OUT out_hal/ is not exist!") : Exit Sub
-                        cmdStr = cmdStr & "mv " & outPath & "/vnd/out_hal vnd/;"
-                    End If
-                    cmdStr = cmdStr & "mv " & outPath & "/vnd/out_krn vnd/;"
-                    cmdStr = cmdStr & "mv " & outPath & "/merged ./;"
-                Else
-                    MsgBox("OUT out/ or merged/ is not exist!")
-                End If
-            Else
-                MsgBox("SDK out/ or merged/ is exist!")
-            End If
-        End If
-    ElseIf Not InStr(mIp.Infos.Sdk, "8168") > 0 Then
-        outPath = "../OUT/" & outName
-        If where = "out" Then
-            If Not isFolderExists(outPath) Then
-                cmdStr = cmdStr & "mkdir " & outPath & ";"
-            ElseIf isFolderExists(outPath & "/out") Then
-                MsgBox("out/ is exist!")
-                Exit Sub
-            End If
-            If isFolderExists("out") Then
-                cmdStr = cmdStr & "mv out " & outPath & "/;"
-            Else
-                MsgBox("SDK out/ is not exist!")
-            End If
-        ElseIf where = "in" Then
-            If Not isFolderExists("out") Then
-                If isFolderExists(outPath & "/out") Then
-                    cmdStr = cmdStr & "mv " & outPath & "/out ./;"
-                Else
-                    MsgBox("OUT out/ is not exist!")
-                End If
-            ELse
-                MsgBox("SDK out/ is exist!")
-            End If
-        End If
-    Else
-        outPath = "../OUT/" & outName
-        If where = "out" Then
-            If Not isFolderExists(outPath) Then
-                cmdStr = cmdStr & "mkdir " & outPath & ";"
-            ElseIf isFolderExists(outPath & "/out") Or _
-                    isFolderExists(outPath & "/out_sys") Then
-                MsgBox("OUT out/ is exist!")
-                Exit Sub
-            End If
-            If isFolderExists("out") And isFolderExists("out_sys") Then
-                cmdStr = cmdStr & "mv out " & outPath & "/;"
-                cmdStr = cmdStr & "mv out_sys " & outPath & "/;"
-            ELse
-                MsgBox("SDK out/ or out_sys/ is not exist!")
-            End If
-        ElseIf where = "in" Then
-            If Not isFolderExists("out") Or _
-                    Not isFolderExists("out_sys") Then
-                If isFolderExists(outPath & "/out") Or _
-                    isFolderExists(outPath & "/out_sys") Then
-                    cmdStr = cmdStr & "mv " & outPath & "/out ./;"
-                    cmdStr = cmdStr & "mv " & outPath & "/out_sys ./;"
-                Else
-                    MsgBox("OUT out/ or out_sys/ is not exist!")
-                End If
-            ELse
-                MsgBox("SDK out/ or out_sys/ is exist!")
-            End If
-        End If
+Function checkAndMkdir(folderPath)
+    Dim cmdStr
+    If Not isFolderExists(folderPath) Then
+        if (isT0Sdk()) Then folderPath = Replace(folderPath, "../", "")
+        cmdStr = "mkdir -p " & folderPath & ";"
     End If
-    Call CopyString(cmdStr)
-    Call pasteCmdInXshell()
+    checkAndMkdir = cmdStr
+End Function
+
+Function checkMvOut(outPath, folders)
+    Dim cmdStr, folder, outFolder, parentFolder, tmpFolder
+    For Each folder In folders
+        If isT0Sdk() Then folder = "../" & folder
+        If Not isFolderExists(folder) Then
+            MsgBox(folder & " does not exist!")
+            checkMvOut = ""
+            Exit Function
+        End If
+    Next
+
+    For Each folder In folders
+        outFolder = outPath & "/" & folder
+        If isFolderExists(outFolder) Then
+            MsgBox(outFolder & " already exist!")
+            checkMvOut = ""
+            Exit Function
+        Else
+            tmpFolder = getParentPath(outFolder)
+            If parentFolder <> tmpFolder Then
+                parentFolder = tmpFolder
+                IF Not isFolderExists(parentFolder) Then
+                    cmdStr = cmdStr & "mkdir -p " & parentFolder & ";"
+                End If
+            End If
+            cmdStr = cmdStr & "mv " & folder & " " & parentFolder & ";"
+        End If
+    Next
+
+    if isT0Sdk() Then cmdStr = Replace(cmdStr, "../", "")
+    checkMvOut = cmdStr
+End Function
+
+Function checkMvIn(outPath, folders)
+    Dim cmdStr, folder, outFolder, parentFolder
+    For Each folder In folders
+        outFolder = outPath & "/" & folder
+        If Not isFolderExists(outFolder) Then
+            MsgBox(outFolder & " does not exist!")
+            checkMvIn = ""
+            Exit Function
+        End If
+    Next
+
+    For Each folder In folders
+        Dim checkFd : checkFd = folder
+        If isT0Sdk() Then checkFd = "../" & folder
+        If isFolderExists(checkFd) Then
+            MsgBox(folder & " already exist!")
+            checkMvIn = ""
+            Exit Function
+        Else
+            outFolder = outPath & "/" & folder
+            parentFolder = getParentPath(folder)
+            if parentFolder = "" Then parentFolder = "./"
+            cmdStr = cmdStr & "mv " & outFolder & " " & parentFolder & ";"
+        End If
+    Next
+
+    if isT0Sdk() Then cmdStr = Replace(cmdStr, "../", "")
+    checkMvIn = cmdStr
+End Function
+
+Sub mvOut(buildType, where)
+    Dim cmdStr, outPath, outFolders
+    outPath = "../OUT/" & getProjectSimpleName() & "_" & buildType
+    If isT0Sdk() Then
+        If isT08168Sdk() Then
+            outFolders = Array("merged", "sys/out", "vnd/out")
+        ElseIf isT08781() Then
+            outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+        Else
+            outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_krn")
+        End If
+    ElseIf InStr(mIp.Infos.Sdk, "8168") > 0 Then
+        outFolders = Array("out", "out_sys")
+    Else
+        outFolders = Array("out")
+    End If
+
+    If where = "out" Then
+        cmdStr = checkMvOut(outPath, outFolders)
+    ElseIf where = "in" Then
+        cmdStr = checkMvIn(outPath, outFolders)
+    End If
+
+    If cmdStr <> "" Then
+        Call CopyString(cmdStr)
+        Call pasteCmdInXshell()
+    End If
 End Sub
