@@ -587,7 +587,7 @@ Sub msgboxPathNotExist(path)
 End Sub
 
 Class ProjectInfos
-    Private mWork, mSdk, mProduct, mProject, mFirmware, mRequirements, mZentao, mTaskNum
+    Private mWork, mSdk, mProduct, mProject, mDriverProject, mFirmware, mRequirements, mZentao, mTaskNum
     Private mProjectAlps, mBootLogo, mSysTarget, mVndTarget, mKrnTarget, mHalTarget, mKernelVer, mTargetArch
 
     Public Property Get Work
@@ -675,7 +675,10 @@ Class ProjectInfos
     End Property
 
     Public Property Get DriverProject
-        DriverProject = getDriverProjectName(Project)
+        If mDriverProject = "" Then
+            mDriverProject = getDriverProjectName(Project)
+        End If
+        DriverProject = mDriverProject
     End Property
 
     Public Property Get DriverProjectPath
@@ -783,6 +786,10 @@ Class ProjectInfos
 
     Public Property Let Project(value)
         mProject = value
+    End Property
+
+    Public Property Let DriverProject(value)
+        mDriverProject = value
     End Property
 
     Public Property Let Firmware(value)
@@ -985,6 +992,13 @@ Class ProjectInputs
             Else
                 mInfos.ProjectAlps = ""
             End If
+
+            If isT0SdkVnd() Then
+                mInfos.DriverProject = Project
+            ElseIf Not isT0Sdk() Then
+                mInfos.DriverProject = getDriverProjectName(Project)
+            End If
+
             Call getProjectConfigMk()
             Call mInfos.getBootLogo()
             onProjectChange = True

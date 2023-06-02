@@ -708,7 +708,7 @@ End Sub
 Sub setT0SdkVnd()
     mIp.Sdk = Replace(mIp.Infos.Sdk, "sys", "vnd")
     mIp.Product = mIp.Infos.VndTarget
-    mIp.Project = Replace(mIp.Infos.Project , "-MMI", "")
+    mIp.Project = mIp.Infos.DriverProject
     Call createWorkName()
 End Sub
 
