@@ -81,6 +81,7 @@ Sub applyShortcut(work, sdk, product, project, firmware, requirements, zentao)
 	If Not checkProjectExist(sdk, product, project) Then Exit Sub
 	Call hideAllShortcuts()
 	
+	mIp.T0InnerSwitch = False
 	mIp.Work = work
 	mIp.Sdk = sdk
 	mIp.Product = product

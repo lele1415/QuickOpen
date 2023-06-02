@@ -582,21 +582,16 @@ End Sub
 Sub setSdk(sdk)
     If sdk = "8766s" Then
         mIp.Sdk = "mt8766_s\alps"
-        Call onSdkPathChange()
     ElseIf sdk = "8168s" Then
         mIp.Sdk = "mt8168_s\alps"
-        Call onSdkPathChange()
     ElseIf sdk = "8766r" Then
         If mDrive = "X:\work2\" Then
             mIp.Sdk = "mt8766_r\alps"
-            Call onSdkPathChange()
         ElseIf mDrive = "Z:\work05\" Then
             mIp.Sdk = "mt8766_r\alps2"
-            Call onSdkPathChange()
         End If
     ElseIf sdk = "8766r" Then
         mIp.Sdk = "mt8168_r\alps"
-        Call onSdkPathChange()
     End If
 End Sub
 
@@ -604,11 +599,13 @@ Sub applyProjectPath()
     Dim aInfos : aInfos = Split(getOpenPath(), "/")
     If UBound(aInfos) < 2 Then MsgBox("Not valid project path!") : Exit Sub
 
-    If isFolderExists("weibu/" & aInfos(1) & "/" & aInfos(2)) Then
+    Dim cleanPath : cleanPath = "weibu/" & aInfos(1) & "/" & aInfos(2)
+    If isFolderExists(cleanPath) Then
+        mIp.T0InnerSwitch = False
         mIp.Product = aInfos(1)
-        Call onProductChange()
         mIp.Project = aInfos(2)
-        Call onProjectChange()
+    Else
+        MsgBox("Path does not exist!" & Vblf & checkDriveSdkPath(cleanPath))
     End if
 End Sub
 
@@ -716,6 +713,7 @@ Function getT0SysProjectFromVnd(vndProject)
 End Function
 
 Sub setT0SdkSys()
+    mIp.T0InnerSwitch = True
     mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
     mIp.Product = mIp.Infos.SysTarget
     mIp.Project = getT0SysProjectFromVnd(mIp.Infos.Project)
