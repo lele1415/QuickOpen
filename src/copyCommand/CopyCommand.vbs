@@ -402,6 +402,10 @@ Sub CopyAdbPushCmd(which)
 	    sourcePath = outPath & "\system\framework\services.jar"
 		targetPath = "/system/framework"
 		finalStr = "adb push " & sourcePath & " " & targetPath
+    ElseIf which = "ft" Then
+	    sourcePath = outPath & "\system\priv-app\FactoryTest"
+		targetPath = "/system/priv-app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
 	End If
 	Call CopyString(finalStr)
     Call pasteCmdInPowerShell()
