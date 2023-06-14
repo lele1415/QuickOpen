@@ -571,9 +571,10 @@ Function onKeyDown(keyCode)
 End Function
 
 Sub setDrive(drive)
-    If (drive = "z") Then
-        mDrive = "Z:\work05\"
-    ElseIf (drive = "z6") Then
+    'If (drive = "z") Then
+    '    mDrive = "Z:\work05\"
+    'Else
+    If (drive = "z6") Then
         mDrive = "Z:\work06\"
     ElseIf (drive = "x") Then
         mDrive = "X:\work2\"
@@ -590,8 +591,8 @@ Sub setSdk(sdk)
     ElseIf sdk = "8766r" Then
         If mDrive = "X:\work2\" Then
             mIp.Sdk = "mt8766_r\alps"
-        ElseIf mDrive = "Z:\work05\" Then
-            mIp.Sdk = "mt8766_r\alps2"
+        'ElseIf mDrive = "Z:\work05\" Then
+        '    mIp.Sdk = "mt8766_r\alps2"
         End If
     ElseIf sdk = "8766r" Then
         mIp.Sdk = "mt8168_r\alps"
@@ -631,15 +632,14 @@ Function checkProjectExist(sdk, product, project)
     If Not checkDrive(sdk, product, project) Then
         Call setDrive("x")
         If Not checkDrive(sdk, product, project) Then
-            Call setDrive("z")
-            If Not checkDrive(sdk, product, project) Then
+            'Call setDrive("z")
+            'If Not checkDrive(sdk, product, project) Then
                 Call setDrive("z6")
                 If Not checkDrive(sdk, product, project) Then 
-                    MsgBox("Not exist: " & path)
                     checkProjectExist = False
                     Exit Function
                 End If
-            End If
+            'End If
         End If
     End If
 
