@@ -150,7 +150,6 @@ End Sub
 
 Function isValidRootPath(rootPath)
 	If mIp.hasProjectInfos() Then
-	    rootPath = Replace(rootPath, "/", "\")
 		If isFolderExists(rootPath) Then
 			If Right(rootPath, 1) = "\" Then rootPath = Mid(rootPath, 1, Len(rootPath) - 1)
 		    isValidRootPath = True

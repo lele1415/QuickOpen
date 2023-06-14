@@ -134,7 +134,7 @@ End Function
 
 Function getSdkSimpleName()
 	Dim str
-	str = Replace(mIp.Infos.Sdk, "/", "\")
-	If InStr(str, "\alps") > 0 Then str = Left(str, InStrRev(str, "\alps") - 1)
+	str = mIp.Infos.Sdk
+	If InStr(str, "alps") > 0 Then str = getParentPath(str)
 	getSdkSimpleName = str
 End Function

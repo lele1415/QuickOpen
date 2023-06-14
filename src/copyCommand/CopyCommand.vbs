@@ -188,9 +188,9 @@ End Sub
 
 Sub CopyPathInWindows()
     If isFileExists(mIp.Infos.getOverlayPath(getOpenPath())) Then
-        commandFinal = mIp.Infos.getPathWithDriveSdk(Replace(mIp.Infos.getOverlayPath(getOpenPath()), "/", "\"))
+        commandFinal = mIp.Infos.getPathWithDriveSdk(mIp.Infos.getOverlayPath(getOpenPath()))
     Else
-        commandFinal = mIp.Infos.getPathWithDriveSdk(Replace(getOpenPath(), "/", "\"))
+        commandFinal = mIp.Infos.getPathWithDriveSdk(getOpenPath())
     End If
     Call CopyString(commandFinal)
 End Sub

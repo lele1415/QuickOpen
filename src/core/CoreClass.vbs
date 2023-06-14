@@ -562,7 +562,7 @@ Function getDownloadOutPath(Product)
     If isT0Sdk() Then
         getDownloadOutPath = mDrive & Left(mIp.Infos.Sdk, InStr(mIp.Infos.Sdk, "\")) & "merged"
     ELse
-        Dim outPath : outPath = mIp.Infos.getPathWithDriveSdk(getOutPath(Product))
+        Dim outPath : outPath = mIp.Infos.getPathWithDriveSdk(mIp.Infos.OutPath)
         If isFolderExists(outPath & "\merged") Then
             getDownloadOutPath = outPath & "\merged"
         Else
@@ -686,10 +686,12 @@ Class ProjectInfos
     End Property
 
     Public Function getPathWithDriveSdk(path)
-        If InStr(path, "../") = 1 Then
-            getPathWithDriveSdk = Left(DriveSdk, InStrRev(DriveSdk, "\")) & Right(path, Len(path) - 3)
+        Dim newPath
+        newPath = relpaceBackSlashInPath(path)
+        If InStr(newPath, "..\") = 1 Then
+            getPathWithDriveSdk = Left(DriveSdk, InStrRev(DriveSdk, "\")) & Right(newPath, Len(newPath) - 3)
         Else
-            getPathWithDriveSdk = DriveSdk & "/" & path
+            getPathWithDriveSdk = DriveSdk & "\" & newPath
         End If
     End Function
 

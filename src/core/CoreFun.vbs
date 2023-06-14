@@ -257,6 +257,10 @@ Function relpaceSlashInPath(path)
     relpaceSlashInPath = Replace(path, "\", "/")
 End Function
 
+Function relpaceBackSlashInPath(path)
+    relpaceBackSlashInPath = Replace(path, "/", "\")
+End Function
+
 Function isEndWith(str, endStr)
     If Right(str, Len(endStr)) = endStr Then
         isEndWith = True
@@ -435,17 +439,18 @@ Sub showHistoryPath(keyCode)
 End Sub
 
 Function checkDriveSdkPath(path)
-    If InStr(path, ":\") = 0 And InStr(path, "\\192.168") = 0 Then
-        checkDriveSdkPath = mIp.Infos.getPathWithDriveSdk(path)
+    Dim newPath
+    newPath = relpaceBackSlashInPath(path)
+    If InStr(newPath, ":\") = 0 And InStr(newPath, "\\192.168") = 0 Then
+        checkDriveSdkPath = mIp.Infos.getPathWithDriveSdk(newPath)
     Else
-        checkDriveSdkPath = path
+        checkDriveSdkPath = newPath
     End If
 End Function
 
 Sub runPath(path)
     Dim p : p = checkDriveSdkPath(path)
     Dim success : success = False
-    p = Replace(p, "/", "\")
     If isFolderExists(p) Then
         oWs.Run "explorer.exe " & p
         success = True
@@ -464,7 +469,6 @@ End Sub
 
 Sub runTextPath(path)
     Dim p : p = checkDriveSdkPath(path)
-    p = Replace(p, "/", "\")
     If isFileExists(p) Then
         oWs.Run mTextEditorPath & " " & p
     Else
@@ -474,7 +478,6 @@ End Sub
 
 Sub runFolderPath(path)
     Dim p : p = checkDriveSdkPath(path)
-    p = Replace(p, "/", "\")
     If isFolderExists(p) Then
         oWs.Run "explorer.exe " & p
     Else
