@@ -173,6 +173,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "lcu" Then Call getLunchCommand("user") : Exit Function
 	If mCmdInput.text = "lcd" Then Call getLunchCommand("userdebug") : Exit Function
 	If mCmdInput.text = "lce" Then Call getLunchCommand("eng") : Exit Function
+	If mCmdInput.text = "lcus" Then Call getT0SysLunchCommand("user") : Exit Function
 	If mCmdInput.text = "lcds" Then Call getT0SysLunchCommand("userdebug") : Exit Function
 	If mCmdInput.text = "mk" Then Call getMakeCommand(False, False, False) : Exit Function
 	If mCmdInput.text = "bmk" Then Call getMakeCommand(False, True, False) : Exit Function
