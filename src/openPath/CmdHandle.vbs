@@ -185,7 +185,8 @@ Function handleCopyCommandCmd()
 	If InStr(mCmdInput.text, "cm-") = 1 Then Call CopyCommitInfo(Replace(mCmdInput.text, "cm-", "")) : Exit Function
 	If mCmdInput.text = "dcm" Then Call CopyDriverCommitInfo() : Exit Function
 	If mCmdInput.text = "ota" Then Call CopyBuildOtaUpdate() : Exit Function
-	If mCmdInput.text = "cc" Then Call CopyCleanCommand() : Exit Function
+	If mCmdInput.text = "cc" Then Call CopyCleanCommand(False) : Exit Function
+	If mCmdInput.text = "ccsv" Then Call CopyCleanCommand(True) : Exit Function
 	If mCmdInput.text = "outp" Then Call CommandOfOut() : Exit Function
 	If mCmdInput.text = "winp" Then Call CopyPathInWindows() : Exit Function
 	If mCmdInput.text = "lnxp" Then Call CopyPathInLinux() : Exit Function

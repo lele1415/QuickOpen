@@ -113,8 +113,8 @@ Sub CommandOfOut()
     Call CopyString(mIp.Infos.DownloadOutPath)
 End Sub
 
-Sub CopyCleanCommand()
-    if isT0Sdk() Then
+Sub CopyCleanCommand(sysAndVnd)
+    if sysAndVnd Then
         commandFinal = "cd sys/;git checkout .;git clean -df;cd ../vnd/;git checkout .;git clean -df;cd ../"
     Else
 	    commandFinal = "git checkout .;git clean -df"
