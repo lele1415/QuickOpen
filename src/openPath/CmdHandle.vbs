@@ -270,7 +270,7 @@ Function handleProjectCmd()
 		    	Exit Function
 		    End If
 		Next
-	ElseIf mCmdInput.text = "z" Or mCmdInput.text = "z6" Or mCmdInput.text = "x" Then
+	ElseIf mCmdInput.text = "z6" Or mCmdInput.text = "x1" Or mCmdInput.text = "x2" Then
 	    Call setDrive(mCmdInput.text)
 		Exit Function
 	ElseIf mCmdInput.text = "s" And isT0SdkVnd() Then

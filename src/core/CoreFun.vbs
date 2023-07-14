@@ -576,7 +576,9 @@ Sub setDrive(drive)
     'Else
     If (drive = "z6") Then
         mDrive = "Z:\work06\"
-    ElseIf (drive = "x") Then
+    ElseIf (drive = "x1") Then
+        mDrive = "X:\work1\"
+    ElseIf (drive = "x2") Then
         mDrive = "X:\work2\"
     End If
     
@@ -630,16 +632,16 @@ End Function
 
 Function checkProjectExist(sdk, product, project)
     If Not checkDrive(sdk, product, project) Then
-        Call setDrive("x")
+        Call setDrive("x2")
         If Not checkDrive(sdk, product, project) Then
-            'Call setDrive("z")
-            'If Not checkDrive(sdk, product, project) Then
+            Call setDrive("x1")
+            If Not checkDrive(sdk, product, project) Then
                 Call setDrive("z6")
                 If Not checkDrive(sdk, product, project) Then 
                     checkProjectExist = False
                     Exit Function
                 End If
-            'End If
+            End If
         End If
     End If
 
