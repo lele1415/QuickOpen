@@ -576,13 +576,18 @@ Sub cpFileAndSetValue(whatArr)
 		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
 
 	ElseIf whatArr(0) = "bn" Then
-	    filePath = "device/mediatek/system/common/BoardConfig.mk"
-		If InStr(mIp.Infos.Sdk, "_r") > 0 Then
-		    keyStr = "BUILD_NUMBER_WEIBU"
-		Else
-	        keyStr = "WEIBU_BUILD_NUMBER"
-		End If
+        Dim weibuConfig : weibuConfig = "build/make/core/weibu_config.mk"
+        keyStr = "WEIBU_BUILD_NUMBER"
 		eqStr = " := "
+        If isFileExists(weibuConfig) Then
+            filePath = weibuConfig
+            eqStr = " ?= "
+        Else
+	        filePath = "device/mediatek/system/common/BoardConfig.mk"
+            If InStr(mIp.Infos.Sdk, "_r") > 0 Then
+                keyStr = "BUILD_NUMBER_WEIBU"
+            End If
+        End If
 		searchStr = keyStr & eqStr
 		valueStr = whatArr(1)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
