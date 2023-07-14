@@ -416,6 +416,14 @@ Sub CopyAdbPushCmd(which)
 	    sourcePath = outPath & "\system\priv-app\FactoryTest"
 		targetPath = "/system/priv-app/"
 		finalStr = "adb push " & sourcePath & " " & targetPath
+    ElseIf which = "sr" Then
+	    sourcePath = outPath & "\system\app\SoundRecorder_old"
+		targetPath = "/system/app/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
+    ElseIf which = "fr" Then
+	    sourcePath = outPath & "\system\framework\framework-res.apk"
+		targetPath = "/system/framework/"
+		finalStr = "adb push " & sourcePath & " " & targetPath
 	End If
 	Call CopyString(finalStr)
     Call pasteCmdInPowerShell()
@@ -427,12 +435,14 @@ Sub CopyAdbClearCmd(which)
 		finalStr = "adb shell stop;adb shell start"
 	ElseIf which = "st" Then
 		finalStr = "adb shell pm clear com.android.settings"
-	ElseIf which = "sl" Then
+	ElseIf which = "lc" Then
 		finalStr = "adb shell pm clear com.android.launcher3"
 	ElseIf which = "cam" Then
 		finalStr = "adb shell pm clear com.mediatek.camera"
     ElseIf which = "ft" Then
 		finalStr = "adb shell pm clear com.weibu.factorytest"
+    ElseIf which = "sr" Then
+		finalStr = "adb shell pm clear com.android.soundrecorder"
 	End If
 	Call CopyString(finalStr)
     Call pasteCmdInPowerShell()
