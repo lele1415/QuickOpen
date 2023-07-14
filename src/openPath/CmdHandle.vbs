@@ -23,6 +23,8 @@ Function HandleFolderPathCmd()
 	If mCmdInput.text = "oa" Then Call runPath(mIp.Infos.OutPath & "/obj/APPS") : Exit Function
 	If mCmdInput.text = "os" Then Call runPath(mIp.Infos.OutPath & "/system/system_ext/priv-app") : Exit Function
 	If mCmdInput.text = "tf" Then Call runPath(mIp.Infos.OutPath & "/obj/PACKAGING/target_files_intermediates") : Exit Function
+	If mCmdInput.text = "lc" Then Call setPathFromCmd("packages/apps/Launcher3") : Exit Function
+	If mCmdInput.text = "vlc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/Launcher3") : Exit Function
 	If mCmdInput.text = "st" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/MtkSettings") : Exit Function
 	If mCmdInput.text = "su" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI") : Exit Function
 	If mCmdInput.text = "cam" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/Camera2") : Exit Function
@@ -119,6 +121,7 @@ Function handleGetInfo()
 	If mCmdInput.text = "getgmsv" Then Call setOpenPath(getOutInfo("ro.com.google.gmsversion")) : Exit Function
 	If mCmdInput.text = "plf" Then Call setOpenPath(getPlatform()) : Exit Function
 	If mCmdInput.text = "gmsv" Then Call setOpenPath(getGmsVersion()) : Exit Function
+	If mCmdInput.text = "spc" Then Call setOpenPath(getSecurityPatch()) : Exit Function
     handleGetInfo = False
 End Function
 
@@ -318,6 +321,10 @@ End Sub
 
 Function getGmsVersion()
     getGmsVersion = readTextAndGetValue("GMS_PACKAGE_VERSION_ID", "vendor/partner_gms/products/gms_package_version.mk")
+End Function
+
+Function getSecurityPatch()
+    getSecurityPatch = readTextAndGetValue("VENDOR_SECURITY_PATCH", "vendor/mediatek/proprietary/buildinfo_vnd/device.mk")
 End Function
 
 Sub checkT0Path(path)
