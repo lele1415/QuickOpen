@@ -716,7 +716,8 @@ Function isT08168SdkVnd()
     End If
 End Function
 
-Function getT0SysProjectFromVnd(vndProject)
+Function getT0SysProjectFromVnd(sysProduct, vndProject)
+    Dim mmiProject
     If InStr(vndProject, "-") > 0 Then
         Dim i, arrStr, str
         arrStr = Split(vndProject, "-")
@@ -727,9 +728,15 @@ Function getT0SysProjectFromVnd(vndProject)
                 str = str & "-" & arrStr(i)
             End If
         Next
-        getT0SysProjectFromVnd = str
+        mmiProject = str
     Else
-        getT0SysProjectFromVnd = vndProject & "-MMI"
+        mmiProject = vndProject & "-MMI"
+    End If
+
+    If isFolderExists(getProjectPath(sysProduct, mmiProject)) Then
+        getT0SysProjectFromVnd = mmiProject
+    Else
+        getT0SysProjectFromVnd = vndProject
     End If
 End Function
 
@@ -737,7 +744,7 @@ Sub setT0SdkSys()
     mIp.T0InnerSwitch = True
     mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
     mIp.Product = mIp.Infos.SysTarget
-    mIp.Project = getT0SysProjectFromVnd(mIp.Infos.Project)
+    mIp.Project = getT0SysProjectFromVnd(mIp.Infos.SysTarget, mIp.Infos.Project)
     Call createWorkName()
 End Sub
 
