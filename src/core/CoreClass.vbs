@@ -11,6 +11,7 @@ Dim mOpenPathList : Set mOpenPathList = (New InputWithTwoLayerList)(getOpenPathP
 Dim mOutFileList : Set mOutFileList = (New ButtonWithOneLayerList)(getOutButtonParentId(), "outfile")
 Dim mOpenButtonList : Set mOpenButtonList = (New ButtonWithOneLayerList)(getOpenButtonParentId(), "openbutton")
 Dim mFileButtonList : Set mFileButtonList = (New ButtonWithOneLayerList)(getFileButtonParentId(), "filebutton")
+Dim mFindProjectButtonList : Set mFindProjectButtonList = (New ButtonWithOneLayerList)(getFindProjectButtonParentId(), "findprojectbutton")
 
 Dim vaPathHistory : Set vaPathHistory = New VariableArray
 Dim mCurrentPath
@@ -438,6 +439,10 @@ Class ButtonWithOneLayerList
 
     Public Property Get VaArray
         Set VaArray = mVaArray
+    End Property
+
+    Public Property Let VaArray(value)
+        Set mVaArray = value
     End Property
 
     Public Sub addList()

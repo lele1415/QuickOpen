@@ -53,6 +53,8 @@ Const ID_PARENT_OPEN_BUTTON = "parent_open_button"
 
 Const ID_PARENT_FILE_BUTTON = "parent_file_button"
 
+Const ID_PARENT_FIND_PROJECT_BUTTON = "parent_find_project_button"
+
 Const ID_SELECT_FOR_COMPARE = "select_for_compare"
 Const ID_COMPARE_TO = "compare_to"
 
@@ -171,4 +173,8 @@ End Function
 
 Function getFileButtonParentId()
     getFileButtonParentId = ID_PARENT_FILE_BUTTON
+End Function
+
+Function getFindProjectButtonParentId()
+    getFindProjectButtonParentId = ID_PARENT_FIND_PROJECT_BUTTON
 End Function

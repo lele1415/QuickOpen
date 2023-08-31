@@ -96,7 +96,7 @@ Sub makeOpenButton()
 	End If
 
     If mIp.hasProjectInfos() Then
-		Dim isFile, fileName
+		Dim isFile
 		If isFileExists(inputPath) Then
 			isFile = True
 		ElseIf isFolderExists(inputPath) Then
@@ -104,10 +104,8 @@ Sub makeOpenButton()
 		Else
 		    Exit Sub
 		End If
-		fileName = getFileNameFromPath(inputPath)
 
-		Call findOverlayPath("MMI", isFile, fileName)
-		Call findOverlayPath("Driver", isFile, fileName)
+		Call findOverlayPath(isFile)
 
 	    If mOpenButtonList.VaArray.Bound > -1 Then
 	    	Call mOverlayPathDict.Add("Origin", inputPath)
@@ -117,41 +115,43 @@ Sub makeOpenButton()
 	End If
 End Sub
 
-Sub findOverlayPath(where, isFile, fileName)
-	Dim path : path = getOverlayPath(where, isFile, fileName)
-	If path <> "" Then
-		Call mOverlayPathDict.Add(where, path)
-		Call mOpenButtonList.VaArray.Append(where)
-	End If
-End Sub
-
-Function getOverlayPath(where, isFile, fileName)
-	Dim inputPath, wholePath
+Function findOverlayPath(isFile)
+	Dim projectName, newName, inputPath, wholePath, configFilePath
+	projectName = mIp.Infos.Project
 	inputPath = getOpenPath()
+	wholePath = mIp.Infos.getOverlayPath(inputPath)
+	If isFile Then configFilePath = mIp.Infos.ProjectPath & "/config/" & getFileNameFromPath(inputPath)
 
-	If where = "MMI" Then
-		wholePath = mIp.Infos.getOverlayPath(inputPath)
+    Do
 		If isFile And (Not isFileExists(wholePath)) Then
-			If isFileExists(mIp.Infos.ProjectPath & "/config/" & fileName) Then
-				wholePath = mIp.Infos.ProjectPath & "/config/" & fileName
+			If isFileExists(configFilePath) Then
+				wholePath = configFilePath
 			End If
 		End If
-    ElseIf where = "Driver" Then
-        wholePath = mIp.Infos.getDriverOverlayPath(inputPath)
-        If isFile And (Not isFileExists(wholePath)) Then
-			If isFileExists(mIp.Infos.DriverProjectPath & "/config/" & fileName) Then
-				wholePath = mIp.Infos.DriverProjectPath & "/config/" & fileName
-			End If
-		End If
-    End If
 
-    If isFile And isFileExists(wholePath) Then
-    	getOverlayPath = wholePath
-    ElseIf (Not isFile) And isFolderExists(wholePath) Then
-    	getOverlayPath = wholePath
-    Else
-        getOverlayPath = ""
-    End If
+		If isFile Then
+		    If isFileExists(wholePath) Then
+				Call mOverlayPathDict.Add(projectName, wholePath)
+				Call mOpenButtonList.VaArray.Append(projectName)
+			ElseIf isFileExists(configFilePath) Then
+			    Call mOverlayPathDict.Add(projectName, configFilePath)
+				Call mOpenButtonList.VaArray.Append(projectName)
+			End If
+			    
+		ElseIf isFolderExists(wholePath) Then
+			Call mOverlayPathDict.Add(projectName, wholePath)
+			Call mOpenButtonList.VaArray.Append(projectName)
+		End If
+
+		If InStr(projectName, "-") > 0 Then
+		    newName = Left(projectName, InStrRev(projectName, "-") - 1)
+			wholePath = Replace(wholePath, projectName, newName)
+			If isFile Then configFilePath = Replace(configFilePath, projectName, newName)
+			projectName = newName
+		Else
+		    Exit Do
+		End If
+	Loop
 End Function
 
 Function getOpenButtonListPath(where)
@@ -159,9 +159,7 @@ Function getOpenButtonListPath(where)
 End Function
 
 Sub removeOpenButtonList()
-	If mOverlayPathDict.Exists("MMI") Then Call mOverlayPathDict.Remove("MMI")
-	If mOverlayPathDict.Exists("Driver") Then Call mOverlayPathDict.Remove("Driver")
-	If mOverlayPathDict.Exists("Origin") Then Call mOverlayPathDict.Remove("Origin")
+    Call mOverlayPathDict.RemoveAll()
 	Call mOpenButtonList.removeList()
 End Sub
 

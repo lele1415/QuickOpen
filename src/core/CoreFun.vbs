@@ -524,12 +524,17 @@ Sub onInputListClick(divId, str)
     ElseIf InStr(divId, "filebutton") > 0 Then
         Call mFileButtonList.removeList()
         Call setOpenPath(str)
+
+    ElseIf InStr(divId, "findprojectbutton") > 0 Then
+        Call mFindProjectButtonList.removeList()
+        Call setFindProject(str)
     End If
 End Sub
 
 Function changeFocus(keyCode)
     If mFileButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
     If mOpenButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
+    If mFindProjectButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
     changeFocus = False
 End Function
 
