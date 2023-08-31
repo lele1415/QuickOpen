@@ -93,6 +93,10 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "label" Then Call runPath("vendor/mediatek/proprietary/buildinfo_sys/label.ini") : Exit Function
 	If mCmdInput.text = "ftn" Then Call runPath("vendor/mediatek/proprietary/packages/apps/FactoryTest/res/xml/factory.xml") : Exit Function
 	If mCmdInput.text = "calc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/ExactCalculator/src/com/android/calculator2/Calculator.java") : Exit Function
+	If mCmdInput.text = "sp1" Then Call setPathFromCmd("build/make/core/version_defaults.mk") : Exit Function
+	If mCmdInput.text = "sp2" Then Call setPathFromCmd("vendor/mediatek/proprietary/buildinfo_vnd/device.mk") : Exit Function
+	If mCmdInput.text = "bn1" Then Call setPathFromCmd("build/make/core/weibu_config.mk") : Exit Function
+	If mCmdInput.text = "bn2" Then Call setPathFromCmd("device/mediatek/system/common/BoardConfig.mk") : Exit Function
 	HandleFilePathCmd = False
 End Function
 
