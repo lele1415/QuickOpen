@@ -722,6 +722,11 @@ Function isT08168SdkVnd()
 End Function
 
 Function getT0SysProjectFromVnd(sysProduct, vndProject)
+    If vndProject = "M101TB_DG_PT2_531" Then
+        getT0SysProjectFromVnd = "M101TB_DG_PT1_532-MMI-PT2_531"
+        Exit Function
+    End If
+
     Dim mmiProject
     If InStr(vndProject, "-") > 0 Then
         Dim i, arrStr, str
