@@ -15,7 +15,15 @@ Const SEARCH_RETURN_NAME = 1
 
 Function searchFolder(path, str, searchType, searchWhere, searchMode, searchTimes, returnType)
     Dim pRootFolder : pRootFolder = checkDriveSdkPath(path)
-    If Not isFolderExists(pRootFolder) Then searchFolder = "" : Exit Function
+    If Not isFolderExists(pRootFolder) Then
+        MsgBox("Path does not exist!" & VbLf & pRootFolder)
+        If searchTimes = SEARCH_ONE Then
+            searchFolder = ""
+        Else
+            Set searchFolder = new VariableArray
+        End If
+        Exit Function
+    End If
     If searchMode = SEARCH_WHOLE_NAME Then searchTimes = SEARCH_ONE
 
     Dim oRootFolder : Set oRootFolder = oFso.GetFolder(pRootFolder)
@@ -668,17 +676,17 @@ Function checkDrive(sdk, product, project)
 End Function
 
 Function getTaskNum(project)
-    Dim arr, str
+    Dim arr, str, taskNum
+    taskNum = 1
     If project <> "" Then
         arr = Split(Replace(project, "-", "_"), "_")
         For Each str In arr
-            If isNumeric(str) And Len(str) < 4 Then
-                getTaskNum = str
-                Exit Function
+            If isNumeric(str) And str > taskNum Then
+                taskNum = str
             End If
         Next
     End If
-    getTaskNum = "1"
+    getTaskNum = taskNum
 End Function
 
 Function isT0Sdk()
@@ -777,3 +785,32 @@ End Function
 Function isT08781()
     isT08781 = InStr(mIp.Infos.VndTarget, "8781") > 0
 End Function
+
+Sub findProjectWithTaskNum(taskNum)
+    Dim i, product, projectArr
+    For i = 0 To vaTargetProduct.Bound
+        product = vaTargetProduct.V(i)
+        Set projectArr = searchFolder(getProductPath(product), "_" & taskNum, _
+                SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+        If projectArr.Bound < 0 Then
+            Set projectArr = searchFolder(getProductPath(product), "-" & taskNum, _
+                SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+        End If
+        If projectArr.Bound >= 0 Then
+            mIp.Product = product
+            If projectArr.Bound = 0 Then
+                Call setFindProject(projectArr.V(0))
+            Else
+                mFindProjectButtonList.VaArray = projectArr
+                Call mFindProjectButtonList.addList()
+                Call mFindProjectButtonList.toggleButtonList()
+            End If
+            Exit For
+        End If
+    Next
+End Sub
+
+Sub setFindProject(project)
+    mIp.T0InnerSwitch = False
+    mIp.Project = project
+End Sub

@@ -270,6 +270,10 @@ Function handleProjectCmd()
 		    	Exit Function
 		    End If
 		Next
+		If vbOK = MsgBox("search project?", 1) Then
+			Call findProjectWithTaskNum(mCmdInput.text)
+		End If
+		Exit Function
 	ElseIf mCmdInput.text = "z6" Or mCmdInput.text = "x1" Or mCmdInput.text = "x2" Then
 	    Call setDrive(mCmdInput.text)
 		Exit Function
