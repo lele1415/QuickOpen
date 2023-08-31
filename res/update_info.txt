@@ -1,29 +1,52 @@
+2023-08-31
+    CmdHandle: add cmd of set product infos
+    CmdHandle: add cmd of mkdir tee files
+    Drive: use work1 drive path by default
+    CmdHandle: add cmd of git pull and push
+    CmdHandle: add cmd of show security patch and build number path
+    Project: search project folder with task number
+    getT0SysProjectFromVnd: add special case
+    ProjectInfos: set project infos with object
+    OpenPath: show all overlay folders when open path
+
+2023-07-14
+    CoreFun: fix bug of running setT0SdkSys() when sysProject is same to vndProject
+    CoreFun: Add x1/x2 drive path
+    CopyCommand: Add weibu_config.mk for modify build number
+    CopyCommand: Add soundrecorder and framework-res cmd for adb push and clear
+    CmdHandle: Add lc/vlc to open Launcher3 folder, add spc to get security patch date
+    CoreFun: remove useless drive path Z:\work05\
+    CoreClass: replace back slash for path in getPathWithDriveSdk
+    CmdHandle: Add lcus to lunch user sys of T0 sdk
+    CmdHandle: Add ccsv to clean sys and vnd of T0 sdk
+
 2023-06-02
-Project: update project.ini
-Project: Call setT0SdkSys() before updateProductList()
-CoreFuns: Update isT0Sdk for mtk_t0_816x
-CoreClass: Update process of input onchange
-CoreFuns: Use getT0SysProjectFromVnd() for xxx-yyy to xxx-MMI-yyy
-CoreClass: Set DriverProject when isT0SdkVnd()
-CoreFun: Use isT0SdkVnd() instead of InStr(Sdk, "t0\vnd") > 0
-CoreFun: Update getDriverProjectName() for -MMI-xxx
-CoreFun: Add getParentPath() instead of getFolderPath()
-CopyCommand: update getRomPath() for T0
-CmdHandle: increase wait time to 500 ms for paste cmd
-CmdHandle: Add "cam" cmd for open Camera2 path
-CmdHandle: call setT0SdkVnd() when input "full" cmd
-CmdHandle: Add wb for vendor/weibu_sz instead of ani
-CopyCommand: Add cmd for settings database
-CopyCommand: Add cmd for dumpsys
-CopyCommand: Add cmd for am start
-CopyCommand: Add cmd for pm clear
-CopyCommand: Add cmd for adb push FactoryTest
-CopyCommand: remove useless path of framework-services for adb push
-CopyCommand: Add wallpaper path of T0
-CopyCommand: Add logo path of T0
- CopyCommand: add project path before copy CopyString in MkdirWeibuFolderPath()
-CmdHandle: Add getT0SysLunchCommand for T0 sys userdebug
-SDK: add mtk_t0_816x, use mt8766_r\alps instead of mt8766_r\alps1 and mt8766_r\alps2
+    Update info of 2023-06-02
+    Project: update project.ini
+    Project: Call setT0SdkSys() before updateProductList()
+    CoreFuns: Update isT0Sdk for mtk_t0_816x
+    CoreClass: Update process of input onchange
+    CoreFuns: Use getT0SysProjectFromVnd() for xxx-yyy to xxx-MMI-yyy
+    CoreClass: Set DriverProject when isT0SdkVnd()
+    CoreFun: Use isT0SdkVnd() instead of InStr(Sdk, "t0\vnd") > 0
+    CoreFun: Update getDriverProjectName() for -MMI-xxx
+    CoreFun: Add getParentPath() instead of getFolderPath()
+    CopyCommand: update getRomPath() for T0
+    CmdHandle: increase wait time to 500 ms for paste cmd
+    CmdHandle: Add "cam" cmd for open Camera2 path
+    CmdHandle: call setT0SdkVnd() when input "full" cmd
+    CmdHandle: Add wb for vendor/weibu_sz instead of ani
+    CopyCommand: Add cmd for settings database
+    CopyCommand: Add cmd for dumpsys
+    CopyCommand: Add cmd for am start
+    CopyCommand: Add cmd for pm clear
+    CopyCommand: Add cmd for adb push FactoryTest
+    CopyCommand: remove useless path of framework-services for adb push
+    CopyCommand: Add wallpaper path of T0
+    CopyCommand: Add logo path of T0
+    CopyCommand: add project path before copy CopyString in MkdirWeibuFolderPath()
+    CmdHandle: Add getT0SysLunchCommand for T0 sys userdebug
+    SDK: add mtk_t0_816x, use mt8766_r\alps instead of mt8766_r\alps1 and mt8766_r\alps2
 
 2023-03-20
     CoreFun: fix bug of history input
