@@ -153,6 +153,8 @@ Function handleMultiMkdirCmd()
 	If mCmdInput.text = "md-wp" Then Call mkdirWallpaper(False) : Exit Function
 	If mCmdInput.text = "md-wp-go" Then Call mkdirWallpaper(True) : Exit Function
 	If mCmdInput.text = "md-tee" Then Call mkdirTee() : Exit Function
+	If mCmdInput.text = "md-sys" Then Call mkdirProductInfo("sys") : Exit Function
+	If mCmdInput.text = "md-vnd" Then Call mkdirProductInfo("vnd") : Exit Function
     handleMultiMkdirCmd = False
 End Function
 

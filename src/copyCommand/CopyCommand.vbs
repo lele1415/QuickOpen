@@ -10,6 +10,18 @@ Const ID_COMMAND_BUILD_OTA = "command_build_ota"
 
 Dim commandFinal
 
+Sub copyStrAndPasteInXshell(cmdStr)
+    If cmdStr = "" Then MsgBox("Empty!") : Exit Sub
+    Call CopyString(cmdStr)
+    Call pasteCmdInXshell()
+End Sub
+
+Sub copyStrAndPasteInPowerShell(cmdStr)
+    If cmdStr = "" Then MsgBox("Empty!") : Exit Sub
+    Call CopyString(cmdStr)
+    Call pasteCmdInPowerShell()
+End Sub
+
 Sub CommandOfMake()
     Dim rmOut, rmBuildprop, ota
     rmOut = element_isChecked(ID_COMMAND_RM_OUT)
@@ -31,8 +43,7 @@ Sub getMakeCommand(rmOut, rmBuildprop, ota)
 
     If ota Then commandFinal = commandFinal & " && " & commandOta
 
-    Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Sub CommandOfLunch()
@@ -59,8 +70,7 @@ Sub getLunchCommand(buildType)
         comboName = "full_" & mIp.Infos.Product & "-" & buildType
         commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mIp.Infos.Project
     End If
-    Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Function getLunchItemInSplitBuild(buildType)
@@ -94,8 +104,7 @@ End Function
 
 Sub getT0SysLunchCommand(buildType)
     commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-" & buildType & " " & mIp.Infos.Project
-    Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Function getRomPath()
@@ -119,25 +128,22 @@ Sub CopyCleanCommand(sysAndVnd)
     Else
 	    commandFinal = "git checkout .;git clean -df"
     End If
-	Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+	Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Sub CopyDriverCommitInfo()
     If Not mIp.hasProjectInfos() Then Exit Sub
 	commandFinal = "[" & mIp.Infos.DriverProject & "] : "
-	Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+	Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Sub CopyBuildOtaUpdate()
-    If InStr(mIp.Infos.Sdk, "_s") > 0 Then
-        commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i old.zip new.zip update.zip"
-    Else
+    If InStr(mIp.Infos.Sdk, "_r") > 0 Then
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
+    Else
+        commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i old.zip new.zip update.zip"
     End If
-    Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Sub MkdirWeibuFolderPath()
@@ -176,14 +182,12 @@ Sub MkdirWeibuFolderPath()
 
     commandFinal = relpaceSlashInPath(commandFinal)
     Call addProjectPath()
-    Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Sub copyExportToolsPathCmd()
     commandFinal = "export PATH=$HOME/Tools:$PATH"
-    Call CopyString(commandFinal)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
 Sub CopyPathInWindows()
@@ -208,8 +212,7 @@ Sub copyCdSdkCommand()
     Dim path, arr
     arr = Split(mIp.Infos.DriveSdk, ":\")
     path = relpaceSlashInPath(arr(1))
-    Call CopyString("cd " & path)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell("cd " & path)
 End Sub
 
 Function getSedCmd(cmdStr, searchStr, replaceStr, newStr, filePath)
@@ -286,8 +289,7 @@ Sub mkdirLogo()
     Dim arr, finalStr
     arr = Array(lg_u, lg_k)
     finalStr = getMultiMkdirStr(arr, "lg")
-    Call CopyString(finalStr)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(finalStr)
 End Sub
 
 Sub mkdirBootAnimation()
@@ -298,8 +300,7 @@ Sub mkdirBootAnimation()
     Dim arr, finalStr
     arr = Array(ani_media, ani_product)
     finalStr = getMultiMkdirStr(arr, "ani")
-    Call CopyString(finalStr)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(finalStr)
 End Sub
 
 Sub mkdirWallpaper(go)
@@ -322,8 +323,8 @@ Sub mkdirWallpaper(go)
         arr = Array(wp_go1, wp_go2, wp1, wp2, wp3)
     End If
     finalStr = getMultiMkdirStr(arr, "wp")
-    Call CopyString(finalStr)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(finalStr)
+End Sub
 
 Sub mkdirTee()
     If isT0SdkSys() Then Call setT0SdkVnd()
@@ -342,16 +343,54 @@ Sub mkdirTee()
     If Not isFileExists(teeOverlayPath & "array.c") Then
         finalStr = finalStr & "cp ../File/array.c " & teeOverlayPath & ";"
     End If
-    Call CopyString(finalStr)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(finalStr)
+End Sub
+
+Sub mkdirProductInfo(where)
+    If Not isFileExists("../File/product.txt") Then MsgBox("product.txt does not exist!") : Exit Sub
+    If where = "sys" And isT0SdkVnd() Then Call setT0SdkSys()
+    If where = "vnd" And isT0SdkSys() Then Call setT0SdkVnd()
+    Dim info, infoArr, infoDict, cmdStr, finalStr
+    infoArr = Array("brand", "manufacturer", "model", "name", "device")
+    Set infoDict = CreateObject("Scripting.Dictionary")
+    For Each info In infoArr
+        Call infoDict.Add(info, readTextAndGetValue(info, "../File/product.txt"))
+    Next
+    For Each info In infoArr
+        If infoDict.Item(info) <> "" Then
+            cmdStr = cmdStr & getCmdStrForCpFileAndSetValue(Array(info, infoDict.Item(info)))
+        End If
+    Next
+    Dim cmd, cmdArr, mkdirFlag, cpFlag, diffStr
+    cmdArr = Split(cmdStr, ";")
+    mkdirFlag = False
+    cpFlag = False
+    For Each cmd In cmdArr
+        If InStr(cmd, "mkdir") = 1 Then
+            If Not mkdirFlag Then
+                finalStr = finalStr & cmd & ";"
+                mkdirFlag = True
+            End If
+        ElseIf InStr(cmd, "cp") = 1 Then
+            If Not cpFlag Then
+                finalStr = finalStr & cmd & ";"
+                cpFlag = True
+            End If
+        ElseIf InStr(cmd, "git diff") = 1 Then
+            diffStr = cmd
+        Else
+            If cmd <> "" Then finalStr = finalStr & cmd & ";"
+        End If
+    Next
+    finalStr = finalStr & diffStr
+    Call copyStrAndPasteInXshell(finalStr)
 End Sub
 
 Sub CopyCommitInfo(what)
     If Not mIp.hasProjectInfos() Then Exit Sub
     If what = "" Then
 	    commandFinal = "[" & mIp.Infos.Project & "] : "
-        Call CopyString(commandFinal)
-        Call pasteCmdInXshell()
+        Call copyStrAndPasteInXshell(commandFinal)
         Exit Sub
 
     ElseIf what = "lg" Then
@@ -368,6 +407,8 @@ Sub CopyCommitInfo(what)
         commandFinal = "DisplayId [" & mIp.Infos.Project & "] : 版本号"
     ElseIf what = "bn" Then
         commandFinal = "BuildNumber [" & mIp.Infos.Project & "] : build number "
+    ElseIf what = "sp" Then
+        commandFinal = "SecurityPatch [" & mIp.Infos.Project & "] : 安全补丁日期改"
     ElseIf what = "bm" Then
         commandFinal = "MMI [" & mIp.Infos.Project & "] : 品牌，型号"
     ElseIf what = "bwm" Then
@@ -405,8 +446,7 @@ Sub CopyCommitInfo(what)
     Else
         commandFinal = what & " [" & mIp.Infos.Project & "] : "
     End If
-	Call CopyString("git add weibu;git commit -m ""&Chr(34)&""" & commandFinal & """&Chr(34)&""")
-    Call pasteCmdInXshell()
+	Call copyStrAndPasteInXshell("git add weibu;git commit -m ""&Chr(34)&""" & commandFinal & """&Chr(34)&""")
 End Sub
 
 Sub CopyAdbPushCmd(which)
@@ -445,8 +485,7 @@ Sub CopyAdbPushCmd(which)
 		targetPath = "/system/framework/"
 		finalStr = "adb push " & sourcePath & " " & targetPath
 	End If
-	Call CopyString(finalStr)
-    Call pasteCmdInPowerShell()
+	Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
 Sub CopyAdbClearCmd(which)
@@ -464,8 +503,7 @@ Sub CopyAdbClearCmd(which)
     ElseIf which = "sr" Then
 		finalStr = "adb shell pm clear com.android.soundrecorder"
 	End If
-	Call CopyString(finalStr)
-    Call pasteCmdInPowerShell()
+	Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
 Sub CopyAdbStartCmd(which)
@@ -477,8 +515,7 @@ Sub CopyAdbStartCmd(which)
     ElseIf which = "ft" Then
 		finalStr = "adb shell am start -n com.weibu.factorytest/.FactoryTest"
 	End If
-	Call CopyString(finalStr)
-    Call pasteCmdInPowerShell()
+	Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
 Sub CopyAdbDumpsysCmd(which)
@@ -496,8 +533,7 @@ Sub CopyAdbDumpsysCmd(which)
 	ElseIf which = "su" Then
 		finalStr = "adb shell ""&Chr(34)&""dumpsys activity service com.android.systemui | grep --color""&Chr(34)&"""
 	End If
-	Call CopyString(finalStr)
-    Call pasteCmdInPowerShell()
+	Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
 Sub CopyAdbSettingsCmd(which)
@@ -507,8 +543,7 @@ Sub CopyAdbSettingsCmd(which)
     ElseIf which = "brt" Then
         finalStr = "adb shell settings get system screen_brightness"
     End If
-    Call CopyString(finalStr)
-    Call pasteCmdInPowerShell()
+    Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
 Sub CopyQmakeCmd(which)
@@ -518,8 +553,7 @@ Sub CopyQmakeCmd(which)
     ElseIf which = "lot" Then
         cmdStr = "qmake GmsSampleIntegration"
     End If
-    Call CopyString(cmdStr)
-    Call pasteCmdInXshell()
+    Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
 Sub modDisplayIdForOtaTest()
@@ -532,12 +566,11 @@ Sub modDisplayIdForOtaTest()
 	keyStr = "ro.build.display.id"
 	If InStr(buildinfo, "/config/") Then
 	    sedStr = "sed -i '/" & keyStr & "/s/$/-OTA_test/' " & buildinfo
-	    Call CopyString(sedStr)
+	    Call copyStrAndPasteInXshell(sedStr)
 	Else
 	    sedStr = "sed -i '/" & keyStr & "/s/""&Chr(34)&""$/-OTA_test""&Chr(34)&""/' " & buildinfo
-	    Call CopyString(sedStr)
+	    Call copyStrAndPasteInXshell(sedStr)
 	End If
-    Call pasteCmdInXshell()
 End Sub
 
 Sub modSystemprop(whatArr)
@@ -568,11 +601,17 @@ Sub modSystemprop(whatArr)
 		End If
 		cmdStr = cmdStr & ";git diff " & systempropPath
 	End If
-	Call CopyString(cmdStr)
-    Call pasteCmdInXshell()
+	Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
 Sub cpFileAndSetValue(whatArr)
+    Dim cmdStr
+    cmdStr = getCmdStrForCpFileAndSetValue(whatArr)
+    If cmdStr = "" Then MsgBox("mpty str!") : Exit Sub
+    Call copyStrAndPasteInXshell(cmdStr)
+End Sub
+
+Function getCmdStrForCpFileAndSetValue(whatArr)
     Dim filePath, folderPath, keyStr, eqStr, searchStr, valueStr, cmdStr
     If whatArr(0) = "gmsv" Then
 	    filePath = "vendor/partner_gms/products/gms_package_version.mk"
@@ -704,9 +743,8 @@ Sub cpFileAndSetValue(whatArr)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
 
 	End If
-	Call CopyString(cmdStr)
-    Call pasteCmdInXshell()
-End Sub
+	getCmdStrForCpFileAndSetValue = cmdStr
+End Function
 
 Function getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, mode)
     Dim folderPath, cmdStr
@@ -825,8 +863,5 @@ Sub mvOut(buildType, where)
         cmdStr = checkMvIn(outPath, outFolders)
     End If
 
-    If cmdStr <> "" Then
-        Call CopyString(cmdStr)
-        Call pasteCmdInXshell()
-    End If
+    Call copyStrAndPasteInXshell(cmdStr)
 End Sub
