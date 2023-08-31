@@ -324,6 +324,26 @@ Sub mkdirWallpaper(go)
     finalStr = getMultiMkdirStr(arr, "wp")
     Call CopyString(finalStr)
     Call pasteCmdInXshell()
+
+Sub mkdirTee()
+    If isT0SdkSys() Then Call setT0SdkVnd()
+    Dim teeOverlayPath, finalStr
+    teeOverlayPath = mIp.Infos.getOverlayPath("vendor/mediatek/proprietary/trustzone/trustkernel/source/build/" & mIp.Infos.Product)
+    If isFolderExists(teeOverlayPath) And isFileExists(teeOverlayPath & "cert.dat") And isFileExists(teeOverlayPath & "array.c") Then
+        MsgBox("tee files exist!")
+        Exit Sub
+    End If
+    If Not isFolderExists(teeOverlayPath) Then
+        finalStr = "mkdir -p " & teeOverlayPath & ";"
+    End If
+    If Not isFileExists(teeOverlayPath & "cert.dat") Then
+        finalStr = finalStr & "cp ../File/cert.dat " & teeOverlayPath & ";"
+    End If
+    If Not isFileExists(teeOverlayPath & "array.c") Then
+        finalStr = finalStr & "cp ../File/array.c " & teeOverlayPath & ";"
+    End If
+    Call CopyString(finalStr)
+    Call pasteCmdInXshell()
 End Sub
 
 Sub CopyCommitInfo(what)
