@@ -73,23 +73,23 @@ Sub removeShortcut(shortcutId)
     Call updateWorkInfoTxt()
 End Sub
 
-Sub applyProjectInfo(obj)
-	Call applyShortcut(obj.Work, obj.Sdk, obj.Product, obj.Project, obj.Firmware, obj.Requirements, obj.Zentao)
+Sub applyProjectInfo(infos)
+	Call applyShortcut(infos)
 End Sub
 
-Sub applyShortcut(work, sdk, product, project, firmware, requirements, zentao)
-	If Not checkProjectExist(sdk, product, project) Then Exit Sub
+Sub onShortcutButtonClick(work, sdk, product, project, firmware, requirements, zentao)
+    Dim oInfos : Set oInfos = New ProjectInfos
+	Call oInfos.setProjectAllInfos(work, sdk, product, project, firmware, requirements, zentao)
+	Call applyShortcut(oInfos)
+End Sub
+
+Sub applyShortcut(infos)
+	If Not checkProjectExist(infos.Sdk, infos.Product, infos.Project) Then Exit Sub
 	Call hideAllShortcuts()
 	
 	mIp.T0InnerSwitch = False
-	mIp.Work = work
-	mIp.Sdk = sdk
-	mIp.Product = product
-	mIp.Project = project
-	mIp.Firmware = firmware
-	mIp.Requirements = requirements
-	mIp.Zentao = zentao
-	Call upShortcut(work)
+	Call mIp.setProjectInputs(infos)
+	Call upShortcut(infos.Work)
 	If isT0Sdk() Then setT0SdkSys()
 	Call updateProductList()
 End Sub
@@ -98,33 +98,14 @@ Sub saveWorkToArray()
 	Dim i, oInfos
 	For i = vaWorksInfo.Bound To 0 Step -1
 		Set oInfos = vaWorksInfo.V(i)
-		If oInfos.Work = mIp.Infos.Work Then
-			oInfos.Sdk = mIp.Infos.Sdk
-			oInfos.Product = mIp.Infos.Product
-			oInfos.Project = mIp.Infos.Project
-			oInfos.Firmware = mIp.Infos.Firmware
-			oInfos.Requirements = mIp.Infos.Requirements
-			oInfos.Zentao = mIp.Infos.Zentao
+		If oInfos.Work = mIp.Infos.Work Or oInfos.isSameProject(mIp.Infos) Then
+		    Call oInfos.setProjectInfos(mIp.Infos)
 			Exit Sub
-		ElseIf oInfos.Sdk = mIp.Infos.Sdk And _
-	    	    oInfos.Product = mIp.Infos.Product And _
-	    	    oInfos.Project = mIp.Infos.Project Then
-	    	oInfos.Work = mIp.Infos.Work
-	    	oInfos.Firmware = mIp.Infos.Firmware
-	    	oInfos.Requirements = mIp.Infos.Requirements
-	    	oInfos.Zentao = mIp.Infos.Zentao
-	    	Exit Sub
 		End If
 	Next
 
 	Set oInfos = New ProjectInfos
-	oInfos.Work = mIp.Infos.Work
-	oInfos.Sdk = mIp.Infos.Sdk
-	oInfos.Product = mIp.Infos.Product
-	oInfos.Project = mIp.Infos.Project
-	oInfos.Firmware = mIp.Infos.Firmware
-	oInfos.Requirements = mIp.Infos.Requirements
-	oInfos.Zentao = mIp.Infos.Zentao
+	Call oInfos.setProjectInfos(mIp.Infos)
 
     vaWorksInfo.Append(oInfos)
 End Sub

@@ -817,6 +817,36 @@ Class ProjectInfos
     Public Property Let ProjectAlps(value)
         mProjectAlps = value
     End Property
+
+    Public Sub setProjectInfos(infos)
+        mWork = infos.Work
+        mSdk = infos.Sdk
+        mProduct = infos.Product
+        mProject = infos.Project
+        mFirmware = infos.Firmware
+        mRequirements = infos.Requirements
+        mZentao = infos.Zentao
+    End Sub
+
+    Public Sub setProjectAllInfos(work, sdk, product, project, firmware, requirements, zentao)
+        mWork = work
+        mSdk = sdk
+        mProduct = product
+        mProject = project
+        mFirmware = firmware
+        mRequirements = requirements
+        mZentao = zentao
+    End Sub
+
+    Public Function isSameProject(infos)
+        If mSdk = infos.Sdk And _
+	    	    mProduct = infos.Product And _
+	    	    mProject = infos.Project Then
+            isSameProject = True
+        Else
+            isSameProject = False
+        End If
+    End Function
 End Class
 
 
@@ -920,6 +950,16 @@ Class ProjectInputs
             hasProjectAlps = False
         End If
     End Function
+
+    Public Sub setProjectInputs(infos)
+        Work = infos.Work
+        Sdk = infos.Sdk
+        Product = infos.Product
+        Project = infos.Project
+        Firmware = infos.Firmware
+        Requirements = infos.Requirements
+        Zentao = infos.Zentao
+    End Sub
 
     Public Sub clearWorkInfos()
         Work = ""

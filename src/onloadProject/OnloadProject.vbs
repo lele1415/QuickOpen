@@ -109,9 +109,7 @@ Function checkProjectInfosExist()
 	Dim i, oInfos
 	For i = 0 To vaWorksInfo.Bound
 		Set oInfos = vaWorksInfo.V(i)
-		If oInfos.Sdk = mIp.Infos.Sdk And _
-	    	    oInfos.Product = mIp.Infos.Product And _
-	    	    oInfos.Project = mIp.Infos.Project Then
+		If oInfos.isSameProject(mIp.Infos) Then
 	    	mIp.Work = oInfos.Work
 	    	checkProjectInfosExist = True
 	    	Exit Function

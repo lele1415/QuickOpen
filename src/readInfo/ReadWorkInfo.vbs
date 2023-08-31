@@ -30,13 +30,7 @@ Sub applyLastWorkInfo()
             Call mIp.clearWorkInfos()
             Exit Sub
         End If
-        mIp.Work = oInfos.Work
-        mIp.Sdk = oInfos.Sdk
-        mIp.Product = oInfos.Product
-        mIp.Project = oInfos.Project
-        mIp.Firmware = oInfos.Firmware
-        mIp.Requirements = oInfos.Requirements
-        mIp.Zentao = oInfos.Zentao
+        Call mIp.setProjectInputs(oInfos)
         If isT0Sdk() Then setT0SdkSys()
         Call updateProductList()
     End If
