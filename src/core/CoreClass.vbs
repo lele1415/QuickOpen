@@ -2,7 +2,7 @@ Option Explicit
 
 Dim mCmdInput : Set mCmdInput = (New InputText)(getCmdInputId())
 Dim mOpenPathInput : Set mOpenPathInput = (New InputText)(getOpenPathInputId())
-Dim mDrive : mDrive = "X:\work2\"
+Dim mDrive : mDrive = "X:\work1\"
 Dim mIp : Set mIp = New ProjectInputs
 Dim mProductList : Set mProductList = (New InputWithOneLayerList)(getProductParentId(), getProductInputId(), "product")
 Dim mProjectList : Set mProjectList = (New InputWithOneLayerList)(getProjectParentId(), getProjectInputId(), "project")

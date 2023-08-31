@@ -645,9 +645,9 @@ End Function
 
 Function checkProjectExist(sdk, product, project)
     If Not checkDrive(sdk, product, project) Then
-        Call setDrive("x2")
+        Call setDrive("x1")
         If Not checkDrive(sdk, product, project) Then
-            Call setDrive("x1")
+            Call setDrive("x2")
             If Not checkDrive(sdk, product, project) Then
                 Call setDrive("z6")
                 If Not checkDrive(sdk, product, project) Then 
