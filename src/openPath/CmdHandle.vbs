@@ -216,6 +216,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "zhh" Then Call sendWeiXinMsg("zhh") : Exit Function
 	If mCmdInput.text = "luo" Then Call sendWeiXinMsg("luo") : Exit Function
 	If mCmdInput.text = "getl" Then Call getCommitMsgList() : Exit Function
+	If mCmdInput.text = "ps" Then Call copyStrAndPasteInXshell("git pull -r origin master && git push origin master") : Exit Function
     handleCopyCommandCmd = False
 End Function
 
