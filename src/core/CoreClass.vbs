@@ -737,6 +737,10 @@ Class ProjectInfos
         mSysTarget = readTextAndGetValue("SYS_TARGET_PROJECT", fullMkPath)
     End Sub
 
+    Sub setNewSysTarget(sysTarget)
+        mSysTarget = sysTarget
+    End Sub
+
     Sub getVndTargetProject()
         If isT0SdkVnd() Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
             mVndTarget = Product
@@ -1062,6 +1066,10 @@ Class ProjectInputs
             Call createWorkName()
             Call getProjectConfigMk()
             Call mInfos.getBootLogo()
+        ElseIf isT0SdkSys() And mInfos.Product = "mssi_t_64_cn" And isFolderExists(getProjectPath("mssi_t_64_cn_wifi", Project)) Then
+            Call mInfos.setNewSysTarget("mssi_t_64_cn_wifi")
+            mIp.Product = mIp.Infos.SysTarget
+
         Else
             msgboxPathNotExist(mInfos.ProjectPath)
             Call clearWorkInfos()
