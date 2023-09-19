@@ -254,8 +254,8 @@ Function getMultiMkdirStr(arr, what)
 		ElseIf what = "ani" Then
 		    If InStr(path, "bootanimation.zip") > 0 Then
 	            str =  str & "cp ../File/bootanimation.zip " & ovlFolder & ";"
-			ElseIf InStr(path, "products.mk") > 0 And Not isFileExists(ovlFile) Then
-			    str =  str & "cp " & path & " " & ovlFolder & ";"
+			ElseIf InStr(path, "products.mk") > 0 Then
+			    If Not isFileExists(ovlFile) Then str =  str & "cp " & path & " " & ovlFolder & ";"
 				str =  getSedCmd(str, "bootanimation", "#", "", path)
 				str =  getGitDiffCmd(str, path)
 			End If
