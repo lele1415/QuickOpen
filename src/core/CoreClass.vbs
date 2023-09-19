@@ -823,23 +823,23 @@ Class ProjectInfos
     End Property
 
     Public Sub setProjectInfos(infos)
-        mWork = infos.Work
-        mSdk = infos.Sdk
-        mProduct = infos.Product
-        mProject = infos.Project
-        mFirmware = infos.Firmware
-        mRequirements = infos.Requirements
-        mZentao = infos.Zentao
+        Work = infos.Work
+        Sdk = infos.Sdk
+        Product = infos.Product
+        Project = infos.Project
+        Firmware = infos.Firmware
+        Requirements = infos.Requirements
+        Zentao = infos.Zentao
     End Sub
 
-    Public Sub setProjectAllInfos(work, sdk, product, project, firmware, requirements, zentao)
-        mWork = work
-        mSdk = sdk
-        mProduct = product
-        mProject = project
-        mFirmware = firmware
-        mRequirements = requirements
-        mZentao = zentao
+    Public Sub setProjectAllInfos(w, s, pd, pj, f, r, z)
+        Work = w
+        Sdk = s
+        Product = pd
+        Project = pj
+        Firmware = f
+        Requirements = r
+        Zentao = z
     End Sub
 
     Public Function isSameProject(infos)
