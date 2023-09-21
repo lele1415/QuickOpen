@@ -729,7 +729,18 @@ Function isT08168SdkVnd()
     End If
 End Function
 
-Function getT0SysProjectFromVnd(sysProduct, vndProject)
+Function checkWifiProduct(project)
+    If isT0SdkSys() And mIp.Infos.Product = "mssi_t_64_cn" And _
+            Not isFolderExists(getProjectPath("mssi_t_64_cn", project)) And _
+            isFolderExists(getProjectPath("mssi_t_64_cn_wifi", project)) Then
+        Call mIp.Infos.setNewSysTarget("mssi_t_64_cn_wifi")
+        mIp.Product = mIp.Infos.SysTarget
+        checkWifiProduct = True
+    End If
+    checkWifiProduct = False
+End Function
+
+Function getT0SysProjectFromVnd(vndProject)
     If vndProject = "M101TB_DG_PT2_531" Then
         getT0SysProjectFromVnd = "M101TB_DG_PT1_532-MMI-PT2_531"
         Exit Function
@@ -751,10 +762,16 @@ Function getT0SysProjectFromVnd(sysProduct, vndProject)
         mmiProject = vndProject & "-MMI"
     End If
 
-    If isFolderExists(getProjectPath(sysProduct, mmiProject)) Then
+    If checkWifiProduct(mmiProject) Then
         getT0SysProjectFromVnd = mmiProject
-    Else
+    ElseIf checkWifiProduct(vndProject) Then
         getT0SysProjectFromVnd = vndProject
+    ElseIf isFolderExists(getProjectPath(mIp.Infos.Product, mmiProject)) Then
+        getT0SysProjectFromVnd = mmiProject
+    ElseIf isFolderExists(getProjectPath(mIp.Infos.Product, vndProject)) Then
+        getT0SysProjectFromVnd = vndProject
+    Else
+        getT0SysProjectFromVnd = ""
     End If
 End Function
 
@@ -762,7 +779,7 @@ Sub setT0SdkSys()
     mIp.T0InnerSwitch = True
     mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
     mIp.Product = mIp.Infos.SysTarget
-    mIp.Project = getT0SysProjectFromVnd(mIp.Infos.SysTarget, mIp.Infos.Project)
+    mIp.Project = getT0SysProjectFromVnd(mIp.Infos.Project)
     Call createWorkName()
 End Sub
 

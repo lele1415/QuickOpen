@@ -1066,10 +1066,9 @@ Class ProjectInputs
             Call createWorkName()
             Call getProjectConfigMk()
             Call mInfos.getBootLogo()
-        ElseIf isT0SdkSys() And mInfos.Product = "mssi_t_64_cn" And isFolderExists(getProjectPath("mssi_t_64_cn_wifi", Project)) Then
-            Call mInfos.setNewSysTarget("mssi_t_64_cn_wifi")
-            mIp.Product = mIp.Infos.SysTarget
 
+        ElseIf checkWifiProduct(Project) Then
+            Exit Sub
         Else
             msgboxPathNotExist(mInfos.ProjectPath)
             Call clearWorkInfos()
