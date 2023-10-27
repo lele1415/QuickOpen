@@ -220,6 +220,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "luo" Then Call sendWeiXinMsg("luo") : Exit Function
 	If mCmdInput.text = "getl" Then Call getCommitMsgList() : Exit Function
 	If mCmdInput.text = "ps" Then Call copyStrAndPasteInXshell("git pull -r origin master && git push origin master") : Exit Function
+	If mCmdInput.text = "update" Then Call copyStrAndPasteInXshell("git remote update origin --prune") : Exit Function
     handleCopyCommandCmd = False
 End Function
 
