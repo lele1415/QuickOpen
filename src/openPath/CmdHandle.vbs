@@ -271,7 +271,7 @@ End Sub
 
 Function handleProjectCmd()
 	handleProjectCmd = True
-	If isNumeric(mCmdInput.text) And Len(mCmdInput.text) < 4 Then
+	If isNumeric(mCmdInput.text) And Len(mCmdInput.text) < 5 Then
 		Dim i, obj : For i = vaWorksInfo.Bound To 0 Step -1
 		    Set obj = vaWorksInfo.V(i)
 		    If mCmdInput.text = obj.TaskNum Then
