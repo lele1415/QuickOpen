@@ -275,7 +275,7 @@ Function handleProjectCmd()
 		Dim i, obj : For i = vaWorksInfo.Bound To 0 Step -1
 		    Set obj = vaWorksInfo.V(i)
 		    If mCmdInput.text = obj.TaskNum Then
-		    	Call applyProjectInfo(obj)
+		    	Call applyShortcutInfos(obj)
 		    	Exit Function
 		    End If
 		Next
@@ -297,6 +297,9 @@ Function handleProjectCmd()
 		Exit Function
 	ElseIf mCmdInput.text = "pp" Then
 	    Call applyProjectPath()
+		Exit Function
+	ElseIf mCmdInput.text = "pl" Then
+	    Call updateProductList()
 		Exit Function
 	End If
 	handleProjectCmd = False

@@ -31,8 +31,6 @@ Sub applyLastWorkInfo()
             Exit Sub
         End If
         Call mIp.setProjectInputs(oInfos)
-        If isT0Sdk() Then setT0SdkSys()
-        Call updateProductList()
     End If
 End Sub
 

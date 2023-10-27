@@ -856,7 +856,7 @@ End Class
 
 
 Class ProjectInputs
-    Private mInfos, mT0InnerSwitch
+    Private mInfos, mT0InnerSwitch, mIsT0VndProductList
 
     Public Sub Class_Initialize
         Set mInfos = New ProjectInfos
@@ -898,6 +898,10 @@ Class ProjectInputs
         T0InnerSwitch = mT0InnerSwitch
     End Property
 
+    Public Property Get IsT0VndProductList
+        IsT0VndProductList = mIsT0VndProductList
+    End Property
+
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
         document.title = value & " " & mDrive
@@ -936,6 +940,10 @@ Class ProjectInputs
 
     Public Property Let T0InnerSwitch(value)
         mT0InnerSwitch = value
+    End Property
+
+    Public Property Let IsT0VndProductList(value)
+        mIsT0VndProductList = value
     End Property
 
     Public Function hasProjectInfos()
@@ -1011,7 +1019,7 @@ Class ProjectInputs
         'Call mIp.cutSdkInOpenPath()
         mInfos.Sdk = Sdk
         If isFolderExists(mInfos.DriveSdk) Then
-            If mT0InnerSwitch Then Exit Sub
+            If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
             Call clearWorkInfos()
             Call updateProductList()
         Else
@@ -1025,7 +1033,7 @@ Class ProjectInputs
     Public Sub onProductChange()
         mInfos.Product = Product
         If isFolderExists(mInfos.ProductPath) Then
-            If mT0InnerSwitch Then Exit Sub
+            If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
             Call updateProjectList()
             Call clearWorkInfos()
             Call mInfos.getSysTargetProject()
@@ -1054,7 +1062,7 @@ Class ProjectInputs
                 mInfos.ProjectAlps = ""
             End If
 
-            If mT0InnerSwitch Then Exit Sub
+            If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
 
             If isT0SdkVnd() Then
                 mInfos.DriverProject = Project

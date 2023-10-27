@@ -535,7 +535,7 @@ Sub onInputListClick(divId, str)
 
     ElseIf InStr(divId, "findprojectbutton") > 0 Then
         Call mFindProjectButtonList.removeList()
-        Call setFindProject(str)
+        mIp.Project = str
     End If
 End Sub
 
@@ -620,7 +620,6 @@ Sub applyProjectPath()
 
     Dim cleanPath : cleanPath = "weibu/" & aInfos(1) & "/" & aInfos(2)
     If isFolderExists(cleanPath) Then
-        mIp.T0InnerSwitch = False
         mIp.Product = aInfos(1)
         mIp.Project = aInfos(2)
     Else
@@ -778,14 +777,19 @@ End Function
 Sub setT0SdkSys()
     mIp.T0InnerSwitch = True
     mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
+    mIp.T0InnerSwitch = True
     mIp.Product = mIp.Infos.SysTarget
+    mIp.T0InnerSwitch = True
     mIp.Project = getT0SysProjectFromVnd(mIp.Infos.Project)
     Call createWorkName()
 End Sub
 
 Sub setT0SdkVnd()
+    mIp.T0InnerSwitch = True
     mIp.Sdk = Replace(mIp.Infos.Sdk, "sys", "vnd")
+    mIp.T0InnerSwitch = True
     mIp.Product = mIp.Infos.VndTarget
+    mIp.T0InnerSwitch = True
     mIp.Project = mIp.Infos.DriverProject
     Call createWorkName()
 End Sub
@@ -804,6 +808,12 @@ Function isT08781()
 End Function
 
 Sub findProjectWithTaskNum(taskNum)
+    If isT0SdkSys() And mIp.IsT0VndProductList Then
+        Call setT0SdkVnd()
+    ElseIf isT0SdkVnd() And Not mIp.IsT0VndProductList Then
+        Call setT0SdkSys()
+    End If
+
     Dim i, product, projectArr
     For i = 0 To vaTargetProduct.Bound
         product = vaTargetProduct.V(i)
@@ -816,7 +826,7 @@ Sub findProjectWithTaskNum(taskNum)
         If projectArr.Bound >= 0 Then
             mIp.Product = product
             If projectArr.Bound = 0 Then
-                Call setFindProject(projectArr.V(0))
+                mIp.Project = projectArr.V(0)
             Else
                 mFindProjectButtonList.VaArray = projectArr
                 Call mFindProjectButtonList.addList()
@@ -825,9 +835,4 @@ Sub findProjectWithTaskNum(taskNum)
             Exit For
         End If
     Next
-End Sub
-
-Sub setFindProject(project)
-    mIp.T0InnerSwitch = False
-    mIp.Project = project
 End Sub

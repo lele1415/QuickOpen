@@ -73,25 +73,18 @@ Sub removeShortcut(shortcutId)
     Call updateWorkInfoTxt()
 End Sub
 
-Sub applyProjectInfo(infos)
-	Call applyShortcut(infos)
-End Sub
-
 Sub onShortcutButtonClick(work, sdk, product, project, firmware, requirements, zentao)
     Dim oInfos : Set oInfos = New ProjectInfos
 	Call oInfos.setProjectAllInfos(work, sdk, product, project, firmware, requirements, zentao)
-	Call applyShortcut(oInfos)
+	Call applyShortcutInfos(oInfos)
 End Sub
 
-Sub applyShortcut(infos)
+Sub applyShortcutInfos(infos)
 	If Not checkProjectExist(infos.Sdk, infos.Product, infos.Project) Then Exit Sub
 	Call hideAllShortcuts()
-	
-	mIp.T0InnerSwitch = False
+
 	Call mIp.setProjectInputs(infos)
 	Call upShortcut(infos.Work)
-	If isT0Sdk() Then setT0SdkSys()
-	Call updateProductList()
 End Sub
 
 Sub saveWorkToArray()

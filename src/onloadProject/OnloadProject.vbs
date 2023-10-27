@@ -40,7 +40,6 @@ Sub onInputProductChange()
 End Sub
 
 Sub onInputProjectChange()
-    mIp.T0InnerSwitch = False
     Call mIp.onProjectChange()
 End Sub
 
@@ -59,9 +58,11 @@ Sub findProduct()
 	If isT0SdkSys() Then
 	    Set vaTargetProduct = searchFolder("weibu", "mssi_", _
 		        SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+		mIp.IsT0VndProductList = False
 	Else
 	    Set vaTargetProduct = searchFolder("weibu", "_bsp", _
 		        SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+		mIp.IsT0VndProductList = True
 	End If
 	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub
 
