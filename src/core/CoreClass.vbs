@@ -592,7 +592,7 @@ Sub msgboxPathNotExist(path)
 End Sub
 
 Class ProjectInfos
-    Private mWork, mSdk, mProduct, mProject, mDriverProject, mFirmware, mRequirements, mZentao, mTaskNum
+    Private mWork, mSdk, mProduct, mProject, mDriverProject, mVndSdk, mSysSdk, mSysProject, mFirmware, mRequirements, mZentao, mTaskNum
     Private mProjectAlps, mBootLogo, mSysTarget, mVndTarget, mKrnTarget, mHalTarget, mKernelVer, mTargetArch
 
     Public Property Get Work
@@ -637,6 +637,18 @@ Class ProjectInfos
 
     Public Property Get Project
         Project = mProject
+    End Property
+
+    Public Property Get VndSdk
+        VndSdk = mVndSdk
+    End Property
+
+    Public Property Get SysSdk
+        SysSdk = mSysSdk
+    End Property
+
+    Public Property Get SysProject
+        SysProject = mSysProject
     End Property
 
     Public Property Get Firmware
@@ -734,11 +746,7 @@ Class ProjectInfos
         Dim fullMkPath
         fullMkPath = "device/mediateksample/" & Product & "/full_" & Product & ".mk"
         If Not isFileExists(fullMkPath) Then Exit Sub
-        mSysTarget = readTextAndGetValue("SYS_TARGET_PROJECT", fullMkPath)
-    End Sub
-
-    Sub setNewSysTarget(sysTarget)
-        mSysTarget = sysTarget
+        SysTarget = readTextAndGetValue("SYS_TARGET_PROJECT", fullMkPath)
     End Sub
 
     Sub getVndTargetProject()
@@ -803,6 +811,23 @@ Class ProjectInfos
         mDriverProject = value
     End Property
 
+    Public Property Let SysTarget(value)
+        mSysTarget = value
+    End Property
+
+    Public Property Let VndSdk(value)
+        mVndSdk = value
+    End Property
+
+    Public Property Let SysSdk(value)
+        mSysSdk = value
+    End Property
+
+    Public Property Let SysProject(value)
+        mSysProject = value
+        Call createWorkName()
+    End Property
+
     Public Property Let Firmware(value)
         mFirmware = value
     End Property
@@ -827,6 +852,8 @@ Class ProjectInfos
         Sdk = infos.Sdk
         Product = infos.Product
         Project = infos.Project
+        SysSdk = infos.SysSdk
+        SysProject = infos.SysProject
         Firmware = infos.Firmware
         Requirements = infos.Requirements
         Zentao = infos.Zentao
@@ -845,7 +872,9 @@ Class ProjectInfos
     Public Function isSameProject(infos)
         If mSdk = infos.Sdk And _
 	    	    mProduct = infos.Product And _
-	    	    mProject = infos.Project Then
+	    	    mProject = infos.Project And _
+	    	    mSysSdk = infos.SysSdk And _
+	    	    mSysProject = infos.SysProject Then
             isSameProject = True
         Else
             isSameProject = False
@@ -856,7 +885,7 @@ End Class
 
 
 Class ProjectInputs
-    Private mInfos, mT0InnerSwitch, mIsT0VndProductList
+    Private mInfos, mT0InnerSwitch
 
     Public Sub Class_Initialize
         Set mInfos = New ProjectInfos
@@ -896,10 +925,6 @@ Class ProjectInputs
 
     Public Property Get T0InnerSwitch
         T0InnerSwitch = mT0InnerSwitch
-    End Property
-
-    Public Property Get IsT0VndProductList
-        IsT0VndProductList = mIsT0VndProductList
     End Property
 
     Public Property Let Work(value)
@@ -942,10 +967,6 @@ Class ProjectInputs
         mT0InnerSwitch = value
     End Property
 
-    Public Property Let IsT0VndProductList(value)
-        mIsT0VndProductList = value
-    End Property
-
     Public Function hasProjectInfos()
         If mInfos.Sdk <> "" And mInfos.Product <> "" And mInfos.Project <> "" Then
             hasProjectInfos = True
@@ -968,6 +989,8 @@ Class ProjectInputs
         Sdk = infos.Sdk
         Product = infos.Product
         Project = infos.Project
+        If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysSdk = infos.SysSdk
+        If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysProject = infos.SysProject
         Firmware = infos.Firmware
         Requirements = infos.Requirements
         Zentao = infos.Zentao
@@ -1021,7 +1044,7 @@ Class ProjectInputs
         If isFolderExists(mInfos.DriveSdk) Then
             If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
             Call clearWorkInfos()
-            Call updateProductList()
+            'Call updateProductList()
         Else
             msgboxPathNotExist(mInfos.DriveSdk)
             Call clearWorkInfos()
@@ -1034,7 +1057,7 @@ Class ProjectInputs
         mInfos.Product = Product
         If isFolderExists(mInfos.ProductPath) Then
             If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
-            Call updateProjectList()
+            'Call updateProjectList()
             Call clearWorkInfos()
             Call mInfos.getSysTargetProject()
             Call mInfos.getVndTargetProject()

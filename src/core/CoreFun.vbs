@@ -697,7 +697,7 @@ Function isT0Sdk()
 End Function
 
 Function isT0SdkSys()
-    If InStr(mIp.Infos.Sdk, "\sys") > 0 Then
+    If InStr(mIp.Infos.Sdk, "sys") > 0 Then
         isT0SdkSys = True
     Else
         isT0SdkSys = False
@@ -728,65 +728,82 @@ Function isT08168SdkVnd()
     End If
 End Function
 
+Function isT0SysSdk()
+    If InStr(mIp.Infos.SysSdk, "\sys") > 0 Then
+        isT0SysSdk = True
+    Else
+        isT0SysSdk = False
+    End If
+End Function
+
+Function isU0SysSdk()
+    If InStr(mIp.Infos.SysSdk, "\u_sys") > 0 Then
+        isU0SysSdk = True
+    Else
+        isU0SysSdk = False
+    End If
+End Function
+
 Function checkWifiProduct(project)
     If isT0SdkSys() And mIp.Infos.Product = "mssi_t_64_cn" And _
             Not isFolderExists(getProjectPath("mssi_t_64_cn", project)) And _
             isFolderExists(getProjectPath("mssi_t_64_cn_wifi", project)) Then
-        Call mIp.Infos.setNewSysTarget("mssi_t_64_cn_wifi")
+        mIp.Infos.SysTarget = "mssi_t_64_cn_wifi"
         mIp.Product = mIp.Infos.SysTarget
         checkWifiProduct = True
     End If
     checkWifiProduct = False
 End Function
 
-Function getT0SysProjectFromVnd(vndProject)
-    If vndProject = "M101TB_DG_PT2_531" Then
-        getT0SysProjectFromVnd = "M101TB_DG_PT1_532-MMI-PT2_531"
-        Exit Function
-    End If
-
-    Dim mmiProject
-    If InStr(vndProject, "-") > 0 Then
-        Dim i, arrStr, str
-        arrStr = Split(vndProject, "-")
-        For i = 0 To UBound(arrStr)
-            If i = 0 Then
-                str = arrStr(i) & "-MMI"
-            Else
-                str = str & "-" & arrStr(i)
-            End If
-        Next
-        mmiProject = str
-    Else
-        mmiProject = vndProject & "-MMI"
-    End If
-
-    If checkWifiProduct(mmiProject) Then
-        getT0SysProjectFromVnd = mmiProject
-    ElseIf checkWifiProduct(vndProject) Then
-        getT0SysProjectFromVnd = vndProject
-    ElseIf isFolderExists(getProjectPath(mIp.Infos.Product, mmiProject)) Then
-        getT0SysProjectFromVnd = mmiProject
-    ElseIf isFolderExists(getProjectPath(mIp.Infos.Product, vndProject)) Then
-        getT0SysProjectFromVnd = vndProject
-    Else
-        getT0SysProjectFromVnd = ""
-    End If
-End Function
+'Function getT0SysProjectFromVnd(vndProject)
+'    If vndProject = "M101TB_DG_PT2_531" Then
+'        getT0SysProjectFromVnd = "M101TB_DG_PT1_532-MMI-PT2_531"
+'        Exit Function
+'    End If
+'
+'    Dim mmiProject
+'    If InStr(vndProject, "-") > 0 Then
+'        Dim i, arrStr, str
+'        arrStr = Split(vndProject, "-")
+'        For i = 0 To UBound(arrStr)
+'            If i = 0 Then
+'                str = arrStr(i) & "-MMI"
+'            Else
+'                str = str & "-" & arrStr(i)
+'            End If
+'        Next
+'        mmiProject = str
+'    Else
+'        mmiProject = vndProject & "-MMI"
+'    End If
+'
+'    If checkWifiProduct(mmiProject) Then
+'        getT0SysProjectFromVnd = mmiProject
+'    ElseIf checkWifiProduct(vndProject) Then
+'        getT0SysProjectFromVnd = vndProject
+'    ElseIf isFolderExists(getProjectPath(mIp.Infos.Product, mmiProject)) Then
+'        getT0SysProjectFromVnd = mmiProject
+'    ElseIf isFolderExists(getProjectPath(mIp.Infos.Product, vndProject)) Then
+'        getT0SysProjectFromVnd = vndProject
+'    Else
+'        getT0SysProjectFromVnd = ""
+'    End If
+'End Function
 
 Sub setT0SdkSys()
     mIp.T0InnerSwitch = True
-    mIp.Sdk = Replace(mIp.Infos.Sdk, "vnd", "sys")
+    mIp.Infos.VndSdk = mIp.Infos.Sdk
+    mIp.Sdk = mIp.Infos.SysSdk
     mIp.T0InnerSwitch = True
     mIp.Product = mIp.Infos.SysTarget
     mIp.T0InnerSwitch = True
-    mIp.Project = getT0SysProjectFromVnd(mIp.Infos.Project)
+    mIp.Project = mIp.Infos.SysProject
     Call createWorkName()
 End Sub
 
 Sub setT0SdkVnd()
     mIp.T0InnerSwitch = True
-    mIp.Sdk = Replace(mIp.Infos.Sdk, "sys", "vnd")
+    mIp.Sdk = mIp.Infos.VndSdk
     mIp.T0InnerSwitch = True
     mIp.Product = mIp.Infos.VndTarget
     mIp.T0InnerSwitch = True
@@ -808,15 +825,17 @@ Function isT08781()
 End Function
 
 Sub findProjectWithTaskNum(taskNum)
-    If isT0SdkSys() And mIp.IsT0VndProductList Then
-        Call setT0SdkVnd()
-    ElseIf isT0SdkVnd() And Not mIp.IsT0VndProductList Then
-        Call setT0SdkSys()
+    Dim vaProduct
+    Call getProductList()
+    If isT0SdkSys() Then
+        Set vaProduct = vaSysProduct
+    Else
+        Set vaProduct = vaTargetProduct
     End If
 
     Dim i, product, projectArr
-    For i = 0 To vaTargetProduct.Bound
-        product = vaTargetProduct.V(i)
+    For i = 0 To vaProduct.Bound
+        product = vaProduct.V(i)
         Set projectArr = searchFolder(getProductPath(product), "_" & taskNum, _
                 SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
         If projectArr.Bound < 0 Then

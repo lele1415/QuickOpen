@@ -88,7 +88,13 @@ Function getLunchItemInSplitBuild(buildType)
             lunchStr = halStr & " " & krnStr & " "
         End If
         lunchStr = lunchStr & vndStr & " " & mIp.Infos.DriverProject & " " &  sysStr & " " & mIp.Infos.Project
-        If isT08781() Then lunchStr = lunchStr & " IS8781"
+
+        If isT0SysSdk() Then
+            lunchStr = lunchStr & " T"
+        ElseIf isU0SysSdk() Then
+            lunchStr = lunchStr & " U"
+        End If
+
         commandStr = "sed -i 's/^.*$/" & lunchStr & "/' lunch_item"
         If isT08781() Then commandStr = commandStr & "_v2"
     Else
@@ -110,7 +116,11 @@ End Sub
 Function getRomPath()
     Dim alpsStr : alpsStr = "alps"
     If isT0SdkSys() Then
-        alpsStr = "sys"
+        If isU0SysSdk() Then
+            alpsStr = "u_sys"
+        Else
+            alpsStr = "sys"
+        End If
     ElseIf isT0SdkVnd() Then
         alpsStr = "vnd"
     End If
@@ -607,7 +617,7 @@ End Sub
 Sub cpFileAndSetValue(whatArr)
     Dim cmdStr
     cmdStr = getCmdStrForCpFileAndSetValue(whatArr)
-    If cmdStr = "" Then MsgBox("mpty str!") : Exit Sub
+    If cmdStr = "" Then Exit Sub
     Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
@@ -741,6 +751,19 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 		searchStr = "battery.capacity"
 		valueStr = whatArr(1) & "</item>"
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+    
+    ElseIf whatArr(0) = "sdk" Then
+	    mIp.Sdk = Trim(whatArr(1))
+	ElseIf whatArr(0) = "ssdk" Then
+	    mIp.Infos.SysSdk = Trim(whatArr(1))
+	ElseIf whatArr(0) = "spj" Then
+	    mIp.Infos.SysProject = Trim(whatArr(1))
+	ElseIf whatArr(0) = "fmw" Then
+	    mIp.Firmware = Trim(whatArr(1))
+	ElseIf whatArr(0) = "req" Then
+	    mIp.Requirements = Trim(whatArr(1))
+	ElseIf whatArr(0) = "zt" Then
+	    mIp.Zentao = Trim(whatArr(1))
 
 	End If
 	getCmdStrForCpFileAndSetValue = cmdStr
@@ -847,9 +870,17 @@ Sub mvOut(buildType, where)
         If isT08168Sdk() Then
             outFolders = Array("merged", "sys/out", "vnd/out")
         ElseIf isT08781() Then
-            outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+            If isU0SysSdk() Then
+                outFolders = Array("merged", "u_sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+            Else
+                outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+            End If
         Else
-            outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_krn")
+            If isU0SysSdk() Then
+                outFolders = Array("merged", "u_sys/out", "vnd/out", "vnd/out_krn")
+            Else
+                outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_krn")
+            End If
         End If
     ElseIf InStr(mIp.Infos.Sdk, "8168") > 0 Then
         outFolders = Array("out", "out_sys")

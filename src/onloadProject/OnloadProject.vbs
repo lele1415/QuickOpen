@@ -6,7 +6,7 @@ Const STR_JOYA_JOYA = "joya_sz"
 Const STR_ROCO_MID = "mid"
 Const STR_ROCO_ROCO = "ROCO"
 
-Dim vaTargetProduct, vaCustomProject
+Dim vaTargetProduct, vaCustomProject, vaSysProduct
 Dim mPdtPath, mPjtPath
 Dim mRocoStr, mJoyaStr
 Dim mProductName, mProductIndex
@@ -51,22 +51,7 @@ End Sub
 
 Sub findProduct()
 	window.clearTimeout(idTimer)
-	If Not isFolderExists("weibu") Then
-		MsgBox "Not found: weibu/"
-		Exit Sub
-	End If
-	If isT0SdkSys() Then
-	    Set vaTargetProduct = searchFolder("weibu", "mssi_", _
-		        SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-		mIp.IsT0VndProductList = False
-	Else
-	    Set vaTargetProduct = searchFolder("weibu", "_bsp", _
-		        SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
-		mIp.IsT0VndProductList = True
-	End If
-	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub
-
-	Call vaTargetProduct.SortArray()
+	Call getProductList()
 	Call mProductList.addList(vaTargetProduct)
 
     If vaTargetProduct.GetIndexIfExist(mIp.Infos.Product) = -1 Then
@@ -76,6 +61,27 @@ Sub findProduct()
 	Call updateProjectList()
 End Sub
 
+Sub getProductList()
+    If Not isFolderExists("weibu") Then
+		MsgBox "Not found: weibu/"
+		Exit Sub
+	End If
+
+	Set vaTargetProduct = searchFolder("weibu", "_", _
+			SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+
+	If isT0Sdk() Then
+	    Call setT0SdkSys()
+	    Set vaSysProduct = searchFolder("weibu", "mssi_", _
+		        SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
+		Call setT0SdkVnd()
+		Call vaSysProduct.SortArray()
+	End If
+
+	If vaTargetProduct.Bound = -1 Then MsgBox("No product found!") : Exit Sub
+
+	Call vaTargetProduct.SortArray()
+End Sub
 
 Sub updateProjectList()
 	idTimer = window.setTimeout( _
@@ -121,9 +127,13 @@ End Function
 
 Function getProjectSimpleName()
 	Dim str
-	str = Replace(mIp.Infos.Project, "-MMI", "")
+	If isT0Sdk() Then
+		str = Replace(mIp.Infos.SysProject, "-MMI", "")
+	Else
+		str = Replace(mIp.Infos.Project, "-MMI", "")
+	End If
 	str = Replace(str, "_MMI", "")
-	If InStr(str, "-") > 0 Then
+	If InStr(mIp.Infos.Sdk, "_r") > 0 And InStr(str, "-") > 0 Then
 	    str = Replace(str, Left(str, InStr(str, "-")), "")
 	ElseIf InStr(str, "_") > 0 Then
 	    str = Replace(str, Left(str, InStr(str, "_")), "")

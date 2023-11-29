@@ -298,8 +298,11 @@ Function handleProjectCmd()
 	ElseIf mCmdInput.text = "pp" Then
 	    Call applyProjectPath()
 		Exit Function
-	ElseIf mCmdInput.text = "pl" Then
-	    Call updateProductList()
+	ElseIf mCmdInput.text = "new" Then
+	    Call creatShortcut()
+		Exit Function
+	ElseIf mCmdInput.text = "upwi" Then
+	    Call updateWorkInfoTxt()
 		Exit Function
 	End If
 	handleProjectCmd = False

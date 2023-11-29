@@ -35,24 +35,21 @@ Sub applyLastWorkInfo()
 End Sub
 
 Sub handleForWorksInfo(oText, sReadLine)
-    Dim i, sLine, oInfos
+    Dim i, oInfos
     i = 0
-    sLine = oText.ReadLine
     Set oInfos = New ProjectInfos
 
-    Do Until (Trim(sLine) = "" Or i > 7)
-        i = i + 1
-        Select Case i
-            Case 1 : oInfos.Work = Trim(sLine)
-            Case 2 : oInfos.Sdk = Trim(sLine)
-            Case 3 : oInfos.Product = Trim(sLine)
-            Case 4 : oInfos.Project = Trim(sLine)
-            Case 5 : oInfos.Firmware = Trim(sLine)
-            Case 6 : oInfos.Requirements = Trim(sLine)
-            Case 7 : oInfos.Zentao = Trim(sLine)
-        End Select
-        sLine = oText.ReadLine
-    Loop
+    oInfos.Work = Trim(oText.ReadLine)
+    oInfos.Sdk = Trim(oText.ReadLine)
+    oInfos.Product = Trim(oText.ReadLine)
+    oInfos.Project = Trim(oText.ReadLine)
+    If InStr(oInfos.Sdk, "_t0") > 0 Then
+        oInfos.SysSdk = Trim(oText.ReadLine)
+        oInfos.SysProject = Trim(oText.ReadLine)
+    End If
+    oInfos.Firmware = Trim(oText.ReadLine)
+    oInfos.Requirements = Trim(oText.ReadLine)
+    oInfos.Zentao = Trim(oText.ReadLine)
 
     vaWorksInfo.Append(oInfos)
 End Sub

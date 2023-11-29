@@ -7,7 +7,7 @@ function addShortcutButton(sWorkName, sSdk, sProduct, sProject, sFirmware, sRequ
     var removeId = baseId + "_remove";
 
     var shortcutFun = function(){onShortcutButtonClick(sWorkName, sSdk, sProduct, sProject, sFirmware, sRequirements, sZentao)};
-    var upFun = function(){upShortcut(sWorkName)}
+    var upFun = function(){moveShortcutToTop(sWorkName)}
 	var removeFun = function(){removeShortcutBtn(upId, removeId, shortcutId, brId)};
 
 	var shortcutValue = " " + sWorkName + " ";

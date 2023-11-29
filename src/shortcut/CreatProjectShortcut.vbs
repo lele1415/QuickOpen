@@ -15,7 +15,8 @@ Sub creatShortcut()
 	If Trim(mIp.Infos.Work) = "" _
 			Or Trim(mIp.Infos.Sdk) = "" _
 			Or Trim(mIp.Infos.Product) = "" _
-			Or Trim(mIp.Infos.Project) = "" Then
+			Or (InStr(mIp.Infos.Sdk, "_t0") > 0 And Trim(mIp.Infos.SysSdk) = "") _
+			Or (InStr(mIp.Infos.Sdk, "_t0") > 0 And Trim(mIp.Infos.SysProject) = "") Then
 		MsgBox("work info is not complete!")
 		Exit Sub
 	End If
@@ -76,15 +77,14 @@ End Sub
 Sub onShortcutButtonClick(work, sdk, product, project, firmware, requirements, zentao)
     Dim oInfos : Set oInfos = New ProjectInfos
 	Call oInfos.setProjectAllInfos(work, sdk, product, project, firmware, requirements, zentao)
+	Call hideAllShortcuts()
 	Call applyShortcutInfos(oInfos)
 End Sub
 
 Sub applyShortcutInfos(infos)
 	If Not checkProjectExist(infos.Sdk, infos.Product, infos.Project) Then Exit Sub
-	Call hideAllShortcuts()
-
 	Call mIp.setProjectInputs(infos)
-	Call upShortcut(infos.Work)
+	Call moveShortcutToTop(infos.Work)
 End Sub
 
 Sub saveWorkToArray()
@@ -115,6 +115,8 @@ Sub updateWorkInfoTxt()
         oTxt.WriteLine(obj.Sdk)
         oTxt.WriteLine(obj.Product)
         oTxt.WriteLine(obj.Project)
+		If InStr(obj.Sdk, "_t0") > 0 Then oTxt.WriteLine(obj.SysSdk)
+		If InStr(obj.Sdk, "_t0") > 0 Then oTxt.WriteLine(obj.SysProject)
         oTxt.WriteLine(obj.Firmware)
         oTxt.WriteLine(obj.Requirements)
         oTxt.WriteLine(obj.Zentao)
@@ -130,7 +132,7 @@ Sub updateNewShortcutBtn()
 	Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, obj.Firmware, obj.Requirements, obj.Zentao, ID_DIV_SHORTCUT)
 End Sub
 
-Sub upShortcut(sName)
+Sub moveShortcutToTop(sName)
 	Dim i, oInfos
 	For i = 0 To vaWorksInfo.Bound
 
