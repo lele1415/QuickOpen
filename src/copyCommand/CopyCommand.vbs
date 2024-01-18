@@ -495,6 +495,11 @@ Sub CopyAdbPushCmd(which)
 		targetPath = "/system/framework/"
 		finalStr = "adb push " & sourcePath & " " & targetPath
 	End If
+
+    If isU0SysSdk() Then
+        finalStr = Replace(finalStr, "\system\system_ext\", "\system_ext\")
+        finalStr = Replace(finalStr, "/system/system_ext/", "/system_ext/")
+    End If
 	Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
@@ -745,8 +750,12 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
 
     ElseIf whatArr(0) = "bat" Then
-        If isT0SdkSys() Then Call setT0SdkVnd()
-	    filePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml"
+        If isU0SysSdk() Then
+            filePath = "device/mediatek/system/common/overlay/power/frameworks/base/core/res/res/xml/power_profile.xml"
+        ElseIf isT0SdkSys() Then
+            Call setT0SdkVnd()
+            filePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml"
+        End If
         eqStr = ">"
 		searchStr = "battery.capacity"
 		valueStr = whatArr(1) & "</item>"
