@@ -749,14 +749,14 @@ Function isU0SysSdk()
 End Function
 
 Function checkWifiProduct(project)
-    If isT0SdkSys() And mIp.Infos.Product = "mssi_t_64_cn" And _
-            Not isFolderExists(getProjectPath("mssi_t_64_cn", project)) And _
-            isFolderExists(getProjectPath("mssi_t_64_cn_wifi", project)) Then
-        mIp.Infos.SysTarget = "mssi_t_64_cn_wifi"
+    If isT0SdkSys() And Not isFolderExists(getProjectPath(mIp.Infos.Product, project)) And _
+            isFolderExists(getProjectPath(mIp.Infos.Product & "_wifi", project)) Then
+        mIp.Infos.SysTarget = mIp.Infos.Product & "_wifi"
         mIp.Product = mIp.Infos.SysTarget
         checkWifiProduct = True
+    Else
+        checkWifiProduct = False
     End If
-    checkWifiProduct = False
 End Function
 
 'Function getT0SysProjectFromVnd(vndProject)
