@@ -1,3 +1,14 @@
+2024-07-01
+    CopyCommand: fix lunch command of Android 11
+    CopyCommand: add diff info for modDisplayIdForOtaTest
+    CoreFun: fix checkWifiProduct
+    CmdHandle: fix getCommitMsgList
+    CmdHandle: fix getCommitMsgList
+    CmdHandle: add cmd of open project.ini
+    CmdHandle: add cmds of show and save workinfo
+    CopyCommand: update file path of Android U0
+    Project: Compatible with Android U
+
 2023-10-27
     Project: fix bug of findProjectWithTaskNum
     CmdHandle: support 4 digits task number
