@@ -256,14 +256,19 @@ Sub writeEnterKeyInWeiXin(who)
 End Sub
 
 Sub getCommitMsgList()
-    Dim arr, i, listStr, count
+    Dim arr, i, listStr, count, splitWord
 	listStr = VbLf
 	count = 0
+	splitWord = "]:"
 	arr = Split(getOpenPath(), VbLf)
 	For i = UBound(arr) To 0 Step -1
-	    If InStr(arr(i), "] : ") > 0 Then
+	    if InStr(arr(i), "]") > 0 Then
+			arr(i) = Replace(arr(i), "] : ", splitWord)
+			arr(i) = Replace(arr(i), "] :", splitWord)
+		End If
+	    If InStr(arr(i), splitWord) > 0 Then
 		    count = count + 1
-			listStr = listStr & count & ". " & Right(arr(i), Len(arr(i)) - InStr(arr(i), "] : ") - Len("] : ") + 1) & VbLf
+			listStr = listStr & count & ". " & Right(arr(i), Len(arr(i)) - InStr(arr(i), splitWord) - Len(splitWord) + 1) & VbLf
 		End If
 	Next
 	Call setOpenPath(listStr)
