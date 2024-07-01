@@ -64,7 +64,7 @@ End Sub
 
 Sub getLunchCommand(buildType)
     Dim comboName
-    If isT0Sdk() Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
+    If isT0Sdk() Or (InStr(mIp.Infos.Sdk, "8168") > 0 And Not InStr(mIp.Infos.Sdk, "_r") > 0) Then
         commandFinal = getLunchItemInSplitBuild(buildType)
     Else
         comboName = "full_" & mIp.Infos.Product & "-" & buildType
