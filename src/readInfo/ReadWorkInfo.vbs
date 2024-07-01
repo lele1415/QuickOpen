@@ -53,3 +53,28 @@ Sub handleForWorksInfo(oText, sReadLine)
 
     vaWorksInfo.Append(oInfos)
 End Sub
+
+Sub showWorkInfo(taskNum)
+    If isNumeric(taskNum) And Len(taskNum) < 5 Then
+		Dim i, obj, infos : For i = vaWorksInfo.Bound To 0 Step -1
+		    Set obj = vaWorksInfo.V(i)
+		    If taskNum = obj.TaskNum Then
+		    	infos = obj.Work & VbLf &_
+                        obj.Sdk & VbLf &_
+                        obj.Product & VbLf &_
+                        obj.project
+                If InStr(obj.Sdk, "_t0") > 0 Then
+                    infos = infos & VbLf &_
+                            obj.SysSdk & VbLf &_
+                            obj.SysProject
+                End If
+                infos = infos & VbLf &_
+                        obj.Firmware & VbLf &_
+                        obj.Requirements & VbLf &_
+                        obj.Zentao
+                Call setOpenPath(infos)
+		    	Exit For
+		    End If
+		Next
+    End If
+End Sub

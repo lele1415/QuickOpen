@@ -12,11 +12,7 @@ Dim mShortcutState
 mShortcutState = SHORTCUT_STATE_HIDE
 
 Sub creatShortcut()
-	If Trim(mIp.Infos.Work) = "" _
-			Or Trim(mIp.Infos.Sdk) = "" _
-			Or Trim(mIp.Infos.Product) = "" _
-			Or (InStr(mIp.Infos.Sdk, "_t0") > 0 And Trim(mIp.Infos.SysSdk) = "") _
-			Or (InStr(mIp.Infos.Sdk, "_t0") > 0 And Trim(mIp.Infos.SysProject) = "") Then
+	If Not isWorkInfosValid(mIp.Infos) Then
 		MsgBox("work info is not complete!")
 		Exit Sub
 	End If
@@ -25,6 +21,18 @@ Sub creatShortcut()
 	If mShortcutState = SHORTCUT_STATE_SHOW Then Call updateAllShortcuts()
 	Call updateWorkInfoTxt()
 End Sub
+
+Function isWorkInfosValid(infos)
+    If Trim(infos.Work) = "" _
+			Or Trim(infos.Sdk) = "" _
+			Or Trim(infos.Product) = "" _
+			Or (InStr(infos.Sdk, "_t0") > 0 And Trim(infos.SysSdk) = "") _
+			Or (InStr(infos.Sdk, "_t0") > 0 And Trim(infos.SysProject) = "") Then
+		isWorkInfosValid = False
+	Else
+	    isWorkInfosValid = True
+	End If
+End Function
 
 Sub showAllShortcuts()
 	If parentNode_getChildNodesLength(ID_DIV_SHORTCUT) = 0 Then
@@ -101,6 +109,42 @@ Sub saveWorkToArray()
 	Call oInfos.setProjectInfos(mIp.Infos)
 
     vaWorksInfo.Append(oInfos)
+End Sub
+
+Sub saveWorkInfosFromOpenPath()
+    Dim oInfos, inputArray, i
+    Set oInfos = New ProjectInfos
+	inputArray = Split(getOpenPath(), VbLf)
+	i = 0
+
+    oInfos.Work = trimStr(inputArray(i)) : i = i + 1
+    oInfos.Sdk = trimStr(inputArray(i)) : i = i + 1
+    oInfos.Product = trimStr(inputArray(i)) : i = i + 1
+    oInfos.Project = trimStr(inputArray(i)) : i = i + 1
+    If InStr(oInfos.Sdk, "_t0") > 0 Then
+        oInfos.SysSdk = trimStr(inputArray(i)) : i = i + 1
+        oInfos.SysProject = trimStr(inputArray(i)) : i = i + 1
+    End If
+    oInfos.Firmware = trimStr(inputArray(i)) : i = i + 1
+    oInfos.Requirements = trimStr(inputArray(i)) : i = i + 1
+    oInfos.Zentao = trimStr(inputArray(i)) : i = i + 1
+
+	If Not isWorkInfosValid(mIp.Infos) Then
+	    MsgBox("Invalid work infos!")
+		Exit Sub
+	End If
+
+    Dim obj
+	For i = vaWorksInfo.Bound To 0 Step -1
+		Set obj = vaWorksInfo.V(i)
+		If obj.Work = oInfos.Work Or obj.isSameProject(oInfos) Then
+		    Call vaWorksInfo.PopBySeq(i)
+			Exit For
+		End If
+	Next
+
+    Call vaWorksInfo.Append(oInfos)
+	Call updateWorkInfoTxt()
 End Sub
 
 Sub updateWorkInfoTxt()

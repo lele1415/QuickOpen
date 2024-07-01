@@ -288,6 +288,10 @@ Function findStr(str, key)
     findStr = num
 End Function
 
+Function trimStr(str)
+    trimStr = Replace(Replace(Trim(str), VbCr, ""), VbLf, "")
+End Function
+
 Function getFileNameFromPath(path)
     Dim str
     str = relpaceSlashInPath(path)

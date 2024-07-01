@@ -304,6 +304,12 @@ Function handleProjectCmd()
 	ElseIf mCmdInput.text = "upwi" Then
 	    Call updateWorkInfoTxt()
 		Exit Function
+	ElseIf InStr(mCmdInput.text, "show-") = 1 Then
+	    Call showWorkInfo(Replace(mCmdInput.text, "show-", ""))
+		Exit Function
+	ElseIf InStr(mCmdInput.text, "save") = 1 Then
+	    Call saveWorkInfosFromOpenPath()
+		Exit Function
 	End If
 	handleProjectCmd = False
 End Function
