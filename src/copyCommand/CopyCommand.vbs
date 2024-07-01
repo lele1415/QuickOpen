@@ -584,6 +584,7 @@ Sub modDisplayIdForOtaTest()
 	    Call copyStrAndPasteInXshell(sedStr)
 	Else
 	    sedStr = "sed -i '/" & keyStr & "/s/""&Chr(34)&""$/-OTA_test""&Chr(34)&""/' " & buildinfo
+        sedStr = sedStr & "; git diff " & buildinfo
 	    Call copyStrAndPasteInXshell(sedStr)
 	End If
 End Sub
