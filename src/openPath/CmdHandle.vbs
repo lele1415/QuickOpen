@@ -319,6 +319,7 @@ Function handleCurrentDictCmd()
 	If mCmdInput.text = "sdk" Then Call runPath(pSdkPathText) : Exit Function
 	If mCmdInput.text = "path" Then Call runPath(pPathText) : Exit Function
 	If mCmdInput.text = "config" Then Call runPath(pConfigText) : Exit Function
+	If mCmdInput.text = "proj" Then Call runPath(pProjectPathText) : Exit Function
 	If mCmdInput.text = "op" Then Call runPath(oWs.CurrentDirectory) : Exit Function
 	handleCurrentDictCmd = False
 End Function

@@ -9,6 +9,7 @@ Set oFso=CreateObject("Scripting.FileSystemObject")
 
 Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\res\config.ini"
 Dim pSdkPathText : pSdkPathText = oWs.CurrentDirectory & "\res\sdk.ini"
+Dim pProjectPathText : pProjectPathText = oWs.CurrentDirectory & "\res\project.ini"
 
 
 
