@@ -111,6 +111,39 @@ Sub saveWorkToArray()
     vaWorksInfo.Append(oInfos)
 End Sub
 
+Sub getProjectInfosFromOpenPath()
+    Dim oInfos, inputArray, fullName, workInfosStr
+	Set oInfos = New ProjectInfos
+	inputArray = Split(getOpenPath(), VbLf)
+
+	oInfos.Sdk = Split(inputArray(0), "/weibu/")(0)
+	oInfos.Product = Split(Split(inputArray(0), "/weibu/")(1), "/")(0)
+	oInfos.Project = Split(Split(inputArray(0), "/weibu/")(1), "/")(1)
+	fullName = trimStr(Right(oInfos.Project, Len(oInfos.Project) - InStr(oInfos.Project, "_")))
+	oInfos.Work = fullName & " " & oInfos.Sdk
+	oInfos.Firmware = "\\192.168.0.248\安卓固件文件\"
+	oInfos.Requirements = "\\192.168.0.24\wbshare\客户需求\"
+	oInfos.Zentao = "http://192.168.0.29:3000/zentao/task-view-" & getTaskNum(oInfos.Project) & ".html"
+
+	workInfosStr = oInfos.Work & VbLf &_
+	               oInfos.Sdk & VbLf &_
+	               oInfos.Product & VbLf &_
+	               oInfos.Project & VbLf
+
+	If UBound(inputArray) > 0 Then
+	    oInfos.SysSdk = Split(inputArray(1), "/weibu/")(0)
+        oInfos.SysProject = Split(Split(inputArray(1), "/weibu/")(1), "/")(1)
+		workInfosStr = workInfosStr & oInfos.SysSdk & VbLf &_
+	                                  oInfos.SysProject & VbLf
+	End If
+
+	workInfosStr = workInfosStr & oInfos.Firmware & VbLf &_
+	                              oInfos.Requirements & VbLf &_
+	                              oInfos.Zentao
+	
+	Call setOpenPath(workInfosStr)
+End Sub
+
 Sub saveWorkInfosFromOpenPath()
     Dim oInfos, inputArray, i
     Set oInfos = New ProjectInfos

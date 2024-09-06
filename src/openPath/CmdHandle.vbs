@@ -312,7 +312,16 @@ Function handleProjectCmd()
 	ElseIf InStr(mCmdInput.text, "show-") = 1 Then
 	    Call showWorkInfo(Replace(mCmdInput.text, "show-", ""))
 		Exit Function
-	ElseIf InStr(mCmdInput.text, "save") = 1 Then
+	ElseIf mCmdInput.text = "vs" Then
+	    Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/sys/")
+		Exit Function
+	ElseIf mCmdInput.text = "vu" Then
+	    Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/u_sys/")
+		Exit Function
+	ElseIf mCmdInput.text = "getpi" Then
+	    Call getProjectInfosFromOpenPath()
+		Exit Function
+	ElseIf mCmdInput.text = "save" Then
 	    Call saveWorkInfosFromOpenPath()
 		Exit Function
 	End If

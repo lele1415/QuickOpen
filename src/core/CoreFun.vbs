@@ -689,7 +689,7 @@ Function getTaskNum(project)
             End If
         Next
     End If
-    getTaskNum = taskNum
+    getTaskNum = trimStr(taskNum)
 End Function
 
 Function isT0Sdk()
