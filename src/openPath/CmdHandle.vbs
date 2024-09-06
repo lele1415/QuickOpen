@@ -21,7 +21,7 @@ Function HandleFolderPathCmd()
 	If mCmdInput.text = "rom" Then Call runPath(getRomPath()) : Exit Function
 	If mCmdInput.text = "out" Then Call runPath(mIp.Infos.OutPath) : Exit Function
 	If mCmdInput.text = "oa" Then Call runPath(mIp.Infos.OutPath & "/obj/APPS") : Exit Function
-	If mCmdInput.text = "os" Then Call runPath(mIp.Infos.OutPath & "/system/system_ext/priv-app") : Exit Function
+	If mCmdInput.text = "os" Then Call runPath(mIp.Infos.OutPath & getOutSystemExtPrivAppPath()) : Exit Function
 	If mCmdInput.text = "tf" Then Call runPath(mIp.Infos.OutPath & "/obj/PACKAGING/target_files_intermediates") : Exit Function
 	If mCmdInput.text = "lc" Then Call setPathFromCmd("packages/apps/Launcher3") : Exit Function
 	If mCmdInput.text = "vlc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/Launcher3") : Exit Function
@@ -81,7 +81,7 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "wfdrt" Then Call setPathFromCmdAndCopyKey("getPersistedDeviceName", "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java") : Exit Function
 	If mCmdInput.text = "bt" Then Call setPathFromCmdAndCopyKey("btif_default_local_name", "system/bt/btif/src/btif_dm.cc") : Exit Function
 	If mCmdInput.text = "devicename" Then Call setPathFromCmdAndCopyKey("initializeDeviceName", "vendor/mediatek/proprietary/packages/apps/MtkSettings/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java") : Exit Function
-	If mCmdInput.text = "bat" Then Call setPathFromCmdAndCopyKey("battery.capacity", "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml") : Exit Function
+	If mCmdInput.text = "bat" Then Call setPathFromCmdAndCopyKey("battery.capacity", getPowerProfilePath()) : Exit Function
 	If mCmdInput.text = "suc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI/res/values/config.xml") : Exit Function
 	If mCmdInput.text = "spdf" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml") : Exit Function
 	If mCmdInput.text = "spdb" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java") : Exit Function

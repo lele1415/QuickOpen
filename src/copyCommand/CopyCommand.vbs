@@ -114,16 +114,6 @@ Sub getT0SysLunchCommand(buildType)
 End Sub
 
 Function getRomPath()
-    Dim alpsStr : alpsStr = "alps"
-    If isT0SdkSys() Then
-        If isU0SysSdk() Then
-            alpsStr = "u_sys"
-        Else
-            alpsStr = "sys"
-        End If
-    ElseIf isT0SdkVnd() Then
-        alpsStr = "vnd"
-    End If
     getRomPath = getParentPath(mIp.Infos.DriveSdk) & "\ROM"
 End Function
 
@@ -287,6 +277,22 @@ Function getLogoPath()
         getLogoPath = "vendor/mediatek/proprietary/external/BootLogo/logo/[boot_logo]/"
     Else
         getLogoPath = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
+    End If
+End Function
+
+Function getPowerProfilePath()
+    If isU0SdkSys() Then
+        getPowerProfilePath = "device/mediatek/system/common/overlay/power/frameworks/base/core/res/res/xml/power_profile.xml"
+    Else
+        getPowerProfilePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml"
+    End If
+End Function
+
+Function getOutSystemExtPrivAppPath()
+    If isU0SdkSys() Then
+        getOutSystemExtPrivAppPath = "/system_ext/priv-app"
+    Else
+        getOutSystemExtPrivAppPath = "/system/system_ext/priv-app"
     End If
 End Function
 
@@ -496,7 +502,7 @@ Sub CopyAdbPushCmd(which)
 		finalStr = "adb push " & sourcePath & " " & targetPath
 	End If
 
-    If isU0SysSdk() Then
+    If isU0SdkSys() Then
         finalStr = Replace(finalStr, "\system\system_ext\", "\system_ext\")
         finalStr = Replace(finalStr, "/system/system_ext/", "/system_ext/")
     End If
@@ -751,12 +757,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
 
     ElseIf whatArr(0) = "bat" Then
-        If isU0SysSdk() Then
-            filePath = "device/mediatek/system/common/overlay/power/frameworks/base/core/res/res/xml/power_profile.xml"
-        ElseIf isT0SdkSys() Then
-            Call setT0SdkVnd()
-            filePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml"
-        End If
+        filePath = getPowerProfilePath()
         eqStr = ">"
 		searchStr = "battery.capacity"
 		valueStr = whatArr(1) & "</item>"

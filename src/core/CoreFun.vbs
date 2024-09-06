@@ -732,6 +732,14 @@ Function isT08168SdkVnd()
     End If
 End Function
 
+Function isU0SdkSys()
+    If InStr(mIp.Infos.Sdk, "\u_sys") > 0 Then
+        isU0SdkSys = True
+    Else
+        isU0SdkSys = False
+    End If
+End Function
+
 Function isT0SysSdk()
     If InStr(mIp.Infos.SysSdk, "\sys") > 0 Then
         isT0SysSdk = True
