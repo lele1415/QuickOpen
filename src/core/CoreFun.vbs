@@ -450,6 +450,37 @@ Sub showHistoryPath(keyCode)
     End If
 End Sub
 
+Sub saveHistoryCmd(cmd)
+    Dim index
+    index = vaCmdHistory.GetIndexIfExist(cmd)
+    If index > -1 Then Call vaCmdHistory.MoveToEnd(index) : Exit Sub
+
+    If vaCmdHistory.Bound = 19 Then Call vaCmdHistory.PopBySeq(0)
+    Call vaCmdHistory.Append(cmd)
+End Sub
+
+Sub showHistoryCmd(keyCode)
+    If vaCmdHistory.Bound = -1 Then Exit Sub
+
+    Dim index
+    index = vaCmdHistory.GetIndexIfExist(mIp.cutProject(getCmdText()))
+    If index = -1 Then mCurrentPath = getCmdText()
+
+    If keyCode = KEYCODE_UP Then
+        If index > 0 Then
+            Call setCmdText(vaCmdHistory.V(index - 1))
+        ElseIf index = -1 Then
+            Call setCmdText(vaCmdHistory.V(vaCmdHistory.Bound))
+        End If
+    ElseIf keyCode = KEYCODE_DOWN Then
+        If index > -1 And index < vaCmdHistory.Bound Then
+            Call setCmdText(vaCmdHistory.V(index + 1))
+        ElseIf index = vaCmdHistory.Bound Then
+            Call setCmdText(mCurrentPath)
+        End If
+    End If
+End Sub
+
 Function checkDriveSdkPath(path)
     Dim newPath
     newPath = relpaceBackSlashInPath(path)
@@ -543,11 +574,11 @@ Sub onInputListClick(divId, str)
     End If
 End Sub
 
-Function changeFocus(keyCode)
-    If mFileButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
-    If mOpenButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
-    If mFindProjectButtonList.changeListFocus(keyCode) Then changeFocus = True : Exit Function
-    changeFocus = False
+Function changeListFocus(keyCode)
+    If mFileButtonList.changeFocus(keyCode) Then changeListFocus = True : Exit Function
+    If mOpenButtonList.changeFocus(keyCode) Then changeListFocus = True : Exit Function
+    If mFindProjectButtonList.changeFocus(keyCode) Then changeListFocus = True : Exit Function
+    changeListFocus = False
 End Function
 
 Const KEYCODE_ENTER = 13
@@ -577,8 +608,12 @@ Function onKeyDown(keyCode)
         Call tabOpenPath()
     
     ElseIf keyCode = KEYCODE_UP Or keyCode = KEYCODE_DOWN Then
-        If changeFocus(keyCode) Then onKeyDown = False : Exit Function
-        Call showHistoryPath(keyCode)
+        If changeListFocus(keyCode) Then onKeyDown = False : Exit Function
+        If document.activeElement.id = ID_INPUT_OPEN_PATH Then
+            Call showHistoryPath(keyCode)
+        ElseIf document.activeElement.id = ID_INPUT_CMD Then
+            Call showHistoryCmd(keyCode)
+        End If
 
     Else
         onKeyDown = True : Exit Function

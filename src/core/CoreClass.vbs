@@ -14,6 +14,7 @@ Dim mFileButtonList : Set mFileButtonList = (New ButtonWithOneLayerList)(getFile
 Dim mFindProjectButtonList : Set mFindProjectButtonList = (New ButtonWithOneLayerList)(getFindProjectButtonParentId(), "findprojectbutton")
 
 Dim vaPathHistory : Set vaPathHistory = New VariableArray
+Dim vaCmdHistory : Set vaCmdHistory = New VariableArray
 Dim mCurrentPath
 Dim mSaveString : Set mSaveString = New SaveString
 
@@ -478,16 +479,16 @@ Class ButtonWithOneLayerList
         End If
     End Function
 
-    Public Function changeListFocus(keyCode)
+    Public Function changeFocus(keyCode)
         If isDivShowing(mListDivId) Then
             If keyCode = KEYCODE_UP Then
                 mFocusLiIndex =  changeLiFocusUp(mListUlId)
             ElseIf keyCode = KEYCODE_DOWN Then
                 mFocusLiIndex = changeLiFocusDown(mListUlId)
             End If
-            changeListFocus = True : Exit Function
+            changeFocus = True : Exit Function
         End If
-        changeListFocus = False
+        changeFocus = False
     End Function
 
     Public Sub clickFocusedLi()

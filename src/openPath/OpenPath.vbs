@@ -21,7 +21,12 @@ Sub onOpenListClick()
 End Sub
 
 Sub onOpenButtonClick()
-	If mCmdInput.text <> "" Then Call handleCmdInput() : Exit Sub
+	If mCmdInput.text <> "" Then
+	    Dim cmd : cmd = mCmdInput.text
+	    Call handleCmdInput()
+		If mCmdInput.text = "" Then Call saveHistoryCmd(cmd)
+		Exit Sub
+	End If
 	Call removeOpenButtonList()
 	Call makeOpenButton()
 	If mOpenButtonList.VaArray.Bound = -1 Then
@@ -41,6 +46,14 @@ End Function
 
 Sub setOpenPath(path)
     mOpenPathInput.setText(path)
+End Sub
+
+Function getCmdText()
+    getCmdText = mCmdInput.text
+End Function
+
+Sub setCmdText(path)
+    mCmdInput.setText(path)
 End Sub
 
 Sub addOpenPathList()
