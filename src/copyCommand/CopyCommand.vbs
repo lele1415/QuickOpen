@@ -712,7 +712,9 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 		searchStr = "mDeviceProperties.getString"
 		valueStr = """&Chr(34)&""" & whatArr(1) & """&Chr(34)&"";"
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
-
+		searchStr = "Build.MODEL"
+		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+    
 	ElseIf whatArr(0) = "wfap" Then
 	    filePath = "packages/modules/Wifi/service/java/com/android/server/wifi/WifiApConfigStore.java"
 		eqStr = "("
@@ -743,7 +745,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
 
     ElseIf whatArr(0) = "name" Or whatArr(0) = "device" Then
-        If isT0SdkSys() Then
+        If Not isT0SdkVnd() Then
             filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
         Else
             If isT08781() Then
@@ -754,9 +756,19 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
         End If
         keyStr = "PRODUCT_SYSTEM_" & UCase(whatArr(0))
         eqStr = " := "
-		searchStr = keyStr & eqStr
-		valueStr = whatArr(1)
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+        If mIp.Infos.Product = "tb8765ap1_bsp_1g_k419" Or _
+                mIp.Infos.Product = "tb8766p1_64_bsp" Or _
+                mIp.Infos.Product = "tb8788p1_64_bsp_k419" Or _
+                mIp.Infos.Product = "tb8321p3_bsp" Or _
+                mIp.Infos.Product = "tb8768p1_64_bsp"  Then
+            searchStr = keyStr & eqStr
+            valueStr = whatArr(1)
+            cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+        Else
+            searchStr = "PRODUCT_BRAND"
+            valueStr = "PRODUCT_SYSTEM_" & UCase(whatArr(0)) & eqStr & whatArr(1)
+            cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "a")
+        End If
 
     ElseIf whatArr(0) = "brt" Then
         If isT0SdkSys() Then Call setT0SdkVnd()
