@@ -5,11 +5,11 @@ Sub handleCmdInput()
 	If HandleFilePathCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If handleProp() Then Exit Sub
     If handleGetInfo() Then Call mCmdInput.setText("") : Exit Sub
-    If handleEditTextCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleLinuxCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleMultiMkdirCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleOpenPathCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleCopyCommandCmd() Then Call mCmdInput.setText("") : Exit Sub
+    If handleEditTextCmd() Then Call mCmdInput.setText("") : Exit Sub
     If handleProjectCmd() Then Call mCmdInput.setText("") : Exit Sub
 	If handleCurrentDictCmd() Then Call mCmdInput.setText("") : Exit Sub
 End Sub
@@ -129,17 +129,6 @@ Function handleGetInfo()
     handleGetInfo = False
 End Function
 
-Function handleEditTextCmd()
-    handleEditTextCmd = True
-    If InStr(mCmdInput.text, "bn=") > 0 Then Call modBuildNumber(Replace(mCmdInput.text, "bn=", "")) : Exit Function
-    If InStr(mCmdInput.text, "-ota") > 0 Then Call modDisplayIdForOtaTest() : Exit Function
-    If InStr(mCmdInput.text, "tz=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
-    If InStr(mCmdInput.text, "loc=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
-    If InStr(mCmdInput.text, "ftd=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
-    If InStr(mCmdInput.text, "=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
-    handleEditTextCmd = False
-End Function
-
 Function handleLinuxCmd()
     handleLinuxCmd = True
     If mCmdInput.text = "cd" Then Call copyCdSdkCommand() : Exit Function
@@ -206,6 +195,7 @@ Function handleCopyCommandCmd()
 	If InStr(mCmdInput.text, "st-") = 1 Then Call CopyAdbStartCmd(Replace(mCmdInput.text, "st-", "")) : Exit Function
 	If InStr(mCmdInput.text, "dp-") = 1 Then Call CopyAdbDumpsysCmd(Replace(mCmdInput.text, "dp-", "")) : Exit Function
 	If InStr(mCmdInput.text, "sts-") = 1 Then Call CopyAdbSettingsCmd(Replace(mCmdInput.text, "sts-", "")) : Exit Function
+	If mCmdInput.text = "gmsp" Then Call CopyAdbGetGmsPropCmd() : Exit Function
 	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
 	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
@@ -222,6 +212,17 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "ps" Then Call copyStrAndPasteInXshell("git pull -r origin master && git push origin master") : Exit Function
 	If mCmdInput.text = "update" Then Call copyStrAndPasteInXshell("git remote update origin --prune") : Exit Function
     handleCopyCommandCmd = False
+End Function
+
+Function handleEditTextCmd()
+    handleEditTextCmd = True
+    If InStr(mCmdInput.text, "bn=") > 0 Then Call modBuildNumber(Replace(mCmdInput.text, "bn=", "")) : Exit Function
+    If InStr(mCmdInput.text, "-ota") > 0 Then Call modDisplayIdForOtaTest() : Exit Function
+    If InStr(mCmdInput.text, "tz=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
+    If InStr(mCmdInput.text, "loc=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
+    If InStr(mCmdInput.text, "ftd=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
+    If InStr(mCmdInput.text, "=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
+    handleEditTextCmd = False
 End Function
 
 Sub sendWeiXinMsg(who)

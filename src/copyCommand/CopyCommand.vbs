@@ -421,10 +421,14 @@ Sub CopyCommitInfo(what)
         commandFinal = "Timezone [" & mIp.Infos.Project & "] : 默认时区"
     ElseIf what = "di" Then
         commandFinal = "DisplayId [" & mIp.Infos.Project & "] : 版本号"
-    ElseIf what = "bn" Then
-        commandFinal = "BuildNumber [" & mIp.Infos.Project & "] : build number "
-    ElseIf what = "sp" Then
-        commandFinal = "SecurityPatch [" & mIp.Infos.Project & "] : 安全补丁日期改"
+    ElseIf InStr(what, "bn=") = 1 Then
+        commandFinal = "BuildNumber [" & mIp.Infos.Project & "] : 更新build number " & Replace(what, "bn=", "")
+    ElseIf InStr(what, "sp=") = 1 Then
+        If InStr(what, "-bn=") > 0 Then
+            commandFinal = "GMS [" & mIp.Infos.Project & "] : 安全补丁日期改" & Replace(Split(what, "-")(0), "sp=", "") & "、更新build number " & Replace(Split(what, "-")(1), "bn=", "")
+        Else
+            commandFinal = "GMS [" & mIp.Infos.Project & "] : 安全补丁日期改" & Replace(what, "sp=", "")
+        End If
     ElseIf what = "bm" Then
         commandFinal = "MMI [" & mIp.Infos.Project & "] : 品牌，型号"
     ElseIf what = "bwm" Then
@@ -457,8 +461,8 @@ Sub CopyCommitInfo(what)
         commandFinal = "Browser [" & mIp.Infos.Project & "] : 默认网址"
     ElseIf what = "bat" Then
         commandFinal = "Battery [" & mIp.Infos.Project & "] : 电池检测容量"
-    ElseIf what = "app" Then
-        commandFinal = "App [" & mIp.Infos.Project & "] : "
+    ElseIf what = "ft" Then
+        commandFinal = "FactoryTest [" & mIp.Infos.Project & "] : "
     Else
         commandFinal = what & " [" & mIp.Infos.Project & "] : "
     End If
@@ -564,6 +568,12 @@ Sub CopyAdbSettingsCmd(which)
     ElseIf which = "brt" Then
         finalStr = "adb shell settings get system screen_brightness"
     End If
+    Call copyStrAndPasteInPowerShell(finalStr)
+End Sub
+
+Sub CopyAdbGetGmsPropCmd()
+    Dim finalStr
+    finalStr = "adb shell ""&Chr(34)&""getprop | grep fingerprint | grep -v ro.bootimage.build.fingerprint | grep -v preview_sdk_fingerprint""&Chr(34)&"";adb shell ""&Chr(34)&""getprop | grep -E 'security_patch|gmsversion|base_os|first_api_level|clientidbase'""&Chr(34)&"""
     Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
