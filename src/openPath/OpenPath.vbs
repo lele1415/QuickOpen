@@ -258,7 +258,7 @@ Sub replaceOpenPath()
 	path = replaceProjectInfoStr(path)
 	Call setOpenPath(path)
 
-	Call cutSdkPath()
+	'Call cutSdkPath()
 End Sub
 
 Function replaceProjectInfoStr(path)
