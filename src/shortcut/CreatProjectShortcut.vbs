@@ -116,7 +116,7 @@ Sub getProjectInfosFromOpenPath()
 	Set oInfos = New ProjectInfos
 	inputArray = Split(getOpenPath(), VbLf)
 
-	oInfos.Sdk = Split(inputArray(0), "/weibu/")(0)
+	oInfos.Sdk = relpaceBackSlashInPath(Split(inputArray(0), "/weibu/")(0))
 	oInfos.Product = Split(Split(inputArray(0), "/weibu/")(1), "/")(0)
 	oInfos.Project = Split(Split(inputArray(0), "/weibu/")(1), "/")(1)
 	fullName = trimStr(Right(oInfos.Project, Len(oInfos.Project) - InStr(oInfos.Project, "_")))
@@ -131,7 +131,7 @@ Sub getProjectInfosFromOpenPath()
 	               oInfos.Project & VbLf
 
 	If UBound(inputArray) > 0 Then
-	    oInfos.SysSdk = Split(inputArray(1), "/weibu/")(0)
+	    oInfos.SysSdk = relpaceBackSlashInPath(Split(inputArray(1), "/weibu/")(0))
         oInfos.SysProject = Split(Split(inputArray(1), "/weibu/")(1), "/")(1)
 		workInfosStr = workInfosStr & oInfos.SysSdk & VbLf &_
 	                                  oInfos.SysProject & VbLf

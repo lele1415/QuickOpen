@@ -797,7 +797,7 @@ Class ProjectInfos
     End Property
 
     Public Property Let Sdk(value)
-        mSdk = value
+        mSdk = relpaceBackSlashInPath(value)
     End Property
 
     Public Property Let Product(value)

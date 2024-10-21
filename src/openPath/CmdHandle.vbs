@@ -313,10 +313,10 @@ Function handleProjectCmd()
 	ElseIf InStr(mCmdInput.text, "show-") = 1 Then
 	    Call showWorkInfo(Replace(mCmdInput.text, "show-", ""))
 		Exit Function
-	ElseIf mCmdInput.text = "vs" Then
+	ElseIf mCmdInput.text = "tpi" Then
 	    Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/sys/")
 		Exit Function
-	ElseIf mCmdInput.text = "vu" Then
+	ElseIf mCmdInput.text = "upi" Then
 	    Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/u_sys/")
 		Exit Function
 	ElseIf mCmdInput.text = "getpi" Then
