@@ -196,6 +196,7 @@ Function handleCopyCommandCmd()
 	If InStr(mCmdInput.text, "dp-") = 1 Then Call CopyAdbDumpsysCmd(Replace(mCmdInput.text, "dp-", "")) : Exit Function
 	If InStr(mCmdInput.text, "lg-") = 1 Then Call CopyAdbLogcatCmd(Replace(mCmdInput.text, "lg-", "")) : Exit Function
 	If InStr(mCmdInput.text, "sts-") = 1 Then Call CopyAdbSettingsCmd(Replace(mCmdInput.text, "sts-", "")) : Exit Function
+	If InStr(mCmdInput.text, "ins-") = 1 Then Call CopyAdbInstallCmd(Replace(mCmdInput.text, "ins-", "")) : Exit Function
 	If mCmdInput.text = "gmsp" Then Call CopyAdbGetGmsPropCmd() : Exit Function
 	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function

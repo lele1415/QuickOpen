@@ -586,6 +586,22 @@ Sub CopyAdbSettingsCmd(which)
     Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
+Sub CopyAdbInstallCmd(which)
+    Dim finalStr
+    If which = "att" Then
+        finalStr = "adb install D:\APK\Antutu\antutu-benchmark-v940.apk"
+    ElseIf which = "aida" Then
+        finalStr = "adb install D:\APK\Antutu\AIDA64.apk"
+    ElseIf which = "dvc" Then
+        finalStr = "adb install D:\APK\Antutu\DevCheck_v5.11_Mod.apk"
+    ElseIf which = "z" Then
+        finalStr = "adb install D:\APK\Antutu\CPU-Z.apk"
+    ElseIf which = "hw" Then
+        finalStr = "adb install D:\APK\Antutu\DeviceInfoHW.apk"
+    End If
+    Call copyStrAndPasteInPowerShell(finalStr)
+End Sub
+
 Sub CopyAdbGetGmsPropCmd()
     Dim finalStr
     finalStr = "adb shell ""&Chr(34)&""getprop | grep fingerprint | grep -v ro.bootimage.build.fingerprint | grep -v preview_sdk_fingerprint""&Chr(34)&"";adb shell ""&Chr(34)&""getprop | grep -E 'security_patch|gmsversion|base_os|first_api_level|clientidbase'""&Chr(34)&"""
