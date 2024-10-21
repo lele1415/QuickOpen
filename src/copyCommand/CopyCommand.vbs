@@ -240,6 +240,13 @@ Function getGitDiffCmd(cmdStr, filePath)
     End If
 End Function
 
+Function GetDiffCmdFromOverlayPath()
+    Dim overlayPath, originPath
+    overlayPath = getOpenPath()
+    originPath = getOriginPathFromOverlayPath(getOpenPath())
+    Call copyStrAndPasteInXshell("git diff --no-index " & originPath & " " & overlayPath)
+End Function
+
 Function getMultiMkdirStr(arr, what)
     Dim str, path, ovlFolder, ovlFile
     For Each path In arr
@@ -559,6 +566,14 @@ Sub CopyAdbDumpsysCmd(which)
 		finalStr = "adb shell ""&Chr(34)&""dumpsys activity service com.android.systemui | grep --color""&Chr(34)&"""
 	End If
 	Call copyStrAndPasteInPowerShell(finalStr)
+End Sub
+
+Sub CopyAdbLogcatCmd(which)
+    Dim finalStr
+    If which = "as" Then
+        finalStr = "adb shell ""&Chr(34)&""logcat -s  ActivityTaskManager | grep START""&Chr(34)&"""
+    End If
+    Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
 
 Sub CopyAdbSettingsCmd(which)

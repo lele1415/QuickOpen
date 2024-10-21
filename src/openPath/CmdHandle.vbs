@@ -194,6 +194,7 @@ Function handleCopyCommandCmd()
 	If InStr(mCmdInput.text, "cl-") = 1 Then Call CopyAdbClearCmd(Replace(mCmdInput.text, "cl-", "")) : Exit Function
 	If InStr(mCmdInput.text, "st-") = 1 Then Call CopyAdbStartCmd(Replace(mCmdInput.text, "st-", "")) : Exit Function
 	If InStr(mCmdInput.text, "dp-") = 1 Then Call CopyAdbDumpsysCmd(Replace(mCmdInput.text, "dp-", "")) : Exit Function
+	If InStr(mCmdInput.text, "lg-") = 1 Then Call CopyAdbLogcatCmd(Replace(mCmdInput.text, "lg-", "")) : Exit Function
 	If InStr(mCmdInput.text, "sts-") = 1 Then Call CopyAdbSettingsCmd(Replace(mCmdInput.text, "sts-", "")) : Exit Function
 	If mCmdInput.text = "gmsp" Then Call CopyAdbGetGmsPropCmd() : Exit Function
 	If mCmdInput.text = "exp" Then Call copyExportToolsPathCmd() : Exit Function
@@ -209,8 +210,10 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "zhh" Then Call sendWeiXinMsg("zhh") : Exit Function
 	If mCmdInput.text = "luo" Then Call sendWeiXinMsg("luo") : Exit Function
 	If mCmdInput.text = "getl" Then Call getCommitMsgList() : Exit Function
+	If mCmdInput.text = "getrl" Then Call getReleaseNoteList() : Exit Function
 	If mCmdInput.text = "ps" Then Call copyStrAndPasteInXshell("git pull -r origin master && git push origin master") : Exit Function
 	If mCmdInput.text = "update" Then Call copyStrAndPasteInXshell("git remote update origin --prune") : Exit Function
+	If mCmdInput.text = "df" Then Call GetDiffCmdFromOverlayPath() : Exit Function
     handleCopyCommandCmd = False
 End Function
 
@@ -258,7 +261,6 @@ End Sub
 
 Sub getCommitMsgList()
     Dim arr, i, listStr, count, splitWord
-	listStr = VbLf
 	count = 0
 	splitWord = "]:"
 	arr = Split(getOpenPath(), VbLf)
@@ -271,6 +273,17 @@ Sub getCommitMsgList()
 		    count = count + 1
 			listStr = listStr & count & ". " & Right(arr(i), Len(arr(i)) - InStr(arr(i), splitWord) - Len(splitWord) + 1) & VbLf
 		End If
+	Next
+	Call setOpenPath(listStr)
+End Sub
+
+Sub getReleaseNoteList()
+    Dim arr, i, listStr, count
+	count = 0
+	arr = Split(getOpenPath(), VbLf)
+	For i = 0 To UBound(arr)
+		count = count + 1
+		listStr = listStr & count & ". " & arr(i) & VbLf
 	Next
 	Call setOpenPath(listStr)
 End Sub

@@ -391,6 +391,14 @@ Function getDriverProjectName(mmiFolderName)
     getDriverProjectName = str
 End Function
 
+Function getOriginPathFromOverlayPath(path)
+    If InStr(path, "/alps/") > 0 Then
+        getOriginPathFromOverlayPath = Right(path, Len(path) - InStr(path, "/alps/") - Len("/alps/") + 1)
+    Else
+        getOriginPathFromOverlayPath = path
+    End If
+End Function
+
 Function isPictureFilePath(path)
     If isEndWith(path, ".bmp") Then
         isPictureFilePath = True
