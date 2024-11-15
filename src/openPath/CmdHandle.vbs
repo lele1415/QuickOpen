@@ -182,6 +182,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "mko" Then Call getMakeCommand(False, False, True) : Exit Function
 	If mCmdInput.text = "bmko" Then Call getMakeCommand(False, True, True) : Exit Function
 	If mCmdInput.text = "omko" Then Call getMakeCommand(True, False, True) : Exit Function
+	If InStr(mCmdInput.text, "smk") = 1 Then Call getSplitBuildCommand(Replace(mCmdInput.text, "smk", "")) : Exit Function
 	If mCmdInput.text = "md" Then Call MkdirWeibuFolderPath() : Exit Function
 	If mCmdInput.text = "cm" Then Call CopyCommitInfo("") : Exit Function
 	If InStr(mCmdInput.text, "cm-") = 1 Then Call CopyCommitInfo(Replace(mCmdInput.text, "cm-", "")) : Exit Function

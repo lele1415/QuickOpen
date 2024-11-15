@@ -46,6 +46,30 @@ Sub getMakeCommand(rmOut, rmBuildprop, ota)
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
+Sub getSplitBuildCommand(opts)
+    Dim params, commandStr
+    If InStr(opts, "v") Then
+        If isT08781() Then
+            params = params & " vext"
+        Else
+            params = params & " vnd"
+        End If
+    End If
+    If InStr(opts, "k") Then params = params & " krn"
+    If isT08781() And InStr(opts, "h") Then params = params & " hal"
+    If InStr(opts, "s") Then params = params & " sys"
+    If InStr(opts, "m") Then params = params & " m"
+    If InStr(opts, "p") Then params = params & " p"
+
+    If isT08781() Then
+        commandStr = "./split_build_v2.sh" & params
+    Else
+        commandStr = "./split_build.sh" & params
+    End If
+
+    Call copyStrAndPasteInXshell(commandStr)
+End Sub
+
 Sub CommandOfLunch()
     If Not mIp.hasProjectInfos() Then Exit Sub
     Dim buildType
