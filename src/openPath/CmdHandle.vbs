@@ -72,6 +72,7 @@ Function HandleFilePathCmd()
 	'If mCmdInput.text = "cc" Then Call setPathFromCmd("device/mediatek/vendor/common/custom.conf") : Exit Function
 	If mCmdInput.text = "fwc" Then Call setPathFromCmd("frameworks/base/core/res/res/values/config.xml") : Exit Function
 	If mCmdInput.text = "fws" Then Call setPathFromCmd("frameworks/base/core/res/res/values/strings.xml") : Exit Function
+	If mCmdInput.text = "tv" Then Call setPathFromCmd("frameworks/base/core/java/android/widget/TextView.java") : Exit Function
 	If mCmdInput.text = "tz" Then Call runPath("frameworks/base/packages/SettingsLib/res/xml/timezones.xml") : Exit Function
 	If mCmdInput.text = "tz2" Then Call runPath("system/timezone/output_data/android/tzlookup.xml") : Exit Function
 	If mCmdInput.text = "dc" Then Call setPathFromCmd("[kernel_version]/arch/[target_arch]/configs/[product]_defconfig") : Exit Function
@@ -118,6 +119,7 @@ End Function
 
 Function handleGetInfo()
     handleGetInfo = True
+	If mCmdInput.text = "getdi" Then Call setOpenPath(getOutInfo("ro.build.display.id")) : Exit Function
 	If mCmdInput.text = "getid" Then Call setOpenPath(getOutInfo("ro.build.display.inner.id")) : Exit Function
 	If mCmdInput.text = "getfp" Then Call setOpenPath(getOutInfo("ro.system.build.fingerprint")) : Exit Function
 	If mCmdInput.text = "getsp" Then Call setOpenPath(getOutInfo("ro.build.version.security_patch")) : Exit Function
