@@ -928,8 +928,9 @@ Function checkMvIn(outPath, folders)
 End Function
 
 Sub mvOut(buildType, where)
-    Dim cmdStr, outPath, outFolders
-    outPath = "../OUT/" & getProjectSimpleName() & "_" & buildType
+    Dim cmdStr, outPath, outFolders, outName
+    outName = Split(mIp.Infos.Work, " ")(0)
+    outPath = "../OUT/" & outName & "_" & buildType
     If isT0Sdk() Then
         If isT08168Sdk() Then
             outFolders = Array("merged", "sys/out", "vnd/out")
