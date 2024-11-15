@@ -251,7 +251,7 @@ Sub openWeiXin(who)
 	    Case "wj" : who = "weijuan"
 	End Select
 
-    Call oWs.appactivate("∆Û“µŒ¢–≈")
+    Call oWs.appactivate("‰ºÅ‰∏öÂæÆ‰ø°")
     Call oWs.sendkeys("^f")
     Call oWs.sendkeys(who & "xiangmuqun")
 	idTimer = window.setTimeout("Call sendEnterKeyInWeiXin(""" & who & """)", 500, "VBScript")

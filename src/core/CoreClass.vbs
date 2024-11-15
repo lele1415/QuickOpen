@@ -999,7 +999,7 @@ Class ProjectInputs
 
     Public Sub clearWorkInfos()
         Work = ""
-        Firmware = "\\192.168.0.248\安卓固件文件\"
+        Firmware = "\\192.168.0.248\安卓固件文件1\"
         Requirements = "\\192.168.0.24\wbshare\客户需求\"
         Zentao = "http://192.168.0.29:3000/zentao/task-view-" & getTaskNum(Project) & ".html"
     End Sub

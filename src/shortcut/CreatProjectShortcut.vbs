@@ -121,8 +121,8 @@ Sub getProjectInfosFromOpenPath()
 	oInfos.Project = Split(Split(inputArray(0), "/weibu/")(1), "/")(1)
 	fullName = trimStr(Right(oInfos.Project, Len(oInfos.Project) - InStr(oInfos.Project, "_")))
 	oInfos.Work = fullName & " " & oInfos.Sdk
-	oInfos.Firmware = "\\192.168.0.248\安卓固件文件\"
-	oInfos.Requirements = "\\192.168.0.24\wbshare\客户需求\"
+	oInfos.Firmware = "\\192.168.0.248\瀹夊崜鍥轰欢鏂囦欢1\"
+	oInfos.Requirements = "\\192.168.0.24\wbshare\瀹㈡埛闇�姹俓"
 	oInfos.Zentao = "http://192.168.0.29:3000/zentao/task-view-" & getTaskNum(oInfos.Project) & ".html"
 
 	workInfosStr = oInfos.Work & VbLf &_
