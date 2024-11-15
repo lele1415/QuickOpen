@@ -113,6 +113,15 @@ Sub getT0SysLunchCommand(buildType)
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
+Sub getT0VndLunchCommand(buildType)
+    If isT08781() Then
+        commandFinal = "source build/envsetup.sh && lunch vext_" & mIp.Infos.VndTarget & "-" & buildType & " " & mIp.Infos.DriverProject
+    ELse
+        commandFinal = "source build/envsetup.sh && lunch vnd_" & mIp.Infos.VndTarget & "-" & buildType & " " & mIp.Infos.DriverProject
+    End If
+    Call copyStrAndPasteInXshell(commandFinal)
+End Sub
+
 Function getRomPath()
     getRomPath = getParentPath(mIp.Infos.DriveSdk) & "\ROM"
 End Function
