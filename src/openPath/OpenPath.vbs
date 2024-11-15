@@ -256,7 +256,7 @@ Sub replaceOpenPath()
 		path = pathDict.Item(path)
     End If
 	path = replaceProjectInfoStr(path)
-	Call setOpenPath(path)
+	Call setOpenPath(relpaceSlashInPath(path))
 
 	'Call cutSdkPath()
 End Sub

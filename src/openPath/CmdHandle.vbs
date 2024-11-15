@@ -207,12 +207,15 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "mdo" Then Call mvOut("debug", "out") : Exit Function
 	If mCmdInput.text = "mdi" Then Call mvOut("debug", "in") : Exit Function
 	If InStr(mCmdInput.text, "qm-") = 1 Then Call CopyQmakeCmd(Replace(mCmdInput.text, "qm-", "")) : Exit Function
-	If mCmdInput.text = "huq" Then Call sendWeiXinMsg("huq") : Exit Function
-	If mCmdInput.text = "zhh" Then Call sendWeiXinMsg("zhh") : Exit Function
-	If mCmdInput.text = "luo" Then Call sendWeiXinMsg("luo") : Exit Function
-	If mCmdInput.text = "getl" Then Call getCommitMsgList() : Exit Function
+	If mCmdInput.text = "hqp" Then Call sendWeiXinMsg("hqp") : Exit Function
+	If mCmdInput.text = "zhq" Then Call sendWeiXinMsg("zhh") : Exit Function
+	If mCmdInput.text = "lqj" Then Call sendWeiXinMsg("lqj") : Exit Function
+	If mCmdInput.text = "lyh" Then Call sendWeiXinMsg("lyh") : Exit Function
+	If mCmdInput.text = "wj" Then Call sendWeiXinMsg("wj") : Exit Function
+	If mCmdInput.text = "getcl" Then Call getCommitMsgList() : Exit Function
 	If mCmdInput.text = "getrl" Then Call getReleaseNoteList() : Exit Function
 	If mCmdInput.text = "ps" Then Call copyStrAndPasteInXshell("git pull -r origin master && git push origin master") : Exit Function
+	If mCmdInput.text = "ccps" Then Call copyStrAndPasteInXshell("git checkout .;git clean -df;git pull -r origin master && git push origin master") : Exit Function
 	If mCmdInput.text = "update" Then Call copyStrAndPasteInXshell("git remote update origin --prune") : Exit Function
 	If mCmdInput.text = "df" Then Call GetDiffCmdFromOverlayPath() : Exit Function
     handleCopyCommandCmd = False
@@ -236,9 +239,11 @@ End Sub
 
 Sub openWeiXin(who)
     Select Case who
-	    Case "huq" : who = "huqipeng"
-	    Case "zhh" : who = "zhonghongqiang"
-	    Case "luo" : who = "luoqingjun"
+	    Case "hqp" : who = "huqipeng"
+	    Case "zhq" : who = "zhonghongqiang"
+	    Case "lqj" : who = "luoqingjun"
+	    Case "lyh" : who = "laiyuhui"
+	    Case "wj" : who = "weijuan"
 	End Select
 
     Call oWs.appactivate("∆Û“µŒ¢–≈")
@@ -379,7 +384,7 @@ Function getGmsVersion()
 End Function
 
 Function getSecurityPatch()
-    getSecurityPatch = readTextAndGetValue("VENDOR_SECURITY_PATCH", "vendor/mediatek/proprietary/buildinfo_vnd/device.mk")
+    getSecurityPatch = readTextAndGetValue("PLATFORM_SECURITY_PATCH", "build/make/core/version_defaults.mk")
 End Function
 
 Sub checkT0Path(path)

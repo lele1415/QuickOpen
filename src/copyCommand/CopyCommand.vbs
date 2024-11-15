@@ -141,7 +141,7 @@ Sub CopyBuildOtaUpdate()
     If InStr(mIp.Infos.Sdk, "_r") > 0 Then
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
     Else
-        commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i old.zip new.zip update.zip"
+        commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i target_files_.zip target_files.zip update__to_.zip"
     End If
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
@@ -446,7 +446,7 @@ Sub CopyCommitInfo(what)
         commandFinal = "Settings [" & mIp.Infos.Project & "] : "    
     ElseIf what = "su" Then
         commandFinal = "SystemUI [" & mIp.Infos.Project & "] : "
-    ElseIf what = "lac" Then
+    ElseIf what = "lc" Then
         commandFinal = "Launcher [" & mIp.Infos.Project & "] : "
     ElseIf what = "cam" Then
         commandFinal = "Camera [" & mIp.Infos.Project & "] : "
@@ -495,7 +495,7 @@ Sub CopyAdbPushCmd(which)
 	    sourcePath = outPath & "\system\system_ext\app\Camera"
 		targetPath = "/system/system_ext/app/"
 		finalStr = "adb push " & sourcePath & " " & targetPath
-    ElseIf which = "sv" Then
+    ElseIf which = "fws" Then
 	    sourcePath = outPath & "\system\framework\services.jar"
 		targetPath = "/system/framework"
 		finalStr = "adb push " & sourcePath & " " & targetPath
@@ -507,7 +507,7 @@ Sub CopyAdbPushCmd(which)
 	    sourcePath = outPath & "\system\app\SoundRecorder_old"
 		targetPath = "/system/app/"
 		finalStr = "adb push " & sourcePath & " " & targetPath
-    ElseIf which = "fr" Then
+    ElseIf which = "fwr" Then
 	    sourcePath = outPath & "\system\framework\framework-res.apk"
 		targetPath = "/system/framework/"
 		finalStr = "adb push " & sourcePath & " " & targetPath
@@ -612,6 +612,14 @@ Sub CopyQmakeCmd(which)
     Dim cmdStr
     If which = "sl" Then
         cmdStr = "qmake SearchLauncherQuickStep"
+    ElseIf which = "st" Then
+        cmdStr = "qmake MtkSettings"
+    ElseIf which = "su" Then
+        cmdStr = "qmake MtkSystemUI"
+    ElseIf which = "fws" Then
+        cmdStr = "mmm -j32 frameworks/base/services:services"
+    ElseIf which = "fwr" Then
+        cmdStr = "mmm -j32 frameworks/base/core/res"
     ElseIf which = "lot" Then
         cmdStr = "qmake GmsSampleIntegration"
     End If
