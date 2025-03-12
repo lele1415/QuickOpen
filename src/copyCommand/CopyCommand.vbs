@@ -19,7 +19,7 @@ End Sub
 Sub copyStrAndPasteInPowerShell(cmdStr)
     If cmdStr = "" Then MsgBox("Empty!") : Exit Sub
     Call CopyString(cmdStr)
-    Call pasteCmdInPowerShell()
+    'Call pasteCmdInPowerShell()
 End Sub
 
 Sub CommandOfMake()
@@ -60,6 +60,13 @@ Sub getSplitBuildCommand(opts)
     If InStr(opts, "s") Then params = params & " sys"
     If InStr(opts, "m") Then params = params & " m"
     If InStr(opts, "p") Then params = params & " p"
+    If InStr(opts, "a") Then
+        If isT08781() Then
+            params = params & " vext krn hal sys m p"
+        Else
+            params = params & " vnd krn sys m p"
+        End If
+    End if
 
     If isT08781() Then
         commandStr = "./split_build_v2.sh" & params
@@ -67,7 +74,56 @@ Sub getSplitBuildCommand(opts)
         commandStr = "./split_build.sh" & params
     End If
 
+    if InStr(params, " p") And InStr(params, " vnd") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
+        Call setT0SdkVnd()
+        commandStr = getCustomModemSedStr() & commandStr
+    End If
+
     Call copyStrAndPasteInXshell(commandStr)
+End Sub
+
+Function getCustomModemSedStr()
+    Dim customModem, deviceModem
+    customModem = getMMIProjectConfigValue("CUSTOM_MODEM")
+    deviceModem = getDeviceProjectConfigValue("CUSTOM_MODEM")
+    if customModem <> deviceModem Then
+        getCustomModemSedStr = getSedCmd("", "CUSTOM_MODEM", "=.*$", "= " & customModem, "vnd/" & pDeviceProjectConfigMk)
+    Else
+        getCustomModemSedStr = ""
+    End If
+End Function
+
+Sub getSplitTestOTABuildCommand(opts)
+    Dim buildsh, params, cmdStr
+    If isT08781() Then
+        buildsh = "./split_build_v2.sh"
+        If InStr(opts, "s") Then
+            params = " sys m p;"
+        Else
+            params = " vext krn hal sys m p;"
+        End If
+    Else
+        buildsh = "./split_build.sh"
+        If InStr(opts, "s") Then
+            params = " sys m p;"
+        Else
+            params = " vnd krn hal sys m p;"
+        End If
+    End If
+    cmdStr = buildsh & params
+    cmdStr = cmdStr & "mkdir -p OTA/" & mIp.Infos.TaskNum & ";"
+    cmdStr = cmdStr & "mv merged/target_files.zip OTA/" & mIp.Infos.TaskNum & "/target_files_s.zip;"
+    If isSplitSdkVnd() Then Call setT0SdkSys()
+    If isU0SysSdk() Then
+        cmdStr = cmdStr & "cd u_sys;"
+    Else
+        cmdStr = cmdStr & "cd sys;"
+    End If
+    cmdStr = cmdStr & getOTATestSedStr(False) & ";"
+    cmdStr = cmdStr & "cd ..;"
+    cmdStr = cmdStr & buildsh & " sys m;"
+    cmdStr = cmdStr & "mv merged/target_files.zip OTA/" & mIp.Infos.TaskNum & "/target_files_t.zip;"
+    Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
 Sub CommandOfLunch()
@@ -103,7 +159,7 @@ Function getLunchItemInSplitBuild(buildType)
     vndStr = "vnd_" & mIp.Infos.VndTarget & "-" & buildType
 
     If isT0Sdk() Then
-        If isT0SdkVnd() Then Call setT0SdkSys()
+        If isSplitSdkVnd() Then Call setT0SdkSys()
         If isT08781() Then
             Dim halStr, krnStr
             halStr = "hal_" & mIp.Infos.HalTarget & "-" & buildType
@@ -175,45 +231,71 @@ Sub CopyBuildOtaUpdate()
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
     Else
         commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i target_files_.zip target_files.zip update__to_.zip"
+        If isT08781() Then commandFinal = Replace(commandFinal, "/out/", "/out_sys/")
     End If
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
+Function getParentProject()
+    Dim vaParents, project, index, folderPath
+    Set vaParents = New VariableArray
+    project = mIp.Infos.Project
+    index = InStrRev(project, "-")
+    Do While index > 0
+        project = Left(project, index - 1)
+        folderPath = "weibu/" & mIp.Infos.Product & "/" & project
+        If isFolderExists(folderPath) Then
+            vaParents.Append(folderPath)
+        End If
+        index = InStrRev(project, "-")
+    Loop
+    Set getParentProject = vaParents
+End Function
+
 Sub MkdirWeibuFolderPath()
     If Not mIp.hasProjectInfos() Then Exit Sub
     Dim path : path = getOpenPath()
+    If Not isFileExists(path) Then Exit Sub
     Dim folderPath
+    Dim fileName
+    Dim filePath
+    Dim overlayFilePath
+    Dim overlayFolderPath
     Dim mkdirCmd, cpCmd
     commandFinal = ""
 
-    If isFileExists(path) Or isFolderExists(path) Then
-        If isFileExists(path) Then
-            Dim index : index = InStrRev(path, "/")
-            folderPath = Left(path, index)
-        Else
-            folderPath = path
-        End If
+    folderPath = Left(path, InStrRev(path, "/"))
+    fileName = Replace(path, folderPath, "")
+    If InStr(path, "weibu/") = 1 Then
+        folderPath = Right(folderPath, Len(folderPath) - InStr(folderPath, "alps/") - Len("alps/") + 1)
+    End If
+    filePath = folderPath & fileName
+    overlayFilePath = mIp.Infos.getOverlayPath(filePath)
+    overlayFolderPath = mIp.Infos.getOverlayPath(folderPath)
 
-        If isFolderExists(folderPath) Then
+    If isFileExists(overlayFilePath) Then MsgBox("File exist! " & overlayFilePath) : Exit Sub
+    If Not isFolderExists(overlayFolderPath) Then
+        mkdirCmd = "mkdir -p " & overlayFolderPath & ";"
+    End If
 
-            If Not isFolderExists(mIp.Infos.getOverlayPath(folderPath)) Then
-                mkdirCmd = "mkdir -p " & mIp.Infos.getOverlayPath(folderPath) & ";"
-            End If
-
-            commandFinal = mkdirCmd
+    If InStr(path, "weibu/") <> 1 And InStr(mIp.Infos.Project, "-") > 0 Then
+        Dim vaParents, i
+        Set vaParents = getParentProject()
+        If vaParents.Bound > -1 Then
+            For i = 0 To vaParents.Bound
+                If isFileExists(vaParents.V(i) & "/alps/" & path) Then
+                    path = vaParents.V(i) & "/alps/" & path
+                    Exit For
+                End If
+            Next
         End If
     End If
 
-    If isFileExists(path) Then
-        If Not isFileExists(mIp.Infos.getOverlayPath(path)) Then
-            cpCmd = "cp " & path & " " & mIp.Infos.getOverlayPath(folderPath)
-        Else
-            MsgBox("File exist!")
-        End If
-            commandFinal = mkdirCmd & cpCmd
-    End If
+    cpCmd = "cp " & path & " " & mIp.Infos.getOverlayPath(folderPath)
+    commandFinal = mkdirCmd & cpCmd
 
     commandFinal = relpaceSlashInPath(commandFinal)
+    If InStr(path, "weibu/") = 1 Then Call setOpenPath(filePath)
     Call addProjectPath()
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
@@ -257,12 +339,12 @@ Function getSedCmd(cmdStr, searchStr, replaceStr, newStr, filePath)
         Next
         getSedCmd = str & ";"
     Else
-        getSedCmd = cmdStr & "sed -i '/" & checkBackslash(searchStr) & "/s/" & checkBackslash(replaceStr) & "/" & checkBackslash(newStr) & "/' " & mIp.Infos.getOverlayPath(filePath) & ";"
+        getSedCmd = cmdStr & "sed -i '/" & checkBackslash(searchStr) & "/s/" & checkBackslash(replaceStr) & "/" & checkBackslash(newStr) & "/' " & filePath & ";"
     End If
 End Function
 
 Function getSedAddCmd(cmdStr, searchStr, addStr, filePath)
-    getSedAddCmd = cmdStr & "sed -i '/" & checkBackslash(searchStr) & "/a\" & checkBackslash(addStr) & "' " & mIp.Infos.getOverlayPath(filePath) & ";"
+    getSedAddCmd = cmdStr & "sed -i '/" & checkBackslash(searchStr) & "/a\" & checkBackslash(addStr) & "' " & filePath & ";"
 End Function
 
 Function getGitDiffCmd(cmdStr, filePath)
@@ -296,7 +378,7 @@ Function getMultiMkdirStr(arr, what)
 	            str =  str & "cp ../File/bootanimation.zip " & ovlFolder & ";"
 			ElseIf InStr(path, "products.mk") > 0 Then
 			    If Not isFileExists(ovlFile) Then str =  str & "cp " & path & " " & ovlFolder & ";"
-				str =  getSedCmd(str, "bootanimation", "#", "", path)
+				str =  getSedCmd(str, "bootanimation", "#", "", mIp.Infos.getOverlayPath(path))
 				str =  getGitDiffCmd(str, path)
 			End If
 		ElseIf what = "wp" Then
@@ -321,7 +403,7 @@ Function getLogoPath()
 End Function
 
 Function getPowerProfilePath()
-    If isU0SdkSys() Then
+    If isU0SysSdk() Then
         getPowerProfilePath = "device/mediatek/system/common/overlay/power/frameworks/base/core/res/res/xml/power_profile.xml"
     Else
         getPowerProfilePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml"
@@ -329,7 +411,7 @@ Function getPowerProfilePath()
 End Function
 
 Function getOutSystemExtPrivAppPath()
-    If isU0SdkSys() Then
+    If isU0SysSdk() Then
         getOutSystemExtPrivAppPath = "/system_ext/priv-app"
     Else
         getOutSystemExtPrivAppPath = "/system/system_ext/priv-app"
@@ -383,7 +465,7 @@ Sub mkdirWallpaper(go)
 End Sub
 
 Sub mkdirTee()
-    If isT0SdkSys() Then Call setT0SdkVnd()
+    If isSplitSdkSys() Then Call setT0SdkVnd()
     Dim teeOverlayPath, finalStr
     teeOverlayPath = mIp.Infos.getOverlayPath("vendor/mediatek/proprietary/trustzone/trustkernel/source/build/" & mIp.Infos.Product)
     If isFolderExists(teeOverlayPath) And isFileExists(teeOverlayPath & "cert.dat") And isFileExists(teeOverlayPath & "array.c") Then
@@ -404,8 +486,8 @@ End Sub
 
 Sub mkdirProductInfo(where)
     If Not isFileExists("../File/product.txt") Then MsgBox("product.txt does not exist!") : Exit Sub
-    If where = "sys" And isT0SdkVnd() Then Call setT0SdkSys()
-    If where = "vnd" And isT0SdkSys() Then Call setT0SdkVnd()
+    If where = "sys" And isSplitSdkVnd() Then Call setT0SdkSys()
+    If where = "vnd" And isSplitSdkSys() Then Call setT0SdkVnd()
     Dim info, infoArr, infoDict, cmdStr, finalStr
     infoArr = Array("brand", "manufacturer", "model", "name", "device")
     Set infoDict = CreateObject("Scripting.Dictionary")
@@ -462,12 +544,12 @@ Sub CopyCommitInfo(what)
     ElseIf what = "di" Then
         commandFinal = "DisplayId [" & mIp.Infos.Project & "] : 版本号"
     ElseIf InStr(what, "bn=") = 1 Then
-        commandFinal = "BuildNumber [" & mIp.Infos.Project & "] : 更新build number " & Replace(what, "bn=", "")
+        commandFinal = "BuildNumber [" & mIp.Infos.Project & "] : 固定指纹信息（build number " & Replace(what, "bn=", "") & "）"
     ElseIf InStr(what, "sp=") = 1 Then
         If InStr(what, "-bn=") > 0 Then
-            commandFinal = "GMS [" & mIp.Infos.Project & "] : 安全补丁日期改" & Replace(Split(what, "-")(0), "sp=", "") & "、更新build number " & Replace(Split(what, "-")(1), "bn=", "")
+            commandFinal = "GMS [" & mIp.Infos.Project & "] : 固定GMS信息（安全补丁日期 " & Replace(Split(what, "-bn=")(0), "sp=", "") & "、build number " & Split(what, "-bn=")(1) & "）"
         Else
-            commandFinal = "GMS [" & mIp.Infos.Project & "] : 安全补丁日期改" & Replace(what, "sp=", "")
+            commandFinal = "GMS [" & mIp.Infos.Project & "] : 固定安全补丁日期 " & Replace(what, "sp=", "")
         End If
     ElseIf what = "bm" Then
         commandFinal = "MMI [" & mIp.Infos.Project & "] : 品牌，型号"
@@ -546,7 +628,7 @@ Sub CopyAdbPushCmd(which)
 		finalStr = "adb push " & sourcePath & " " & targetPath
 	End If
 
-    If isU0SdkSys() Then
+    If isU0SysSdk() Then
         finalStr = Replace(finalStr, "\system\system_ext\", "\system_ext\")
         finalStr = Replace(finalStr, "/system/system_ext/", "/system_ext/")
     End If
@@ -622,7 +704,7 @@ End Sub
 Sub CopyAdbInstallCmd(which)
     Dim finalStr
     If which = "att" Then
-        finalStr = "adb install D:\APK\Antutu\antutu-benchmark-v940.apk"
+        finalStr = "adb install D:\APK\Antutu\antutu-benchmark-v10.apk"
     ElseIf which = "aida" Then
         finalStr = "adb install D:\APK\Antutu\AIDA64.apk"
     ElseIf which = "dvc" Then
@@ -649,6 +731,8 @@ Sub CopyQmakeCmd(which)
         cmdStr = "qmake MtkSettings"
     ElseIf which = "su" Then
         cmdStr = "qmake MtkSystemUI"
+    ElseIf which = "ft" Then
+        cmdStr = "qmake FactoryTest"
     ElseIf which = "fws" Then
         cmdStr = "mmm -j32 frameworks/base/services:services"
     ElseIf which = "fwr" Then
@@ -660,22 +744,29 @@ Sub CopyQmakeCmd(which)
 End Sub
 
 Sub modDisplayIdForOtaTest()
-	Dim buildinfo, keyStr, sedStr
+    Dim sedStr
+    sedStr = getOTATestSedStr(True)
+	If sedStr <> "" Then Call copyStrAndPasteInXshell(sedStr)
+End Sub
+
+Function getOTATestSedStr(showDiff)
+    Dim buildinfo, keyStr, sedStr
 	buildinfo = mIp.Infos.ProjectPath & "/config/buildinfo.sh"
 	If Not isFileExists(buildinfo) Then buildinfo = mIp.Infos.DriverProjectPath & "/config/buildinfo.sh"
 	If Not isFileExists(buildinfo) Then buildinfo = mIp.Infos.getOverlayPath("build/make/tools/buildinfo.sh")
-	If Not isFileExists(buildinfo) Then MsgBox("No buildinfo.sh found in overlay") : Exit Sub
+	If Not isFileExists(buildinfo) Then buildinfo = "build/make/tools/buildinfo.sh"
 
 	keyStr = "ro.build.display.id"
 	If InStr(buildinfo, "/config/") Then
 	    sedStr = "sed -i '/" & keyStr & "/s/$/-OTA_test/' " & buildinfo
-	    Call copyStrAndPasteInXshell(sedStr)
 	Else
 	    sedStr = "sed -i '/" & keyStr & "/s/""&Chr(34)&""$/-OTA_test""&Chr(34)&""/' " & buildinfo
-        sedStr = sedStr & "; git diff " & buildinfo
-	    Call copyStrAndPasteInXshell(sedStr)
 	End If
-End Sub
+    If showDiff Then
+        sedStr = sedStr & "; git diff " & buildinfo
+    End If
+    getOTATestSedStr = sedStr
+End Function
 
 Sub modSystemprop(whatArr)
     Dim systempropPath, cmdStr, keyStr, valueStr
@@ -708,6 +799,10 @@ Sub modSystemprop(whatArr)
 	Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
+Sub modFingerprintInfos(version)
+    
+End Sub
+
 Sub cpFileAndSetValue(whatArr)
     Dim cmdStr
     cmdStr = getCmdStrForCpFileAndSetValue(whatArr)
@@ -716,92 +811,107 @@ Sub cpFileAndSetValue(whatArr)
 End Sub
 
 Function getCmdStrForCpFileAndSetValue(whatArr)
-    Dim filePath, folderPath, keyStr, eqStr, searchStr, valueStr, cmdStr
+    Dim filePath, folderPath, keyStr, startStr, searchStr, valueStr, cmdStr
     If whatArr(0) = "gmsv" Then
 	    filePath = "vendor/partner_gms/products/gms_package_version.mk"
 		keyStr = "GMS_PACKAGE_VERSION_ID"
-		eqStr = " := "
-		searchStr = keyStr & eqStr
+		startStr = " := "
+		searchStr = keyStr & startStr
 		valueStr = whatArr(1)
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 	ElseIf whatArr(0) = "sp" Then
 	    filePath = "build/make/core/version_defaults.mk"
 		keyStr = "PLATFORM_SECURITY_PATCH"
-		eqStr = " := "
-		searchStr = keyStr & eqStr
+		startStr = " := "
+		searchStr = keyStr & startStr
 		valueStr = whatArr(1)
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 	    filePath = "vendor/mediatek/proprietary/buildinfo_vnd/device.mk"
 		keyStr = "VENDOR_SECURITY_PATCH"
-		searchStr = keyStr & eqStr
-		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		searchStr = keyStr & startStr
+		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 	ElseIf whatArr(0) = "bn" Then
         Dim weibuConfig : weibuConfig = "build/make/core/weibu_config.mk"
         keyStr = "WEIBU_BUILD_NUMBER"
-		eqStr = " := "
+		startStr = " := "
         If isFileExists(weibuConfig) Then
             filePath = weibuConfig
-            eqStr = " ?= "
+            startStr = " ?= "
         Else
 	        filePath = "device/mediatek/system/common/BoardConfig.mk"
             If InStr(mIp.Infos.Sdk, "_r") > 0 Then
                 keyStr = "BUILD_NUMBER_WEIBU"
             End If
         End If
-		searchStr = keyStr & eqStr
+		searchStr = keyStr & startStr
 		valueStr = whatArr(1)
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 	ElseIf whatArr(0) = "bn2" Then
 	    filePath = "device/mediatek/system/common/BoardConfig.mk"
 		keyStr = "WEIBU_BUILD_NUMBER"
-		eqStr = " := "
-		searchStr = keyStr & eqStr
+		startStr = " := "
+		searchStr = keyStr & startStr
 		valueStr = whatArr(1)
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 		filePath = "device/mediatek/vendor/common/BoardConfig.mk"
-		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
+    
+    ElseIf whatArr(0) = "fp" Then
+        Dim version, buildId
+        version = whatArr(1)
+        If version = "14" Then
+            buildId="UP1A.231005.007"
+        ElseIf version = "13" Then
+            buildId="TP1A.220624.014"
+        Else
+            MsgBox("Unknown fp version: " & version)
+            getCmdStrForCpFileAndSetValue = ""
+            Exit Function
+        End If
+        cmdStr = getCpAndSedCmdStr("build/make/core/build_id.mk", "BUILD_ID", "=", buildId, "s")
+        cmdStr = cmdStr & getCpAndSedCmdStr("build/make/core/sysprop.mk", "BUILD_FINGERPRINT := $(PRODUCT_BRAND)", "$(PLATFORM_VERSION)", version, "ss")
 
 	ElseIf whatArr(0) = "bt" Then
-	    If isT0SdkSys() Then
+	    If isSplitSdkSys() Then
 	        filePath = "vendor/mediatek/proprietary/packages/modules/Bluetooth/system/btif/src/btif_dm.cc"
 		Else
 		    filePath = "system/bt/btif/src/btif_dm.cc"
 		End If
 		keyStr = "static char btif_default_local_name"
-		eqStr = " = "
+		startStr = " = "
 		searchStr = keyStr
 		valueStr = """&Chr(34)&""" & whatArr(1) & """&Chr(34)&"";"
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 	ElseIf whatArr(0) = "mtp" Then
 	    filePath = "frameworks/base/media/java/android/mtp/MtpDatabase.java"
-		eqStr = " = "
+		startStr = " = "
 		searchStr = "mDeviceProperties.getString"
 		valueStr = """&Chr(34)&""" & whatArr(1) & """&Chr(34)&"";"
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 		searchStr = "Build.MODEL"
-		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = cmdStr & getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
     
 	ElseIf whatArr(0) = "wfap" Then
 	    filePath = "packages/modules/Wifi/service/java/com/android/server/wifi/WifiApConfigStore.java"
-		eqStr = "("
+		startStr = "("
 		searchStr = "configBuilder.setSsid(Build.MODEL)"
 		valueStr = """&Chr(34)&""" & whatArr(1) & """&Chr(34)&"");"
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 	ElseIf whatArr(0) = "wfdrt" Then
 	    filePath = "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java"
 		searchStr = "String getPersistedDeviceName()"
 		valueStr = "            if (true) return ""&Chr(34)&""" & whatArr(1) & """&Chr(34)&"";"
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "a")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "a")
 
 	ElseIf whatArr(0) = "brand" Or whatArr(0) = "model" Or whatArr(0) = "manufacturer" Then
-	    If isT0SdkSys() Then
+	    If isSplitSdkSys() Then
             filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
         Else
             If isT08781() Then
@@ -811,13 +921,13 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
             End If
         End If
         keyStr = "PRODUCT_" & UCase(whatArr(0))
-        eqStr = " := "
-		searchStr = keyStr & eqStr
+        startStr = " := "
+		searchStr = keyStr & startStr
 		valueStr = whatArr(1)
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
     ElseIf whatArr(0) = "name" Or whatArr(0) = "device" Then
-        If Not isT0SdkVnd() Then
+        If Not isSplitSdkVnd() Then
             filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
         Else
             If isT08781() Then
@@ -827,35 +937,35 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
             End If
         End If
         keyStr = "PRODUCT_SYSTEM_" & UCase(whatArr(0))
-        eqStr = " := "
+        startStr = " := "
         If mIp.Infos.Product = "tb8765ap1_bsp_1g_k419" Or _
                 mIp.Infos.Product = "tb8766p1_64_bsp" Or _
                 mIp.Infos.Product = "tb8788p1_64_bsp_k419" Or _
                 mIp.Infos.Product = "tb8321p3_bsp" Or _
                 mIp.Infos.Product = "tb8768p1_64_bsp"  Then
-            searchStr = keyStr & eqStr
+            searchStr = keyStr & startStr
             valueStr = whatArr(1)
-            cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+            cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
         Else
             searchStr = "PRODUCT_BRAND"
-            valueStr = "PRODUCT_SYSTEM_" & UCase(whatArr(0)) & eqStr & whatArr(1)
-            cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "a")
+            valueStr = "PRODUCT_SYSTEM_" & UCase(whatArr(0)) & startStr & whatArr(1)
+            cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "a")
         End If
 
     ElseIf whatArr(0) = "brt" Then
-        If isT0SdkSys() Then Call setT0SdkVnd()
+        If isSplitSdkSys() Then Call setT0SdkVnd()
 	    filePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/res/values/config.xml"
-        eqStr = ">"
+        startStr = ">"
 		searchStr = "config_screenBrightnessSettingDefaultFloat"
 		valueStr = whatArr(1) & "</item>"
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
     ElseIf whatArr(0) = "bat" Then
         filePath = getPowerProfilePath()
-        eqStr = ">"
+        startStr = ">"
 		searchStr = "battery.capacity"
 		valueStr = whatArr(1) & "</item>"
-		cmdStr = getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, "s")
+		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
     
     ElseIf whatArr(0) = "sdk" Then
 	    mIp.Sdk = Trim(whatArr(1))
@@ -874,7 +984,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 	getCmdStrForCpFileAndSetValue = cmdStr
 End Function
 
-Function getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, mode)
+Function getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, mode)
     Dim folderPath, cmdStr
 	folderPath = getParentPath(filePath)
 
@@ -882,15 +992,17 @@ Function getCpAndSedCmdStr(filePath, searchStr, eqStr, valueStr, mode)
 		cmdStr = cmdStr & "mkdir -p " & mIp.Infos.getOverlayPath(folderPath) & ";"
 		cmdStr = cmdStr & "cp " & filePath & " " & mIp.Infos.getOverlayPath(folderPath) & ";"
 	End If
-    cmdStr = getSedStr(cmdStr, filePath, searchStr, eqStr, valueStr, mode)
+    cmdStr = getSedStr(cmdStr, mIp.Infos.getOverlayPath(filePath), searchStr, startStr, valueStr, mode)
     cmdStr = getGitDiffCmd(cmdStr, filePath)
 
 	getCpAndSedCmdStr = cmdStr
 End Function
 
-Function getSedStr(cmdStr, filePath, searchStr, eqStr, valueStr, mode)
-    if mode = "s" Then
-        getSedStr = getSedCmd(cmdStr, searchStr, eqStr & ".*$", eqStr & valueStr, filePath)
+Function getSedStr(cmdStr, filePath, searchStr, startStr, valueStr, mode)
+    If mode = "s" Then
+        getSedStr = getSedCmd(cmdStr, searchStr, startStr & ".*$", startStr & valueStr, filePath)
+    ElseIf mode = "ss" Then
+        getSedStr = getSedCmd(cmdStr, searchStr, startStr, valueStr, filePath)
     ElseIf mode = "a" Then
         getSedStr = getSedAddCmd(cmdStr, searchStr, valueStr, filePath)
     End If
@@ -968,37 +1080,90 @@ Function checkMvIn(outPath, folders)
     checkMvIn = cmdStr
 End Function
 
-Sub mvOut(buildType, where)
-    Dim cmdStr, outPath, outFolders, outName
-    outName = Split(mIp.Infos.Work, " ")(0)
-    outPath = "../OUT/" & outName & "_" & buildType
+Function getOutFoldersForMvIn()
     If isT0Sdk() Then
         If isT08168Sdk() Then
-            outFolders = Array("merged", "sys/out", "vnd/out")
+            getOutFoldersForMvIn = Array("merged", "sys/out", "vnd/out")
         ElseIf isT08781() Then
             If isU0SysSdk() Then
-                outFolders = Array("merged", "u_sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+                getOutFoldersForMvIn = Array("merged", "u_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             Else
-                outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+                getOutFoldersForMvIn = Array("merged", "sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             End If
         Else
             If isU0SysSdk() Then
-                outFolders = Array("merged", "u_sys/out", "vnd/out", "vnd/out_krn")
+                getOutFoldersForMvIn = Array("merged", "u_sys/out", "vnd/out")
             Else
-                outFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_krn")
+                getOutFoldersForMvIn = Array("merged", "sys/out", "vnd/out")
             End If
         End If
     ElseIf InStr(mIp.Infos.Sdk, "8168") > 0 Then
-        outFolders = Array("out", "out_sys")
+        getOutFoldersForMvIn = Array("out", "out_sys")
     Else
-        outFolders = Array("out")
+        getOutFoldersForMvIn = Array("out")
     End If
+End Function
 
-    If where = "out" Then
+Function getOutFoldersForMvOut()
+    If isT0Sdk() Then
+        If isFolderExists("../vnd/out_hal") Then
+            If isFolderExists("../u_sys/out_sys") Then
+                If isFolderExists("../u_sys/out") Then
+                    MsgBox("There are two sys out folders: out/ out_sys/")
+                    getOutFoldersForMvOut = Array("")
+                Else
+                    getOutFoldersForMvOut = Array("merged", "u_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+                End If
+            ElseIf isFolderExists("../sys/out_sys") Then
+                getOutFoldersForMvOut = Array("merged", "sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+            Else
+                MsgBox("No sys out_sys!")
+                getOutFoldersForMvOut = Array("")
+            End If
+        ElseIf isFolderExists("../vnd/out") Then
+            If isFolderExists("../u_sys/out") Then
+                getOutFoldersForMvOut = Array("merged", "u_sys/out", "vnd/out")
+            ElseIf isFolderExists("../sys/out") Then
+                getOutFoldersForMvOut = Array("merged", "sys/out", "vnd/out")
+            Else
+                MsgBox("No sys out!")
+                getOutFoldersForMvOut = Array("")
+            End If
+        Else
+            MsgBox("No vnd out!")
+                getOutFoldersForMvOut = Array("")
+        End If
+    Else
+        getOutFoldersForMvOut = Array("out")
+    End If
+End Function
+
+Sub moveOutFoldersOut()
+    Dim idArr, taskNum, taskNumArr, buildType, workName, outName, outPath, outFolders, cmdStr
+    idArr = Split(getOutInfo("ro.build.display.inner.id"), ".")
+    taskNum = Replace(idArr(2), "-MMI", "")
+    if InStr(taskNum, "-") > 0 Then
+        taskNumArr = Split(taskNum, "-")
+        taskNum = taskNumArr(UBound(taskNumArr))
+    End If
+    buildType = LCase(idArr(UBound(idArr)))
+    If buildType = "userdebug" Then buildType = "debug"
+    workName = getWorkInfoWithTaskNum(taskNum, "work")
+    if workName = "" Then Exit Sub
+    outName = Split(workName, " ")(0)
+    outPath = "../OUT/" & outName & "_" & buildType
+    outFolders = getOutFoldersForMvOut()
+    If outFolders(0) <> "" Then
         cmdStr = checkMvOut(outPath, outFolders)
-    ElseIf where = "in" Then
-        cmdStr = checkMvIn(outPath, outFolders)
+        Call copyStrAndPasteInXshell(cmdStr)
     End If
+End Sub
 
+Sub moveOutFoldersIn(buildType)
+    Dim outName, outPath, outFolders, cmdStr
+    outName = Split(mIp.Infos.Work, " ")(0)
+    outPath = "../OUT/" & outName & "_" & buildType
+    outFolders = getOutFoldersForMvIn()
+    cmdStr = checkMvIn(outPath, outFolders)
     Call copyStrAndPasteInXshell(cmdStr)
 End Sub

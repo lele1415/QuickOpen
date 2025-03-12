@@ -561,7 +561,11 @@ End Class
 
 
 Function getOutPath(Product)
-    getOutPath = "out/target/product/" & Product
+    If isT08781() And isSplitSdkSys() Then
+        getOutPath = "out_sys/target/product/" & Product
+    Else
+        getOutPath = "out/target/product/" & Product
+    End If
 End Function
 
 Function getDownloadOutPath(Product)
@@ -751,7 +755,7 @@ Class ProjectInfos
     End Sub
 
     Sub getVndTargetProject()
-        If isT0SdkVnd() Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
+        If isSplitSdkVnd() Or InStr(mIp.Infos.Sdk, "8168") > 0 Then
             mVndTarget = Product
         ElseIf Not isT0Sdk() Then
             mVndTarget = ""
@@ -759,7 +763,7 @@ Class ProjectInfos
     End Sub
 
     Sub getKrnTargetProject()
-        If isT0SdkVnd() Then
+        If isSplitSdkVnd() Then
             Dim path : path = "device/mediateksample/" & Product & "/vnd_" & Product & ".mk"
             mKrnTarget = readTextAndGetValue("KRN_TARGET_PROJECT", path)
         ElseIf Not isT0Sdk() Then
@@ -768,7 +772,7 @@ Class ProjectInfos
     End Sub
 
     Sub getHalTargetProject()
-        If isT0SdkVnd() Then
+        If isSplitSdkVnd() Then
             Dim path : path = "device/mediateksample/" & Product & "/vnd_" & Product & ".mk"
             mHalTarget = readTextAndGetValue("HAL_TARGET_PROJECT", path)
         ElseIf Not isT0Sdk() Then
@@ -1088,7 +1092,7 @@ Class ProjectInputs
 
             If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
 
-            If isT0SdkVnd() Then
+            If isSplitSdkVnd() Then
                 mInfos.DriverProject = Project
             ElseIf Not isT0Sdk() Then
                 mInfos.DriverProject = getDriverProjectName(Project)

@@ -55,7 +55,7 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "dvc" Then Call setPathFromCmd("device/mediatek/system/common/device.mk") : Exit Function
 	If mCmdInput.text = "sc" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/SystemConfig.mk") : Exit Function
 	If mCmdInput.text = "full" Then
-		If isT0SdkSys() Then Call setT0SdkVnd()
+		If isSplitSdkSys() Then Call setT0SdkVnd()
 		Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
 	End If
 	If mCmdInput.text = "sys" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/sys_[sys_target_project].mk") : Exit Function
@@ -114,6 +114,7 @@ Function handleProp()
 	If mCmdInput.text = "sku" Then Call mCmdInput.setText("ro.boot.hardware.sku") : Exit Function
 	If mCmdInput.text = "hardware" Then Call mCmdInput.setText("ro.boot.hardware.revision") : Exit Function
 	If mCmdInput.text = "date" Then Call mCmdInput.setText("$(date +%Y%m%d)") : Exit Function
+	If mCmdInput.text = "gettn" Then Call mCmdInput.setText(Split(getOutInfo("ro.build.display.inner.id"), ".")(2)) : Exit Function
 	handleProp = False
 End Function
 
@@ -128,6 +129,10 @@ Function handleGetInfo()
 	If mCmdInput.text = "plf" Then Call setOpenPath(getPlatform()) : Exit Function
 	If mCmdInput.text = "gmsv" Then Call setOpenPath(getGmsVersion()) : Exit Function
 	If mCmdInput.text = "spc" Then Call setOpenPath(getSecurityPatch()) : Exit Function
+	If mCmdInput.text = "brand" Then Call setOpenPath(getProductInfo("brand")) : Exit Function
+	If mCmdInput.text = "model" Then Call setOpenPath(getProductInfo("model")) : Exit Function
+	If mCmdInput.text = "device" Then Call setOpenPath(getProductInfo("device")) : Exit Function
+	If mCmdInput.text = "name" Then Call setOpenPath(getProductInfo("name")) : Exit Function
     handleGetInfo = False
 End Function
 
@@ -185,6 +190,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "bmko" Then Call getMakeCommand(False, True, True) : Exit Function
 	If mCmdInput.text = "omko" Then Call getMakeCommand(True, False, True) : Exit Function
 	If InStr(mCmdInput.text, "smk") = 1 Then Call getSplitBuildCommand(Replace(mCmdInput.text, "smk", "")) : Exit Function
+	If InStr(mCmdInput.text, "smo") = 1 Then Call getSplitTestOTABuildCommand(Replace(mCmdInput.text, "smo", "")) : Exit Function
 	If mCmdInput.text = "md" Then Call MkdirWeibuFolderPath() : Exit Function
 	If mCmdInput.text = "cm" Then Call CopyCommitInfo("") : Exit Function
 	If InStr(mCmdInput.text, "cm-") = 1 Then Call CopyCommitInfo(Replace(mCmdInput.text, "cm-", "")) : Exit Function
@@ -207,10 +213,9 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "cmd" Then Call startCmdMode() : Exit Function
 	If mCmdInput.text = "exit" Then Call exitCmdMode() : Exit Function
 	If mCmdInput.text = "ss" Then Call mSaveString.copy() : Call searchStrInVSCode() : Exit Function
-	If mCmdInput.text = "muo" Then Call mvOut("user", "out") : Exit Function
-	If mCmdInput.text = "mui" Then Call mvOut("user", "in") : Exit Function
-	If mCmdInput.text = "mdo" Then Call mvOut("debug", "out") : Exit Function
-	If mCmdInput.text = "mdi" Then Call mvOut("debug", "in") : Exit Function
+	If mCmdInput.text = "mo" Then Call moveOutFoldersOut() : Exit Function
+	If mCmdInput.text = "mui" Then Call moveOutFoldersIn("user") : Exit Function
+	If mCmdInput.text = "mdi" Then Call moveOutFoldersIn("debug") : Exit Function
 	If InStr(mCmdInput.text, "qm-") = 1 Then Call CopyQmakeCmd(Replace(mCmdInput.text, "qm-", "")) : Exit Function
 	If mCmdInput.text = "hqp" Then Call sendWeiXinMsg("hqp") : Exit Function
 	If mCmdInput.text = "zhq" Then Call sendWeiXinMsg("zhh") : Exit Function
@@ -302,13 +307,11 @@ End Sub
 Function handleProjectCmd()
 	handleProjectCmd = True
 	If isNumeric(mCmdInput.text) And Len(mCmdInput.text) < 5 Then
-		Dim i, obj : For i = vaWorksInfo.Bound To 0 Step -1
-		    Set obj = vaWorksInfo.V(i)
-		    If mCmdInput.text = obj.TaskNum Then
-		    	Call applyShortcutInfos(obj)
-		    	Exit Function
-		    End If
-		Next
+		Dim obj : Set obj = getWorkInfoWithTaskNum(mCmdInput.text, "obj")
+		If obj.Work <> "" Then
+			Call applyShortcutInfos(obj)
+			Exit Function
+		End If
 		If vbOK = MsgBox("search project?", 1) Then
 			Call findProjectWithTaskNum(mCmdInput.text)
 		End If
@@ -316,10 +319,10 @@ Function handleProjectCmd()
 	ElseIf mCmdInput.text = "z6" Or mCmdInput.text = "x1" Or mCmdInput.text = "x2" Then
 	    Call setDrive(mCmdInput.text)
 		Exit Function
-	ElseIf mCmdInput.text = "s" And isT0SdkVnd() Then
+	ElseIf mCmdInput.text = "s" And isSplitSdkVnd() Then
 	    Call setT0SdkSys()
 		Exit Function
-	ElseIf mCmdInput.text = "v" And isT0SdkSys() Then
+	ElseIf mCmdInput.text = "v" And isSplitSdkSys() Then
 	    Call setT0SdkVnd()
 		Exit Function
 	ElseIf mCmdInput.text = "8766s" Or mCmdInput.text = "8168s" Or mCmdInput.text = "8766r" Or mCmdInput.text = "8168r" Then
@@ -392,8 +395,22 @@ Function getSecurityPatch()
     getSecurityPatch = readTextAndGetValue("PLATFORM_SECURITY_PATCH", "build/make/core/version_defaults.mk")
 End Function
 
+Function getProductInfo(info)
+    Dim filePath
+	If isSplitSdkSys() Then
+		filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
+	Else
+		If isT08781() Then
+			filePath = "device/mediateksample/" & mIp.Infos.Product & "/vext_" & mIp.Infos.Product & ".mk"
+		Else
+			filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
+		End If
+	End If
+    getProductInfo = readTextAndGetValue("PRODUCT_" & UCase(info), mIp.Infos.getOverlayPath(filePath))
+End Function
+
 Sub checkT0Path(path)
-    If isT0SdkSys() Then
+    If isSplitSdkSys() Then
 		If InStr(path, "bootable") > 0 Or _
 				InStr(path, "vnd") > 0 Or _
 				InStr(path, "FrameworkResOverlay") > 0 Or _

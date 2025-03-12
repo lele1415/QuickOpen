@@ -188,27 +188,33 @@ End Sub
 
 Function getOutProductPath()
 	If mIp.hasProjectInfos() Then
-		Dim path : path = mIp.Infos.OutPath
+		Dim path, outName
+		path = mIp.Infos.OutPath
+		If isT08781() And isSplitSdkSys() And isFolderExists("out_sys") Then
+			outName = "out_sys"
+		Else
+			outName = "out"
+		End If
 
 		If Not isFolderExists(path) Then
-			If Not isFolderExists("out") Then
-				MsgBox("Not found out/")
+			If Not isFolderExists(outName) Then
+				MsgBox("Not found " & outName)
 				runFolderPath(mIp.Infos.DriveSdk)
 				getOutProductPath = ""
-			ElseIf Not isFolderExists("out/target/product") Then
+			ElseIf Not isFolderExists(outName & "/target/product") Then
 				MsgBox("Not found out/target/product/")
-				runFolderPath("out")
+				runFolderPath(outName)
 				getOutProductPath = ""
 			Else
-			    Dim vaOutProduct : Set vaOutProduct = searchFolder("out/target/product", "", _
+			    Dim vaOutProduct : Set vaOutProduct = searchFolder(outName & "/target/product", "", _
 		                SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 			    If vaOutProduct.Bound < 0 Then
 			        MsgBox("No product folders found in out/target/product/")
-			        runFolderPath("out/target/product")
+			        runFolderPath(outName & "/target/product")
 			        getOutProductPath = ""
 			    ElseIf vaOutProduct.V(0) <> mIp.Infos.Product Then
-			        MsgBox("Other product found in out/target/product/" & Vblf & vaOutProduct.V(0))
-			        getOutProductPath = "out/target/product/" & vaOutProduct.V(0)
+			        'MsgBox("Other product found in " & outName & "/target/product/" & Vblf & vaOutProduct.V(0))
+			        getOutProductPath = outName & "/target/product/" & vaOutProduct.V(0)
 			    End If
 			End If
 		Else

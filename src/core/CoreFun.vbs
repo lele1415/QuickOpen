@@ -743,19 +743,19 @@ Function isT0Sdk()
     End If
 End Function
 
-Function isT0SdkSys()
+Function isSplitSdkSys()
     If InStr(mIp.Infos.Sdk, "sys") > 0 Then
-        isT0SdkSys = True
+        isSplitSdkSys = True
     Else
-        isT0SdkSys = False
+        isSplitSdkSys = False
     End If
 End Function
 
-Function isT0SdkVnd()
+Function isSplitSdkVnd()
     If InStr(mIp.Infos.Sdk, "\vnd") > 0 Then
-        isT0SdkVnd = True
+        isSplitSdkVnd = True
     Else
-        isT0SdkVnd = False
+        isSplitSdkVnd = False
     End If
 End Function
 
@@ -772,14 +772,6 @@ Function isT08168SdkVnd()
         isT08168SdkVnd = True
     Else
         isT08168SdkVnd = False
-    End If
-End Function
-
-Function isU0SdkSys()
-    If InStr(mIp.Infos.Sdk, "\u_sys") > 0 Then
-        isU0SdkSys = True
-    Else
-        isU0SdkSys = False
     End If
 End Function
 
@@ -800,7 +792,7 @@ Function isU0SysSdk()
 End Function
 
 Function checkWifiProduct(project)
-    If isT0SdkSys() And Not isFolderExists(getProjectPath(mIp.Infos.Product, project)) And _
+    If isSplitSdkSys() And Not isFolderExists(getProjectPath(mIp.Infos.Product, project)) And _
             isFolderExists(getProjectPath(mIp.Infos.Product & "_wifi", project)) Then
         mIp.Infos.SysTarget = mIp.Infos.Product & "_wifi"
         mIp.Product = mIp.Infos.SysTarget
@@ -881,12 +873,8 @@ End Function
 
 Sub findProjectWithTaskNum(taskNum)
     Dim vaProduct
-    Call getProductList()
-    If isT0SdkSys() Then
-        Set vaProduct = vaSysProduct
-    Else
-        Set vaProduct = vaTargetProduct
-    End If
+    Set vaProduct = searchFolder("weibu", "_", _
+			SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
 
     Dim i, product, projectArr
     For i = 0 To vaProduct.Bound
@@ -898,15 +886,37 @@ Sub findProjectWithTaskNum(taskNum)
                 SEARCH_FOLDER, SEARCH_ROOT, SEARCH_PART_NAME, SEARCH_ALL, SEARCH_RETURN_NAME)
         End If
         If projectArr.Bound >= 0 Then
-            mIp.Product = product
-            If projectArr.Bound = 0 Then
-                mIp.Project = projectArr.V(0)
-            Else
-                mFindProjectButtonList.VaArray = projectArr
-                Call mFindProjectButtonList.addList()
-                Call mFindProjectButtonList.toggleButtonList()
-            End If
+            Call setOpenPath("weibu/" & product & "/" & projectArr.V(0))
+            'mIp.Product = product
+            'If projectArr.Bound = 0 Then
+            '    mIp.Project = projectArr.V(0)
+            'Else
+            '    mFindProjectButtonList.VaArray = projectArr
+            '    Call mFindProjectButtonList.addList()
+            '    Call mFindProjectButtonList.toggleButtonList()
+            'End If
             Exit For
         End If
     Next
 End Sub
+
+Function getWorkInfoWithTaskNum(taskNum, info)
+    If isNumeric(taskNum) And Len(taskNum) < 5 Then
+		Dim i, obj : For i = vaWorksInfo.Bound To 0 Step -1
+		    Set obj = vaWorksInfo.V(i)
+		    If taskNum = obj.TaskNum Then
+                If info = "obj" Then
+		    	    Set getWorkInfoWithTaskNum = obj
+                ElseIf info = "work" Then
+                    getWorkInfoWithTaskNum = obj.Work
+                End if
+		    	Exit Function
+		    End If
+		Next
+    End If
+    If info = "obj" Then
+        Set getWorkInfoWithTaskNum = New ProjectInfos
+    Else
+        getWorkInfoWithTaskNum = ""
+    End If
+End Function

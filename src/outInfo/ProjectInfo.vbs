@@ -26,6 +26,10 @@ Function getMMIProjectConfigValue(keyStr)
     getMMIProjectConfigValue = value
 End Function
 
+Function getDeviceProjectConfigValue(keyStr)
+    getDeviceProjectConfigValue = readTextAndGetValue(keyStr, pDeviceProjectConfigMk)
+End Function
+
 Sub getProjectConfigMk()
     If mIp.hasProjectAlps() Then
         pMMIProjectConfigMk = mIp.Infos.ProjectPath & "/config/ProjectConfig.mk"
