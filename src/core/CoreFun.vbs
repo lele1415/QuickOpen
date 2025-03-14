@@ -746,6 +746,8 @@ End Function
 Function isSplitSdkSys()
     If InStr(mIp.Infos.Sdk, "sys") > 0 Then
         isSplitSdkSys = True
+    ElseIf isV0SysSdk() And InStr(mIp.Infos.Product, "mssi") > 0 Then
+        isSplitSdkSys = True
     Else
         isSplitSdkSys = False
     End If
@@ -753,6 +755,8 @@ End Function
 
 Function isSplitSdkVnd()
     If InStr(mIp.Infos.Sdk, "\vnd") > 0 Then
+        isSplitSdkVnd = True
+    ElseIf isV0SysSdk() And InStr(mIp.Infos.Product, "tb87") > 0 Then
         isSplitSdkVnd = True
     Else
         isSplitSdkVnd = False
@@ -788,6 +792,14 @@ Function isU0SysSdk()
         isU0SysSdk = True
     Else
         isU0SysSdk = False
+    End If
+End Function
+
+Function isV0SysSdk()
+    If InStr(mIp.Infos.SysSdk, "\v_sys") > 0 Then
+        isV0SysSdk = True
+    Else
+        isV0SysSdk = False
     End If
 End Function
 

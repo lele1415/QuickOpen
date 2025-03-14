@@ -114,11 +114,7 @@ Sub getSplitTestOTABuildCommand(opts)
     cmdStr = cmdStr & "mkdir -p OTA/" & mIp.Infos.TaskNum & ";"
     cmdStr = cmdStr & "mv merged/target_files.zip OTA/" & mIp.Infos.TaskNum & "/target_files_s.zip;"
     If isSplitSdkVnd() Then Call setT0SdkSys()
-    If isU0SysSdk() Then
-        cmdStr = cmdStr & "cd u_sys;"
-    Else
-        cmdStr = cmdStr & "cd sys;"
-    End If
+    cmdStr = cmdStr & "cd " & getFileNameFromPath(mIp.Infos.SysSdk) & ";"
     cmdStr = cmdStr & getOTATestSedStr(False) & ";"
     cmdStr = cmdStr & "cd ..;"
     cmdStr = cmdStr & buildsh & " sys m;"
@@ -154,9 +150,14 @@ Sub getLunchCommand(buildType)
 End Sub
 
 Function getLunchItemInSplitBuild(buildType)
-    Dim sysStr, vndStr, lunchStr, commandStr
-    sysStr = "sys_" & mIp.Infos.SysTarget & "-" & buildType
-    vndStr = "vnd_" & mIp.Infos.VndTarget & "-" & buildType
+    Dim sysStr, vndStr, lunchStr, commandStr, releseStr
+    if isV0SysSdk() Then
+        releseStr = "-next-"
+    Else
+        releseStr = "-"
+    End If
+    sysStr = "sys_" & mIp.Infos.SysTarget & releseStr & buildType
+    vndStr = "vnd_" & mIp.Infos.VndTarget & releseStr & buildType
 
     If isT0Sdk() Then
         If isSplitSdkVnd() Then Call setT0SdkSys()
@@ -173,6 +174,8 @@ Function getLunchItemInSplitBuild(buildType)
             lunchStr = lunchStr & " T"
         ElseIf isU0SysSdk() Then
             lunchStr = lunchStr & " U"
+        ElseIf isV0SysSdk() And isT08781() Then
+            lunchStr = lunchStr & " V"
         End If
 
         commandStr = "sed -i 's/^.*$/" & lunchStr & "/' lunch_item"
@@ -403,7 +406,7 @@ Function getLogoPath()
 End Function
 
 Function getPowerProfilePath()
-    If isU0SysSdk() Then
+    If isU0SysSdk() Or isV0SysSdk() Then
         getPowerProfilePath = "device/mediatek/system/common/overlay/power/frameworks/base/core/res/res/xml/power_profile.xml"
     Else
         getPowerProfilePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml"
@@ -411,7 +414,7 @@ Function getPowerProfilePath()
 End Function
 
 Function getOutSystemExtPrivAppPath()
-    If isU0SysSdk() Then
+    If isU0SysSdk() Or isV0SysSdk() Then
         getOutSystemExtPrivAppPath = "/system_ext/priv-app"
     Else
         getOutSystemExtPrivAppPath = "/system/system_ext/priv-app"
@@ -628,7 +631,7 @@ Sub CopyAdbPushCmd(which)
 		finalStr = "adb push " & sourcePath & " " & targetPath
 	End If
 
-    If isU0SysSdk() Then
+    If isU0SysSdk() Or isV0SysSdk() Then
         finalStr = Replace(finalStr, "\system\system_ext\", "\system_ext\")
         finalStr = Replace(finalStr, "/system/system_ext/", "/system_ext/")
     End If
@@ -1085,13 +1088,17 @@ Function getOutFoldersForMvIn()
         If isT08168Sdk() Then
             getOutFoldersForMvIn = Array("merged", "sys/out", "vnd/out")
         ElseIf isT08781() Then
-            If isU0SysSdk() Then
+            If isV0SysSdk() Then
+                getOutFoldersForMvIn = Array("merged", "v_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+            ElseIf isU0SysSdk() Then
                 getOutFoldersForMvIn = Array("merged", "u_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             Else
                 getOutFoldersForMvIn = Array("merged", "sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             End If
         Else
-            If isU0SysSdk() Then
+            If isV0SysSdk() Then
+                getOutFoldersForMvIn = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out")
+            ElseIf isU0SysSdk() Then
                 getOutFoldersForMvIn = Array("merged", "u_sys/out", "vnd/out")
             Else
                 getOutFoldersForMvIn = Array("merged", "sys/out", "vnd/out")
@@ -1106,14 +1113,28 @@ End Function
 
 Function getOutFoldersForMvOut()
     If isT0Sdk() Then
-        If isFolderExists("../vnd/out_hal") Then
-            If isFolderExists("../u_sys/out_sys") Then
+        'v+v
+        If isFolderExists("merged") And isFolderExists("out_sys") And isFolderExists("out") Then
+            getOutFoldersForMvOut = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out")
+        '8781
+        ElseIf isFolderExists("../vnd/out_hal") Then
+            '8781 s+v
+            If isFolderExists("../v_sys/out_sys") Then
+                If isFolderExists("../v_sys/out") Then
+                    MsgBox("There are two sys out folders: out/ out_sys/")
+                    getOutFoldersForMvOut = Array("")
+                Else
+                    getOutFoldersForMvOut = Array("merged", "v_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+                End If
+            '8781 s+u
+            ElseIf isFolderExists("../u_sys/out_sys") Then
                 If isFolderExists("../u_sys/out") Then
                     MsgBox("There are two sys out folders: out/ out_sys/")
                     getOutFoldersForMvOut = Array("")
                 Else
                     getOutFoldersForMvOut = Array("merged", "u_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
                 End If
+            '8781 s+t
             ElseIf isFolderExists("../sys/out_sys") Then
                 getOutFoldersForMvOut = Array("merged", "sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             Else
@@ -1131,10 +1152,17 @@ Function getOutFoldersForMvOut()
             End If
         Else
             MsgBox("No vnd out!")
-                getOutFoldersForMvOut = Array("")
+            getOutFoldersForMvOut = Array("")
         End If
     Else
-        getOutFoldersForMvOut = Array("out")
+        If isFolderExists("out_sys") And isFolderExists("out") Then
+            getOutFoldersForMvOut = Array("out", "out_sys")
+        ElseIf isFolderExists("out") Then
+            getOutFoldersForMvOut = Array("out")
+        Else
+            MsgBox("No out!")
+            getOutFoldersForMvOut = Array("")
+        End If
     End If
 End Function
 

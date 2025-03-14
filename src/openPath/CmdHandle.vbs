@@ -346,6 +346,12 @@ Function handleProjectCmd()
 	ElseIf mCmdInput.text = "upi" Then
 	    Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/u_sys/")
 		Exit Function
+	ElseIf mCmdInput.text = "vpi" Then
+	    Call setOpenPath("mtk_sp_t0/v_sys/" & VbLf & "mtk_sp_t0/v_sys/")
+		Exit Function
+	ElseIf mCmdInput.text = "svpi" Then
+	    Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/v_sys/")
+		Exit Function
 	ElseIf mCmdInput.text = "getpi" Then
 	    Call getProjectInfosFromOpenPath()
 		Exit Function

@@ -855,9 +855,9 @@ Class ProjectInfos
     Public Sub setProjectInfos(infos)
         Work = infos.Work
         Sdk = infos.Sdk
+        SysSdk = infos.SysSdk
         Product = infos.Product
         Project = infos.Project
-        SysSdk = infos.SysSdk
         SysProject = infos.SysProject
         Firmware = infos.Firmware
         Requirements = infos.Requirements
@@ -934,7 +934,7 @@ Class ProjectInputs
 
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
-        document.title = value & " " & mDrive
+        document.title = value & "\weibu\" & mInfos.Product & " " & mDrive
         Call onWorkChange()
     End Property
 
@@ -992,9 +992,9 @@ Class ProjectInputs
     Public Sub setProjectInputs(infos)
         Work = infos.Work
         Sdk = infos.Sdk
+        If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysSdk = infos.SysSdk
         Product = infos.Product
         Project = infos.Project
-        If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysSdk = infos.SysSdk
         If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysProject = infos.SysProject
         Firmware = infos.Firmware
         Requirements = infos.Requirements
