@@ -561,7 +561,7 @@ End Class
 
 
 Function getOutPath(Product)
-    If isT08781() And isSplitSdkSys() Then
+    If is8781Vnd() And isSplitSdkSys() Then
         getOutPath = "out_sys/target/product/" & Product
     Else
         getOutPath = "out/target/product/" & Product
@@ -625,11 +625,11 @@ Class ProjectInfos
     End Property
 
     Public Property Get KrnTarget
-        KrnTarget = mKrnTarget
+        KrnTarget = "mgk_64_entry_level_k510"
     End Property
 
     Public Property Get HalTarget
-        HalTarget = mHalTarget
+        HalTarget = "mgvi_t_64_armv82"
     End Property
 
     Public Property Get KernelVer
@@ -934,7 +934,7 @@ Class ProjectInputs
 
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
-        document.title = value & "\weibu\" & mInfos.Product & " " & mDrive
+        Call updateTitle()
         Call onWorkChange()
     End Property
 
@@ -995,6 +995,7 @@ Class ProjectInputs
         If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysSdk = infos.SysSdk
         Product = infos.Product
         Project = infos.Project
+        If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysTarget = infos.SysTarget
         If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysProject = infos.SysProject
         Firmware = infos.Firmware
         Requirements = infos.Requirements
@@ -1064,10 +1065,10 @@ Class ProjectInputs
             If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
             'Call updateProjectList()
             Call clearWorkInfos()
-            Call mInfos.getSysTargetProject()
+            'Call mInfos.getSysTargetProject()
             Call mInfos.getVndTargetProject()
-            Call mInfos.getKrnTargetProject()
-            Call mInfos.getHalTargetProject()
+            'Call mInfos.getKrnTargetProject()
+            'Call mInfos.getHalTargetProject()
             Call mInfos.getKernelInfos()
         Else
             msgboxPathNotExist(mInfos.ProductPath)

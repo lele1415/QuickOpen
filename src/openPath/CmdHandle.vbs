@@ -55,12 +55,12 @@ Function HandleFilePathCmd()
 	If mCmdInput.text = "dvc" Then Call setPathFromCmd("device/mediatek/system/common/device.mk") : Exit Function
 	If mCmdInput.text = "sc" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/SystemConfig.mk") : Exit Function
 	If mCmdInput.text = "full" Then
-		If isSplitSdkSys() Then Call setT0SdkVnd()
+		Call setT0SdkVnd()
 		Call setPathFromCmd("device/mediateksample/[product]/full_[product].mk") : Exit Function
 	End If
 	If mCmdInput.text = "sys" Then Call setPathFromCmd("device/mediatek/system/[sys_target_project]/sys_[sys_target_project].mk") : Exit Function
 	If mCmdInput.text = "vnd" Then
-	    If isT08781() Then
+	    If is8781Vnd() Then
 			Call setPathFromCmd("device/mediateksample/[product]/vext_[product].mk") : Exit Function
 		Else
 			Call setPathFromCmd("device/mediateksample/[product]/vnd_[product].mk") : Exit Function
@@ -176,9 +176,12 @@ End Function
 
 Function handleCopyCommandCmd()
     handleCopyCommandCmd = True
-	If mCmdInput.text = "lcu" Then Call getLunchCommand("user") : Exit Function
-	If mCmdInput.text = "lcd" Then Call getLunchCommand("userdebug") : Exit Function
-	If mCmdInput.text = "lce" Then Call getLunchCommand("eng") : Exit Function
+	If mCmdInput.text = "lcu" Then Call getLunchCommand("user", mIp.Infos.TaskNum) : Exit Function
+	If mCmdInput.text = "lcd" Then Call getLunchCommand("userdebug", mIp.Infos.TaskNum) : Exit Function
+	If mCmdInput.text = "lce" Then Call getLunchCommand("eng", mIp.Infos.TaskNum) : Exit Function
+	If InStr(mCmdInput.text, "lcu-") = 1 Then Call getLunchCommand("user", Replace(mCmdInput.text, "lcu-", "")) : Exit Function
+	If InStr(mCmdInput.text, "lcd-") = 1 Then Call getLunchCommand("userdebug", Replace(mCmdInput.text, "lcd-", "")) : Exit Function
+	If InStr(mCmdInput.text, "lce-") = 1 Then Call getLunchCommand("eng", Replace(mCmdInput.text, "lce-", "")) : Exit Function
 	If mCmdInput.text = "lcus" Then Call getT0SysLunchCommand("user") : Exit Function
 	If mCmdInput.text = "lcds" Then Call getT0SysLunchCommand("userdebug") : Exit Function
 	If mCmdInput.text = "lcuv" Then Call getT0VndLunchCommand("user") : Exit Function
@@ -189,7 +192,7 @@ Function handleCopyCommandCmd()
 	If mCmdInput.text = "mko" Then Call getMakeCommand(False, False, True) : Exit Function
 	If mCmdInput.text = "bmko" Then Call getMakeCommand(False, True, True) : Exit Function
 	If mCmdInput.text = "omko" Then Call getMakeCommand(True, False, True) : Exit Function
-	If InStr(mCmdInput.text, "smk") = 1 Then Call getSplitBuildCommand(Replace(mCmdInput.text, "smk", "")) : Exit Function
+	If InStr(mCmdInput.text, "smk") = 1 Then Call copySplitBuildCommand(Replace(mCmdInput.text, "smk", "")) : Exit Function
 	If InStr(mCmdInput.text, "smo") = 1 Then Call getSplitTestOTABuildCommand(Replace(mCmdInput.text, "smo", "")) : Exit Function
 	If mCmdInput.text = "md" Then Call MkdirWeibuFolderPath() : Exit Function
 	If mCmdInput.text = "cm" Then Call CopyCommitInfo("") : Exit Function
@@ -319,10 +322,10 @@ Function handleProjectCmd()
 	ElseIf mCmdInput.text = "z6" Or mCmdInput.text = "x1" Or mCmdInput.text = "x2" Then
 	    Call setDrive(mCmdInput.text)
 		Exit Function
-	ElseIf mCmdInput.text = "s" And isSplitSdkVnd() Then
+	ElseIf mCmdInput.text = "s" Then
 	    Call setT0SdkSys()
 		Exit Function
-	ElseIf mCmdInput.text = "v" And isSplitSdkSys() Then
+	ElseIf mCmdInput.text = "v" Then
 	    Call setT0SdkVnd()
 		Exit Function
 	ElseIf mCmdInput.text = "8766s" Or mCmdInput.text = "8168s" Or mCmdInput.text = "8766r" Or mCmdInput.text = "8168r" Then
@@ -406,7 +409,7 @@ Function getProductInfo(info)
 	If isSplitSdkSys() Then
 		filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
 	Else
-		If isT08781() Then
+		If is8781Vnd() Then
 			filePath = "device/mediateksample/" & mIp.Infos.Product & "/vext_" & mIp.Infos.Product & ".mk"
 		Else
 			filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
@@ -416,15 +419,13 @@ Function getProductInfo(info)
 End Function
 
 Sub checkT0Path(path)
-    If isSplitSdkSys() Then
-		If InStr(path, "bootable") > 0 Or _
-				InStr(path, "vnd") > 0 Or _
-				InStr(path, "FrameworkResOverlay") > 0 Or _
-				InStr(path, "trustzone") > 0 Then
-			Call setT0SdkVnd()
-		ElseIf InStr(path, "btif_dm.cc") > 0 Then
-			path = "vendor/mediatek/proprietary/packages/modules/Bluetooth/system/btif/src/btif_dm.cc"
-		End If
+	If InStr(path, "bootable") > 0 Or _
+			InStr(path, "vnd") > 0 Or _
+			InStr(path, "FrameworkResOverlay") > 0 Or _
+			InStr(path, "trustzone") > 0 Then
+		Call setT0SdkVnd()
+	ElseIf InStr(path, "btif_dm.cc") > 0 Then
+		path = "vendor/mediatek/proprietary/packages/modules/Bluetooth/system/btif/src/btif_dm.cc"
 	End If
 End Sub
 

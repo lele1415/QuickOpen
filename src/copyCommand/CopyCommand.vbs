@@ -46,40 +46,45 @@ Sub getMakeCommand(rmOut, rmBuildprop, ota)
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
-Sub getSplitBuildCommand(opts)
-    Dim params, commandStr
-    If InStr(opts, "v") Then
-        If isT08781() Then
-            params = params & " vext"
-        Else
-            params = params & " vnd"
-        End If
+Function getSplitBuildCommand(opts)
+    Dim buildsh, params, commandStr
+    If is8781Vnd() Then
+        buildsh = "./split_build_v2.sh"
+    Else
+        buildsh = "./split_build.sh"
     End If
-    If InStr(opts, "k") Then params = params & " krn"
-    If isT08781() And InStr(opts, "h") Then params = params & " hal"
-    If InStr(opts, "s") Then params = params & " sys"
-    If InStr(opts, "m") Then params = params & " m"
-    If InStr(opts, "p") Then params = params & " p"
-    If InStr(opts, "a") Then
-        If isT08781() Then
-            params = params & " vext krn hal sys m p"
+    If opts = "a" Then
+        If is8781Vnd() Then
+            params = " vext krn hal sys m p"
         Else
-            params = params & " vnd krn sys m p"
+            params = " vnd krn sys m p"
         End If
+    Else
+        If InStr(opts, "v") Then
+            If is8781Vnd() Then
+                params = params & " vext"
+            Else
+                params = params & " vnd"
+            End If
+        End If
+        If InStr(opts, "k") Then params = params & " krn"
+        If is8781Vnd() And InStr(opts, "h") Then params = params & " hal"
+        If InStr(opts, "s") Then params = params & " sys"
+        If InStr(opts, "m") Then params = params & " m"
+        If InStr(opts, "p") Then params = params & " p"
     End if
 
-    If isT08781() Then
-        commandStr = "./split_build_v2.sh" & params
-    Else
-        commandStr = "./split_build.sh" & params
-    End If
+    commandStr = buildsh & params
 
-    if InStr(params, " p") And InStr(params, " vnd") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
+    if Not isV0SysSdk() And InStr(params, " p") And InStr(params, " vnd") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
         Call setT0SdkVnd()
         commandStr = getCustomModemSedStr() & commandStr
     End If
+    getSplitBuildCommand = commandStr & ";"
+End Function
 
-    Call copyStrAndPasteInXshell(commandStr)
+Sub copySplitBuildCommand(opts)
+    Call copyStrAndPasteInXshell(getSplitBuildCommand(opts))
 End Sub
 
 Function getCustomModemSedStr()
@@ -94,31 +99,23 @@ Function getCustomModemSedStr()
 End Function
 
 Sub getSplitTestOTABuildCommand(opts)
-    Dim buildsh, params, cmdStr
-    If isT08781() Then
-        buildsh = "./split_build_v2.sh"
-        If InStr(opts, "s") Then
-            params = " sys m p;"
-        Else
-            params = " vext krn hal sys m p;"
-        End If
+    Dim cmdStr
+    cmdStr = getSplitBuildCommand(opts)
+    
+    If isV0SysSdk() And Not is8781Vnd() Then
+        cmdStr = cmdStr & "mkdir -p ../OTA/" & mIp.Infos.TaskNum & ";"
+        cmdStr = cmdStr & "mv merged/target_files.zip ../OTA/" & mIp.Infos.TaskNum & "/target_files_s.zip;"
+        cmdStr = cmdStr & getOTATestSedStr(False) & ";"
+        cmdStr = cmdStr & getSplitBuildCommand("sm")
     Else
-        buildsh = "./split_build.sh"
-        If InStr(opts, "s") Then
-            params = " sys m p;"
-        Else
-            params = " vnd krn hal sys m p;"
-        End If
+        cmdStr = cmdStr & "mkdir -p OTA/" & mIp.Infos.TaskNum & ";"
+        cmdStr = cmdStr & "mv merged/target_files.zip OTA/" & mIp.Infos.TaskNum & "/target_files_s.zip;"
+        If isSplitSdkVnd() Then Call setT0SdkSys()
+        cmdStr = cmdStr & "cd " & getFileNameFromPath(mIp.Infos.SysSdk) & ";"
+        cmdStr = cmdStr & getOTATestSedStr(False) & ";"
+        cmdStr = cmdStr & "cd ..;"
+        cmdStr = cmdStr & getSplitBuildCommand("sm")
     End If
-    cmdStr = buildsh & params
-    cmdStr = cmdStr & "mkdir -p OTA/" & mIp.Infos.TaskNum & ";"
-    cmdStr = cmdStr & "mv merged/target_files.zip OTA/" & mIp.Infos.TaskNum & "/target_files_s.zip;"
-    If isSplitSdkVnd() Then Call setT0SdkSys()
-    cmdStr = cmdStr & "cd " & getFileNameFromPath(mIp.Infos.SysSdk) & ";"
-    cmdStr = cmdStr & getOTATestSedStr(False) & ";"
-    cmdStr = cmdStr & "cd ..;"
-    cmdStr = cmdStr & buildsh & " sys m;"
-    cmdStr = cmdStr & "mv merged/target_files.zip OTA/" & mIp.Infos.TaskNum & "/target_files_t.zip;"
     Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
@@ -138,10 +135,10 @@ Sub CommandOfLunch()
     Call getLunchCommand(buildType)
 End Sub
 
-Sub getLunchCommand(buildType)
+Sub getLunchCommand(buildType, taskNum)
     Dim comboName
     If isT0Sdk() Or (InStr(mIp.Infos.Sdk, "8168") > 0 And Not InStr(mIp.Infos.Sdk, "_r") > 0) Then
-        commandFinal = getLunchItemInSplitBuild(buildType)
+        commandFinal = getLunchCommandInSplitBuild(buildType, taskNum)
     Else
         comboName = "full_" & mIp.Infos.Product & "-" & buildType
         commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mIp.Infos.Project
@@ -149,46 +146,95 @@ Sub getLunchCommand(buildType)
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
-Function getLunchItemInSplitBuild(buildType)
-    Dim sysStr, vndStr, lunchStr, commandStr, releseStr
-    if isV0SysSdk() Then
-        releseStr = "-next-"
-    Else
-        releseStr = "-"
-    End If
-    sysStr = "sys_" & mIp.Infos.SysTarget & releseStr & buildType
-    vndStr = "vnd_" & mIp.Infos.VndTarget & releseStr & buildType
+Function getLunchCommandInSplitBuild(buildType, taskNum)
+    Dim obj, lunchStr, commandStr
+    If isNumeric(taskNum) And Len(taskNum) < 5 Then
+		Set obj = getWorkInfoWithTaskNum(taskNum, "obj")
 
-    If isT0Sdk() Then
-        If isSplitSdkVnd() Then Call setT0SdkSys()
-        If isT08781() Then
-            Dim halStr, krnStr
-            halStr = "hal_" & mIp.Infos.HalTarget & "-" & buildType
-            krnStr = "krn_" & mIp.Infos.KrnTarget & "-" & buildType
-            vndStr = "vext_" & mIp.Infos.VndTarget & "-" & buildType
-            lunchStr = halStr & " " & krnStr & " "
+        If isT0Sdk() Then
+            lunchStr = getLunchStrFromWSavedWork(buildType, obj)
+            If lunchStr = "" Then getLunchCommandInSplitBuild = "" : Exit Function
+            commandStr = "sed -i 's/^.*$/" & lunchStr & "/' lunch_item"
+            If InStr(obj.Product, "tb8781") Then commandStr = commandStr & "_v2"
+        Else
+            lunchStr = getLunchStrFromWSavedWork(buildType, obj)
+            If lunchStr = "" Then getLunchCommandInSplitBuild = "" : Exit Function
+            Dim keyStr
+            keyStr = "##Cusomer Settings"
+            commandStr = "sed -i '/" & keyStr & "/i\" & lunchStr & "' split_build.sh;git diff split_build.sh"
         End If
-        lunchStr = lunchStr & vndStr & " " & mIp.Infos.DriverProject & " " &  sysStr & " " & mIp.Infos.Project
-
-        If isT0SysSdk() Then
-            lunchStr = lunchStr & " T"
-        ElseIf isU0SysSdk() Then
-            lunchStr = lunchStr & " U"
-        ElseIf isV0SysSdk() And isT08781() Then
-            lunchStr = lunchStr & " V"
-        End If
-
-        commandStr = "sed -i 's/^.*$/" & lunchStr & "/' lunch_item"
-        If isT08781() Then commandStr = commandStr & "_v2"
-    Else
-        lunchStr = sysStr & " " & vndStr & " " & mIp.Infos.Project
-        lunchStr = "lunch_item=""&Chr(34)&""" & lunchStr & """&Chr(34)&"""
-
-        Dim keyStr
-        keyStr = "##Cusomer Settings"
-        commandStr = "sed -i '/" & keyStr & "/i\" & lunchStr & "' split_build.sh;git diff split_build.sh"
     End If
-    getLunchItemInSplitBuild = commandStr
+    getLunchCommandInSplitBuild = commandStr
+End Function
+
+Function getLunchStrFromWSavedWork(buildType, obj)
+    Dim lunchStr
+    If obj.SysSdk <> "" Then
+        If InStr(obj.SysSdk, "\v_sys") Then
+            If InStr(obj.Sdk, "\v_sys") Then
+                lunchStr = getVVLunchStr(obj, buildType)
+            ElseIf InStr(obj.Sdk, "\vnd") > 0 And InStr(obj.Product, "tb8781") > 0 Then
+                lunchStr = get8781LunchStr(obj, buildType, "-next-", " V")
+            Else
+                lunchStr = ""
+            End If
+        ElseIf InStr(obj.SysSdk, "\u_sys") Then
+            If InStr(obj.Product, "tb8781") Then
+                lunchStr = get8781LunchStr(obj, buildType, "-", " U")
+            Else
+                lunchStr = getSULunchStr(obj, buildType, " U")
+            End If
+        ElseIf InStr(obj.SysSdk, "\sys") Then
+            If InStr(obj.Product, "tb8781") Then
+                lunchStr = get8781LunchStr(obj, buildType, "-", " T")
+            Else
+                lunchStr = getSULunchStr(obj, buildType, " T")
+            End If
+        ElseIf InStr(obj.Sdk, "mt8168_r") Then
+            Dim sysStr, vndStr
+            sysStr = "sys_" & mIp.Infos.SysTarget & "-" & buildType
+            vndStr = "vnd_" & mIp.Infos.VndTarget & "-" & buildType
+            lunchStr = sysStr & " " & vndStr & " " & mIp.Infos.Project
+            lunchStr = "lunch_item=""&Chr(34)&""" & lunchStr & """&Chr(34)&"""
+        Else
+            lunchStr = ""
+        End If
+    Else
+        lunchStr = ""
+    End if
+
+    getLunchStrFromWSavedWork = lunchStr
+End Function
+
+Function getVVLunchStr(obj, buildType)
+    If obj.Product <> "" And obj.Project <> "" And obj.SysTarget <> "" And obj.SysProject <> "" Then
+        getVVLunchStr = "vnd_" & obj.Product & "-next-" & buildType & " " & obj.Project &_
+                " sys_" & obj.SysTarget & "-next-" & buildType & " " & obj.SysProject
+    Else
+        getVVLunchStr = ""
+    End If
+End Function
+
+Function getSULunchStr(obj, buildType, androidVer)
+    If obj.Product <> "" And obj.Project <> "" And obj.SysTarget <> "" And obj.SysProject <> "" Then
+        getSULunchStr = " vnd_" & obj.Product & "-" & buildType & " " & obj.Project &_
+                " sys_" & obj.SysTarget & "-" & buildType & " " & obj.SysProject &_
+                androidVer
+    Else
+        getSULunchStr = ""
+    End If
+End Function
+
+Function get8781LunchStr(obj, buildType, releseStr, androidVer)
+    If obj.Product <> "" And obj.Project <> "" And obj.SysTarget <> "" And obj.SysProject <> "" Then
+        get8781LunchStr = "hal_" & obj.HalTarget & "-" & buildType &_
+                " krn_" & obj.KrnTarget & "-" & buildType &_
+                " vext_" & obj.Product & "-" & buildType & " " & obj.Project &_
+                " sys_" & obj.SysTarget & releseStr & buildType & " " & obj.SysProject &_
+                androidVer
+    Else
+        get8781LunchStr = ""
+    End If
 End Function
 
 Sub getT0SysLunchCommand(buildType)
@@ -197,7 +243,7 @@ Sub getT0SysLunchCommand(buildType)
 End Sub
 
 Sub getT0VndLunchCommand(buildType)
-    If isT08781() Then
+    If is8781Vnd() Then
         commandFinal = "source build/envsetup.sh && lunch vext_" & mIp.Infos.VndTarget & "-" & buildType & " " & mIp.Infos.DriverProject
     ELse
         commandFinal = "source build/envsetup.sh && lunch vnd_" & mIp.Infos.VndTarget & "-" & buildType & " " & mIp.Infos.DriverProject
@@ -234,7 +280,7 @@ Sub CopyBuildOtaUpdate()
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
     Else
         commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i target_files_.zip target_files.zip update__to_.zip"
-        If isT08781() Then commandFinal = Replace(commandFinal, "/out/", "/out_sys/")
+        If is8781Vnd() Then commandFinal = Replace(commandFinal, "/out/", "/out_sys/")
     End If
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
@@ -398,7 +444,7 @@ Function getMultiMkdirStr(arr, what)
 End Function
 
 Function getLogoPath()
-    If isT08781() Then
+    If is8781Vnd() Then
         getLogoPath = "vendor/mediatek/proprietary/external/BootLogo/logo/[boot_logo]/"
     Else
         getLogoPath = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/[boot_logo]/"
@@ -468,7 +514,7 @@ Sub mkdirWallpaper(go)
 End Sub
 
 Sub mkdirTee()
-    If isSplitSdkSys() Then Call setT0SdkVnd()
+    Call setT0SdkVnd()
     Dim teeOverlayPath, finalStr
     teeOverlayPath = mIp.Infos.getOverlayPath("vendor/mediatek/proprietary/trustzone/trustkernel/source/build/" & mIp.Infos.Product)
     If isFolderExists(teeOverlayPath) And isFileExists(teeOverlayPath & "cert.dat") And isFileExists(teeOverlayPath & "array.c") Then
@@ -489,8 +535,8 @@ End Sub
 
 Sub mkdirProductInfo(where)
     If Not isFileExists("../File/product.txt") Then MsgBox("product.txt does not exist!") : Exit Sub
-    If where = "sys" And isSplitSdkVnd() Then Call setT0SdkSys()
-    If where = "vnd" And isSplitSdkSys() Then Call setT0SdkVnd()
+    If where = "sys" Then Call setT0SdkSys()
+    If where = "vnd" Then Call setT0SdkVnd()
     Dim info, infoArr, infoDict, cmdStr, finalStr
     infoArr = Array("brand", "manufacturer", "model", "name", "device")
     Set infoDict = CreateObject("Scripting.Dictionary")
@@ -917,7 +963,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 	    If isSplitSdkSys() Then
             filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
         Else
-            If isT08781() Then
+            If is8781Vnd() Then
 	            filePath = "device/mediateksample/" & mIp.Infos.Product & "/vext_" & mIp.Infos.Product & ".mk"
             Else
 	            filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
@@ -933,7 +979,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
         If Not isSplitSdkVnd() Then
             filePath = "device/mediatek/system/" & mIp.Infos.SysTarget & "/sys_" & mIp.Infos.SysTarget & ".mk"
         Else
-            If isT08781() Then
+            If is8781Vnd() Then
                 filePath = "device/mediateksample/" & mIp.Infos.Product & "/vext_" & mIp.Infos.Product & ".mk"
             Else
                 filePath = "device/mediateksample/" & mIp.Infos.Product & "/vnd_" & mIp.Infos.Product & ".mk"
@@ -1087,7 +1133,7 @@ Function getOutFoldersForMvIn()
     If isT0Sdk() Then
         If isT08168Sdk() Then
             getOutFoldersForMvIn = Array("merged", "sys/out", "vnd/out")
-        ElseIf isT08781() Then
+        ElseIf is8781Vnd() Then
             If isV0SysSdk() Then
                 getOutFoldersForMvIn = Array("merged", "v_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             ElseIf isU0SysSdk() Then

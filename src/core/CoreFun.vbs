@@ -630,6 +630,10 @@ Function onKeyDown(keyCode)
     onKeyDown = False
 End Function
 
+Sub updateTitle()
+    document.title = mIp.Work & "\weibu\" & mIp.Infos.Product & " " & mDrive
+End Sub
+
 Sub setDrive(drive)
     'If (drive = "z") Then
     '    mDrive = "Z:\work05\"
@@ -642,7 +646,7 @@ Sub setDrive(drive)
         mDrive = "X:\work2\"
     End If
     
-    document.title = getElementValue(getWorkInputId()) & " " & mDrive
+    Call updateTitle()
 End Sub
 
 Sub setSdk(sdk)
@@ -744,12 +748,20 @@ Function isT0Sdk()
 End Function
 
 Function isSplitSdkSys()
-    If InStr(mIp.Infos.Sdk, "sys") > 0 Then
-        isSplitSdkSys = True
-    ElseIf isV0SysSdk() And InStr(mIp.Infos.Product, "mssi") > 0 Then
-        isSplitSdkSys = True
+    If isV0SysSdk() Then
+        If Not is8781Vnd() And InStr(mIp.Infos.Product, "mssi") > 0 Then
+            isSplitSdkSys = True
+        ElseIf is8781Vnd() And InStr(mIp.Infos.Sdk, "sys") > 0 Then
+            isSplitSdkSys = True
+        Else
+            isSplitSdkSys = False
+        End If
     Else
-        isSplitSdkSys = False
+        If InStr(mIp.Infos.Sdk, "sys") > 0 Then
+            isSplitSdkSys = True
+        Else
+            isSplitSdkSys = False
+        End If
     End If
 End Function
 
@@ -777,6 +789,10 @@ Function isT08168SdkVnd()
     Else
         isT08168SdkVnd = False
     End If
+End Function
+
+Function is8781Vnd()
+    is8781Vnd = InStr(mIp.Infos.VndTarget, "8781") > 0
 End Function
 
 Function isT0SysSdk()
@@ -850,24 +866,28 @@ End Function
 'End Function
 
 Sub setT0SdkSys()
-    mIp.T0InnerSwitch = True
-    mIp.Infos.VndSdk = mIp.Infos.Sdk
-    mIp.Sdk = mIp.Infos.SysSdk
-    mIp.T0InnerSwitch = True
-    mIp.Product = mIp.Infos.SysTarget
-    mIp.T0InnerSwitch = True
-    mIp.Project = mIp.Infos.SysProject
-    Call createWorkName()
+    If isSplitSdkVnd() Then
+        mIp.T0InnerSwitch = True
+        mIp.Infos.VndSdk = mIp.Infos.Sdk
+        mIp.Sdk = mIp.Infos.SysSdk
+        mIp.T0InnerSwitch = True
+        mIp.Product = mIp.Infos.SysTarget
+        mIp.T0InnerSwitch = True
+        mIp.Project = mIp.Infos.SysProject
+        Call createWorkName()
+    End If
 End Sub
 
 Sub setT0SdkVnd()
-    mIp.T0InnerSwitch = True
-    mIp.Sdk = mIp.Infos.VndSdk
-    mIp.T0InnerSwitch = True
-    mIp.Product = mIp.Infos.VndTarget
-    mIp.T0InnerSwitch = True
-    mIp.Project = mIp.Infos.DriverProject
-    Call createWorkName()
+    If isSplitSdkSys() Then
+        mIp.T0InnerSwitch = True
+        mIp.Sdk = mIp.Infos.VndSdk
+        mIp.T0InnerSwitch = True
+        mIp.Product = mIp.Infos.VndTarget
+        mIp.T0InnerSwitch = True
+        mIp.Project = mIp.Infos.DriverProject
+        Call createWorkName()
+    End If
 End Sub
 
 Function checkBackslash(str)
@@ -877,10 +897,6 @@ Function checkBackslash(str)
     str = Replace(str, ".", "\.")
     str = Replace(str, "\.*", ".*")
     checkBackslash = str
-End Function
-
-Function isT08781()
-    isT08781 = InStr(mIp.Infos.VndTarget, "8781") > 0
 End Function
 
 Sub findProjectWithTaskNum(taskNum)

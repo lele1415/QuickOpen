@@ -190,7 +190,7 @@ Function getOutProductPath()
 	If mIp.hasProjectInfos() Then
 		Dim path, outName
 		path = mIp.Infos.OutPath
-		If isT08781() And isSplitSdkSys() And isFolderExists("out_sys") Then
+		If is8781Vnd() And isSplitSdkSys() And isFolderExists("out_sys") Then
 			outName = "out_sys"
 		Else
 			outName = "out"

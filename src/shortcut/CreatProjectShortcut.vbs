@@ -132,8 +132,10 @@ Sub getProjectInfosFromOpenPath()
 
 	If UBound(inputArray) > 0 Then
 	    oInfos.SysSdk = relpaceBackSlashInPath(Split(inputArray(1), "/weibu/")(0))
+	    oInfos.SysTarget = Split(Split(inputArray(1), "/weibu/")(1), "/")(0)
         oInfos.SysProject = Split(Split(inputArray(1), "/weibu/")(1), "/")(1)
 		workInfosStr = workInfosStr & oInfos.SysSdk & VbLf &_
+	                                  oInfos.SysTarget & VbLf &_
 	                                  oInfos.SysProject & VbLf
 	End If
 
@@ -156,6 +158,7 @@ Sub saveWorkInfosFromOpenPath()
     oInfos.Project = trimStr(inputArray(i)) : i = i + 1
     If InStr(oInfos.Sdk, "_t0") > 0 Then
         oInfos.SysSdk = trimStr(inputArray(i)) : i = i + 1
+        oInfos.SysTarget = trimStr(inputArray(i)) : i = i + 1
         oInfos.SysProject = trimStr(inputArray(i)) : i = i + 1
     End If
     oInfos.Firmware = trimStr(inputArray(i)) : i = i + 1
@@ -193,6 +196,7 @@ Sub updateWorkInfoTxt()
         oTxt.WriteLine(obj.Product)
         oTxt.WriteLine(obj.Project)
 		If InStr(obj.Sdk, "_t0") > 0 Then oTxt.WriteLine(obj.SysSdk)
+		If InStr(obj.Sdk, "_t0") > 0 Then oTxt.WriteLine(obj.SysTarget)
 		If InStr(obj.Sdk, "_t0") > 0 Then oTxt.WriteLine(obj.SysProject)
         oTxt.WriteLine(obj.Firmware)
         oTxt.WriteLine(obj.Requirements)

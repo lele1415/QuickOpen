@@ -45,6 +45,7 @@ Sub handleForWorksInfo(oText, sReadLine)
     oInfos.Project = Trim(oText.ReadLine)
     If InStr(oInfos.Sdk, "_t0") > 0 Then
         oInfos.SysSdk = Trim(oText.ReadLine)
+        oInfos.SysTarget = Trim(oText.ReadLine)
         oInfos.SysProject = Trim(oText.ReadLine)
     End If
     oInfos.Firmware = Trim(oText.ReadLine)
