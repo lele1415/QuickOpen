@@ -755,13 +755,13 @@ Sub CopyAdbInstallCmd(which)
     If which = "att" Then
         finalStr = "adb install D:\APK\Antutu\antutu-benchmark-v10.apk"
     ElseIf which = "aida" Then
-        finalStr = "adb install D:\APK\Antutu\AIDA64.apk"
+        finalStr = "adb install D:\APK\Antutu\aida64-v198.apk"
     ElseIf which = "dvc" Then
         finalStr = "adb install D:\APK\Antutu\DevCheck_v5.11_Mod.apk"
     ElseIf which = "z" Then
-        finalStr = "adb install D:\APK\Antutu\CPU-Z.apk"
+        finalStr = "adb install D:\APK\Antutu\CPU-Z-1.43.apk"
     ElseIf which = "hw" Then
-        finalStr = "adb install D:\APK\Antutu\DeviceInfoHW.apk"
+        finalStr = "adb install D:\APK\Antutu\DeviceInfoHW-v5.20.1.apk"
     End If
     Call copyStrAndPasteInPowerShell(finalStr)
 End Sub
