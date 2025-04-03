@@ -92,7 +92,8 @@ End Sub
 Sub applyShortcutInfos(infos)
 	If Not checkProjectExist(infos.Sdk, infos.Product, infos.Project) Then Exit Sub
 	Call mIp.setProjectInputs(infos)
-	Call moveShortcutToTop(infos.Work)
+	'Call moveShortcutToTop(infos.Work)
+	Call updateLastTaskTxt()
 End Sub
 
 Sub saveWorkToArray()
@@ -181,6 +182,17 @@ Sub saveWorkInfosFromOpenPath()
 
     Call vaWorksInfo.Append(oInfos)
 	Call updateWorkInfoTxt()
+End Sub
+
+Sub updateLastTaskTxt()
+    initTxtFile(pLastTaskText)
+    Dim oTxt, i, obj
+    Set oTxt = oFso.OpenTextFile(pLastTaskText, FOR_APPENDING, False, True)
+
+	oTxt.WriteLine(mIp.Infos.TaskNum)
+
+    oTxt.Close
+    Set oTxt = Nothing
 End Sub
 
 Sub updateWorkInfoTxt()

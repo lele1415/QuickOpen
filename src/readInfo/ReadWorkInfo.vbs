@@ -1,6 +1,7 @@
 Option Explicit
 
 Dim pProjectText : pProjectText = oWs.CurrentDirectory & "\res\project.ini"
+Dim pLastTaskText : pLastTaskText = oWs.CurrentDirectory & "\res\last_task.ini"
 
 Dim vaWorksInfo : Set vaWorksInfo = New VariableArray
 
@@ -21,10 +22,33 @@ Sub readWorksInfoText()
     Set oText = Nothing
 End Sub
 
+Function getLastProjectTaskNum()
+    If Not isFileExists(pLastTaskText) Then
+        getLastProjectTaskNum = ""
+        Exit Function
+    End If
+    
+    Dim oText, sReadLine
+    Set oText = oFso.OpenTextFile(pLastTaskText, FOR_READING, False, True)
+
+    Do Until oText.AtEndOfStream
+        sReadLine = oText.ReadLine
+        If isNumeric(sReadLine) And Len(sReadLine) < 5 Then
+            Exit Do
+        End If
+    Loop
+
+    oText.Close
+    Set oText = Nothing
+
+    getLastProjectTaskNum = sReadLine
+End Function
+
 Sub applyLastWorkInfo()
-    Dim oInfos
-    If vaWorksInfo.Bound > -1 Then
-        Set oInfos = vaWorksInfo.V(vaWorksInfo.Bound)
+    Dim oInfos, taskNum
+    taskNum = getLastProjectTaskNum()
+    If isNumeric(taskNum) And Len(taskNum) < 5 Then
+		Set oInfos = getWorkInfoWithTaskNum(taskNum, "obj")
         if Not checkProjectExist(oInfos.Sdk, oInfos.Product, oInfos.Project) Then
             Call mIp.clearSdkInfos()
             Call mIp.clearWorkInfos()
