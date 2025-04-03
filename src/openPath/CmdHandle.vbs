@@ -176,6 +176,11 @@ End Function
 
 Function handleCopyCommandCmd()
     handleCopyCommandCmd = True
+	If InStr(mCmdInput.text, "fd-") = 1 Then Call findProjectPathWithTaskNum(Replace(mCmdInput.text, "fd-", "")) : Exit Function
+	If mCmdInput.text = "spp" Then Call getProjectPathWithTaskNum(mIp.Infos.TaskNum, "s") : Exit Function
+	If mCmdInput.text = "vpp" Then Call getProjectPathWithTaskNum(mIp.Infos.TaskNum, "v") : Exit Function
+	If InStr(mCmdInput.text, "spp-") = 1 Then Call getProjectPathWithTaskNum(Replace(mCmdInput.text, "spp-", ""), "s") : Exit Function
+	If InStr(mCmdInput.text, "vpp-") = 1 Then Call getProjectPathWithTaskNum(Replace(mCmdInput.text, "vpp-", ""), "v") : Exit Function
 	If mCmdInput.text = "lcu" Then Call getLunchCommand("user", mIp.Infos.TaskNum) : Exit Function
 	If mCmdInput.text = "lcd" Then Call getLunchCommand("userdebug", mIp.Infos.TaskNum) : Exit Function
 	If mCmdInput.text = "lce" Then Call getLunchCommand("eng", mIp.Infos.TaskNum) : Exit Function

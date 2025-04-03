@@ -251,6 +251,30 @@ Sub getT0VndLunchCommand(buildType)
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
+Sub findProjectPathWithTaskNum(taskNum)
+    Dim commandFinal
+    If isNumeric(taskNum) And Len(taskNum) < 5 Then
+        commandFinal = "find weibu -maxdepth 2 -name ""&Chr(34)&""*" & taskNum & "*""&Chr(34)&"""
+    End If
+    Call copyStrAndPasteInXshell(commandFinal)
+End Sub
+
+Sub getProjectPathWithTaskNum(taskNum, which)
+    Dim obj
+    If isNumeric(taskNum) And Len(taskNum) < 5 Then
+		Set obj = getWorkInfoWithTaskNum(taskNum, "obj")
+        If which = "s" Then
+            If obj.SysTarget <> "" And obj.SysProject <> "" Then
+                Call setOpenPath("weibu/" & obj.SysTarget & "/" & obj.SysProject)
+            Else
+                Call setOpenPath("weibu/" & obj.Product & "/" & obj.Project)
+            End If
+        Else
+            Call setOpenPath("weibu/" & obj.Product & "/" & obj.Project)
+        End If
+    End If
+End Sub
+
 Function getRomPath()
     getRomPath = getParentPath(mIp.Infos.DriveSdk) & "\ROM"
 End Function
