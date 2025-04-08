@@ -387,7 +387,7 @@ Class InputText
 
     Public Property Get Text
         If checkElement() Then
-            Text = document.getElementById(mInputId).value
+            Text = getElementValue(mInputId)
         Else
             Text = ""
         End If
@@ -395,7 +395,7 @@ Class InputText
 
     Public Sub setText(text)
         If checkElement() Then
-            document.getElementById(mInputId).value = text
+            Call setElementValue(mInputId, text)
         End If
     End Sub
 End Class
@@ -901,31 +901,31 @@ Class ProjectInputs
     End Property
 
     Public Property Get Work
-        Work = document.getElementById(getWorkInputId()).value
+        Work = getElementValue(getWorkInputId())
     End Property
 
     Public Property Get Sdk
-        Sdk = document.getElementById(getSdkPathInputId()).value
+        Sdk = getElementValue(getSdkPathInputId())
     End Property
 
     Public Property Get Product
-        Product = document.getElementById(getProductInputId()).value
+        Product = getElementValue(getProductInputId())
     End Property
 
     Public Property Get Project
-        Project = document.getElementById(getProjectInputId()).value
+        Project = getElementValue(getProjectInputId())
     End Property
 
     Public Property Get Firmware
-        Firmware = document.getElementById(getFirmwareInputId()).value
+        Firmware = getElementValue(getFirmwareInputId())
     End Property
 
     Public Property Get Requirements
-        Requirements = document.getElementById(getRequirementsInputId()).value
+        Requirements = getElementValue(getRequirementsInputId())
     End Property
 
     Public Property Get Zentao
-        Zentao = document.getElementById(getZentaoInputId()).value
+        Zentao = getElementValue(getZentaoInputId())
     End Property
 
     Public Property Get T0InnerSwitch
@@ -934,38 +934,38 @@ Class ProjectInputs
 
     Public Property Let Work(value)
         Call setElementValue(getWorkInputId(), value)
+        Call onWorkChange(value)
         Call updateTitle()
-        Call onWorkChange()
     End Property
 
     Public Property Let Sdk(value)
         Call setElementValue(getSdkPathInputId(), value)
-        Call onSdkChange()
+        Call onSdkChange(value)
     End Property
 
     Public Property Let Product(value)
         Call setElementValue(getProductInputId(), value)
-        Call onProductChange()
+        Call onProductChange(value)
     End Property
 
     Public Property Let Project(value)
         Call setElementValue(getProjectInputId(), value)
-        Call onProjectChange()
+        Call onProjectChange(value)
     End Property
 
     Public Property Let Firmware(value)
         Call setElementValue(getFirmwareInputId(), value)
-        Call onFirmwareChange()
+        Call onFirmwareChange(value)
     End Property
 
     Public Property Let Requirements(value)
         Call setElementValue(getRequirementsInputId(), value)
-        Call onRequirementsChange()
+        Call onRequirementsChange(value)
     End Property
 
     Public Property Let Zentao(value)
         Call setElementValue(getZentaoInputId(), value)
-        Call onZentaoChange()
+        Call onZentaoChange(value)
     End Property
 
     Public Property Let T0InnerSwitch(value)
@@ -1040,13 +1040,13 @@ Class ProjectInputs
         cutProject = path
     End Function
 
-    Public Sub onWorkChange()
-        mInfos.Work = Work
+    Public Sub onWorkChange(value)
+        mInfos.Work = value
     End Sub
 
-    Public Sub onSdkChange()
+    Public Sub onSdkChange(value)
         'Call mIp.cutSdkInOpenPath()
-        mInfos.Sdk = Sdk
+        mInfos.Sdk = value
         If isFolderExists(mInfos.DriveSdk) Then
             If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
             Call clearWorkInfos()
@@ -1059,8 +1059,8 @@ Class ProjectInputs
         End If
     End Sub
 
-    Public Sub onProductChange()
-        mInfos.Product = Product
+    Public Sub onProductChange(value)
+        mInfos.Product = value
         If isFolderExists(mInfos.ProductPath) Then
             If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
             'Call updateProjectList()
@@ -1078,9 +1078,9 @@ Class ProjectInputs
         End If
     End Sub
 
-    Public Sub onProjectChange()
+    Public Sub onProjectChange(value)
         'Call mIp.cutProjectInOpenPath()
-        mInfos.Project = Project
+        mInfos.Project = value
         If isFolderExists(mInfos.ProjectPath) Then
 
             If InStr(mInfos.Sdk, "_r") = 0 _
@@ -1094,9 +1094,9 @@ Class ProjectInputs
             If mT0InnerSwitch Then mT0InnerSwitch = False : Exit Sub
 
             If isSplitSdkVnd() Then
-                mInfos.DriverProject = Project
+                mInfos.DriverProject = value
             ElseIf Not isT0Sdk() Then
-                mInfos.DriverProject = getDriverProjectName(Project)
+                mInfos.DriverProject = getDriverProjectName(value)
             End If
 
             Call clearWorkInfos()
@@ -1104,7 +1104,7 @@ Class ProjectInputs
             Call getProjectConfigMk()
             Call mInfos.getBootLogo()
 
-        ElseIf checkWifiProduct(Project) Then
+        ElseIf checkWifiProduct(value) Then
             Exit Sub
         Else
             msgboxPathNotExist(mInfos.ProjectPath)
@@ -1115,16 +1115,16 @@ Class ProjectInputs
         End If
     End Sub
 
-    Public Sub onFirmwareChange()
-        mInfos.Firmware = Firmware
+    Public Sub onFirmwareChange(value)
+        mInfos.Firmware = value
     End Sub
 
-    Public Sub onRequirementsChange()
-        mInfos.Requirements = Requirements
+    Public Sub onRequirementsChange(value)
+        mInfos.Requirements = value
     End Sub
 
-    Public Sub onZentaoChange()
-        mInfos.Zentao = Zentao
+    Public Sub onZentaoChange(value)
+        mInfos.Zentao = value
     End Sub
 
 End Class

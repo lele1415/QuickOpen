@@ -78,7 +78,7 @@ Sub removeShortcut(shortcutId)
         	Exit For
         End If
     Next
-    If mIp.Work = work Then Call applyLastWorkInfo()
+    If mIp.Infos.Work = work Then Call applyLastWorkInfo()
     Call updateWorkInfoTxt()
 End Sub
 

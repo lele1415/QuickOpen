@@ -1,5 +1,8 @@
 Option Explicit
 
+Const FOR_READING = 1
+Const FOR_APPENDING = 8
+
 Const SEARCH_FILE = 0
 Const SEARCH_FOLDER = 1
 Const SEARCH_FILE_FOLDER = 2
@@ -12,6 +15,13 @@ Const SEARCH_ONE = 0
 Const SEARCH_ALL = 1
 Const SEARCH_RETURN_PATH = 0
 Const SEARCH_RETURN_NAME = 1
+
+Dim oFso
+Set oFso=CreateObject("Scripting.FileSystemObject")
+
+Dim pConfigText : pConfigText = oWs.CurrentDirectory & "\res\config.ini"
+Dim pSdkPathText : pSdkPathText = oWs.CurrentDirectory & "\res\sdk.ini"
+Dim pProjectPathText : pProjectPathText = oWs.CurrentDirectory & "\res\project.ini"
 
 Function searchFolder(path, str, searchType, searchWhere, searchMode, searchTimes, returnType)
     Dim pRootFolder : pRootFolder = checkDriveSdkPath(path)

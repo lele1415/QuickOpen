@@ -1,5 +1,8 @@
 Option Explicit
 
+Dim oWs
+Set oWs=CreateObject("wscript.shell")
+
 Sub runPath(path)
     Dim p : p = checkDriveSdkPath(path)
     Dim success : success = False
