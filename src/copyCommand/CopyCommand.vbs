@@ -937,7 +937,9 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
     ElseIf whatArr(0) = "fp" Then
         Dim version, buildId
         version = whatArr(1)
-        If version = "14" Then
+        If version = "15" Then
+            buildId="AP3A.240905.015.A2"
+        ElseIf version = "14" Then
             buildId="UP1A.231005.007"
         ElseIf version = "13" Then
             buildId="TP1A.220624.014"
