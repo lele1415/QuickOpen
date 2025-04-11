@@ -1186,8 +1186,12 @@ End Function
 Function getOutFoldersForMvOut()
     If isT0Sdk() Then
         'v+v
-        If isFolderExists("merged") And isFolderExists("out_sys") And isFolderExists("out") Then
-            getOutFoldersForMvOut = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out")
+        If isFolderExists("../v_sys/merged") And isFolderExists("../v_sys/out_sys") And isFolderExists("../v_sys/out") Then
+            If isFolderExists("../v_sys/out_krn") Then
+                getOutFoldersForMvOut = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out", "v_sys/out_krn")
+            Else
+                getOutFoldersForMvOut = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out")
+            End If
         '8781
         ElseIf isFolderExists("../vnd/out_hal") Then
             '8781 s+v
@@ -1239,15 +1243,21 @@ Function getOutFoldersForMvOut()
 End Function
 
 Sub moveOutFoldersOut()
-    Dim idArr, taskNum, taskNumArr, buildType, workName, outName, outPath, outFolders, cmdStr
-    idArr = Split(getOutInfo("ro.build.display.inner.id"), ".")
+    Dim innerId, idArr, taskNum, taskNumArr, buildType, workName, outName, outPath, outFolders, cmdStr
+    innerId = getSysOutInfo("ro.build.display.inner.id")
+    If innerId = "" Then MsgBox("Empty inner id!") : Exit Sub
+    buildType = getSysOutInfo("ro.build.type")
+    If buildType = "userdebug" Then buildType = "debug"
+    idArr = Split(Split(innerId, "-")(0), ".")
     taskNum = Replace(idArr(2), "-MMI", "")
     if InStr(taskNum, "-") > 0 Then
         taskNumArr = Split(taskNum, "-")
         taskNum = taskNumArr(UBound(taskNumArr))
+        If Not isNumeric(taskNum) Then
+            taskNum = taskNumArr(UBound(taskNumArr) - 1)
+        End If
     End If
-    buildType = LCase(idArr(UBound(idArr)))
-    If buildType = "userdebug" Then buildType = "debug"
+    If Not isNumeric(taskNum) Then MsgBox("Invalid taskNum! " & taskNum) : Exit Sub
     workName = getWorkInfoWithTaskNum(taskNum, "work")
     if workName = "" Then Exit Sub
     outName = Split(workName, " ")(0)

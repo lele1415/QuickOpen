@@ -132,6 +132,10 @@ Function is8781Vnd()
     is8781Vnd = InStr(mIp.Infos.VndTarget, "8781") > 0
 End Function
 
+Function is8791Vnd()
+    is8791Vnd = InStr(mIp.Infos.VndTarget, "8791") > 0
+End Function
+
 Function isT0SysSdk()
     If InStr(mIp.Infos.SysSdk, "\sys") > 0 Then
         isT0SysSdk = True

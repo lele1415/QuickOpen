@@ -561,11 +561,31 @@ End Class
 
 
 Function getOutPath(Product)
-    If is8781Vnd() And isSplitSdkSys() Then
-        getOutPath = "out_sys/target/product/" & Product
+    Dim outName
+    If isSplitSdkSys() Then
+        If isV0SysSdk() And (Not is8791Vnd()) Then
+            outName = "out_sys"
+        ElseIf is8781Vnd() Then
+            outName = "out_sys"
+        Else
+            outName = "out"
+        End If
     Else
-        getOutPath = "out/target/product/" & Product
+        outName = "out"
     End If
+    getOutPath = outName & "/target/product/" & Product
+End Function
+
+Function getSysOutPath(Product)
+    Dim outName
+    If isV0SysSdk() And (Not is8791Vnd()) Then
+        outName = "out_sys"
+    ElseIf is8781Vnd() Then
+        outName = "out_sys"
+    Else
+        outName = "out"
+    End If
+    getSysOutPath = outName & "/target/product/" & Product
 End Function
 
 Function getDownloadOutPath(Product)
@@ -678,6 +698,10 @@ Class ProjectInfos
 
     Public Property Get OutPath
         OutPath = getOutPath(Product)
+    End Property
+
+    Public Property Get SysOutPath
+        SysOutPath = getSysOutPath(Product)
     End Property
 
     Public Property Get DownloadOutPath

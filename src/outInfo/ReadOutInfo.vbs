@@ -8,7 +8,7 @@ Dim pSystemBuildProp
 Dim pVendorBuildProp
 Dim pProductBuildProp
 
-Sub getBuildProp()
+Sub getBuildProp(sys)
     If Not mIp.hasProjectInfos() Then
         pSystemBuildProp = ""
         pVendorBuildProp = ""
@@ -16,7 +16,8 @@ Sub getBuildProp()
         Exit Sub
     End If
     
-    Dim outProductPath : outProductPath = getOutProductPath()
+    Dim outProductPath
+    outProductPath = getOutProductPath(sys)
 
     pSystemBuildProp = outProductPath & "/system/build.prop"
     pVendorBuildProp = outProductPath & "/vendor/build.prop"
@@ -27,7 +28,7 @@ Sub getBuildProp()
 End Sub
 
 Sub getOutInfos()
-    Call getBuildProp()
+    Call getBuildProp(False)
 
     Dim str
     str = str & "display_id=" & readTextAndGetValue("ro.build.display.id", pSystemBuildProp) & VbLf
@@ -66,11 +67,21 @@ Sub closeOutInfos()
 End Sub
 
 Function getOutInfo(prop)
-    Call getBuildProp()
+    Call getBuildProp(False)
 
     Dim value
     value = readTextAndGetValue(prop, pSystemBuildProp)
     If value = "" Then value = readTextAndGetValue(prop, pVendorBuildProp)
     If value = "" Then value = readTextAndGetValue(prop, pProductBuildProp)
     getOutInfo = value
+End Function
+
+Function getSysOutInfo(prop)
+    Call getBuildProp(True)
+
+    Dim value
+    value = readTextAndGetValue(prop, pSystemBuildProp)
+    If value = "" Then value = readTextAndGetValue(prop, pVendorBuildProp)
+    If value = "" Then value = readTextAndGetValue(prop, pProductBuildProp)
+    getSysOutInfo = value
 End Function
