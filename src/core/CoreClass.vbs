@@ -1014,6 +1014,7 @@ Class ProjectInputs
     End Function
 
     Public Sub setProjectInputs(infos)
+        Call findDrive(infos.Work, infos.Sdk)
         Work = infos.Work
         Sdk = infos.Sdk
         If InStr(infos.Sdk, "_t0") > 0 Then mInfos.SysSdk = infos.SysSdk

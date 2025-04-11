@@ -15,6 +15,17 @@ Sub setDrive(drive)
     Call updateTitle()
 End Sub
 
+Sub findDrive(work, sdk)
+    Dim sdkP, workName
+    sdkP = Left(sdk, InStrRev(sdk, "\") - 1)
+    workName = Split(work, " ")(0)
+    If oFso.FolderExists("X:\work1\" & sdkP & "\OUT\" & workName & "_user") Or oFso.FolderExists("X:\work1\" & sdkP & "\OUT\" & workName & "_debug") Then
+        Call setDrive("x1")
+    ElseIf oFso.FolderExists("X:\work2\" & sdkP & "\OUT\" & workName & "_user") Or oFso.FolderExists("X:\work2\" & sdkP & "\OUT\" & workName & "_debug") Then
+        Call setDrive("x2")
+    End If
+End Sub
+
 Sub setSdk(sdk)
     If sdk = "8766s" Then
         mIp.Sdk = "mt8766_s\alps"
@@ -53,6 +64,7 @@ Function checkProjectExist(sdk, product, project)
                 Call setDrive("z6")
                 If Not checkDrive(sdk, product, project) Then 
                     checkProjectExist = False
+                    Call setDrive("x1")
                     Exit Function
                 End If
             End If
