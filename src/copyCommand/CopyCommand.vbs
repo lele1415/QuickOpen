@@ -238,7 +238,11 @@ Function get8781LunchStr(obj, buildType, releseStr, androidVer)
 End Function
 
 Sub getT0SysLunchCommand(buildType)
-    commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-" & buildType & " " & mIp.Infos.Project
+    If isV0SysSdk() THen
+        commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-next-" & buildType & " " & mIp.Infos.Project
+    Else
+        commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-" & buildType & " " & mIp.Infos.Project
+    End If
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
@@ -304,7 +308,7 @@ Sub CopyBuildOtaUpdate()
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
     Else
         commandFinal = "./out/host/linux-x86/bin/ota_from_target_files -i target_files_.zip target_files.zip update__to_.zip"
-        If is8781Vnd() Then commandFinal = Replace(commandFinal, "/out/", "/out_sys/")
+        If InStr(mIp.Infos.OutPath, "out_sys") > 0 Then commandFinal = Replace(commandFinal, "/out/", "/out_sys/")
     End If
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
@@ -910,7 +914,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
         Dim weibuConfig : weibuConfig = "build/make/core/weibu_config.mk"
         keyStr = "WEIBU_BUILD_NUMBER"
 		startStr = " := "
-        If isFileExists(weibuConfig) Then
+        If isFileExists(weibuConfig) And isSplitSdkVnd() Then
             filePath = weibuConfig
             startStr = " ?= "
         Else
@@ -1186,7 +1190,7 @@ End Function
 Function getOutFoldersForMvOut()
     If isT0Sdk() Then
         'v+v
-        If isFolderExists("../v_sys/merged") And isFolderExists("../v_sys/out_sys") And isFolderExists("../v_sys/out") Then
+        If isV0SysSdk() And isFolderExists("../v_sys/merged") And isFolderExists("../v_sys/out_sys") And isFolderExists("../v_sys/out") Then
             If isFolderExists("../v_sys/out_krn") Then
                 getOutFoldersForMvOut = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out", "v_sys/out_krn")
             Else
@@ -1195,7 +1199,7 @@ Function getOutFoldersForMvOut()
         '8781
         ElseIf isFolderExists("../vnd/out_hal") Then
             '8781 s+v
-            If isFolderExists("../v_sys/out_sys") Then
+            If isV0SysSdk() And isFolderExists("../v_sys/out_sys") Then
                 If isFolderExists("../v_sys/out") Then
                     MsgBox("There are two sys out folders: out/ out_sys/")
                     getOutFoldersForMvOut = Array("")
@@ -1203,7 +1207,7 @@ Function getOutFoldersForMvOut()
                     getOutFoldersForMvOut = Array("merged", "v_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
                 End If
             '8781 s+u
-            ElseIf isFolderExists("../u_sys/out_sys") Then
+            ElseIf isU0SysSdk() And isFolderExists("../u_sys/out_sys") Then
                 If isFolderExists("../u_sys/out") Then
                     MsgBox("There are two sys out folders: out/ out_sys/")
                     getOutFoldersForMvOut = Array("")
@@ -1218,7 +1222,7 @@ Function getOutFoldersForMvOut()
                 getOutFoldersForMvOut = Array("")
             End If
         ElseIf isFolderExists("../vnd/out") Then
-            If isFolderExists("../u_sys/out") Then
+            If isU0SysSdk() And isFolderExists("../u_sys/out") Then
                 getOutFoldersForMvOut = Array("merged", "u_sys/out", "vnd/out")
             ElseIf isFolderExists("../sys/out") Then
                 getOutFoldersForMvOut = Array("merged", "sys/out", "vnd/out")
@@ -1243,6 +1247,7 @@ Function getOutFoldersForMvOut()
 End Function
 
 Sub moveOutFoldersOut()
+    If isSplitSdkVnd() Then Call setT0SdkSys()
     Dim innerId, idArr, taskNum, taskNumArr, buildType, workName, outName, outPath, outFolders, cmdStr
     innerId = getSysOutInfo("ro.build.display.inner.id")
     If innerId = "" Then MsgBox("Empty inner id!") : Exit Sub

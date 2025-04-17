@@ -563,9 +563,7 @@ End Class
 Function getOutPath(Product)
     Dim outName
     If isSplitSdkSys() Then
-        If isV0SysSdk() And (Not is8791Vnd()) Then
-            outName = "out_sys"
-        ElseIf is8781Vnd() Then
+        If isV0SysSdk() Or is8781Vnd() Then
             outName = "out_sys"
         Else
             outName = "out"
@@ -578,9 +576,7 @@ End Function
 
 Function getSysOutPath(Product)
     Dim outName
-    If isV0SysSdk() And (Not is8791Vnd()) Then
-        outName = "out_sys"
-    ElseIf is8781Vnd() Then
+    If isV0SysSdk() Or is8781Vnd() Then
         outName = "out_sys"
     Else
         outName = "out"
