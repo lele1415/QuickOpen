@@ -88,6 +88,36 @@ Function checkDrive(sdk, product, project)
     checkDrive = False
 End Function
 
+Function checkDriveSdkPath(path)
+    Dim newPath
+    newPath = relpaceBackSlashInPath(path)
+    If InStr(newPath, ":\") = 0 And InStr(newPath, "\\192.168") = 0 Then
+        checkDriveSdkPath = mIp.Infos.getPathWithDriveSdk(newPath)
+    Else
+        checkDriveSdkPath = newPath
+    End If
+End Function
+
+Function checkBuildType()
+    Dim outBuildType, lunchItemPath, lunchStr
+    If isSplitSdkVnd() Then Call setT0SdkSys()
+    outBuildType = getSysOutInfo("ro.build.type")
+    If is8781Vnd() Then
+        lunchItemPath = "../lunch_item_v2"
+    ElseIf isV0SysSdk() Then
+        lunchItemPath = "lunch_item"
+    Else
+        lunchItemPath = "../lunch_item"
+    End If
+    lunchStr = readLineOfTextFile(1, lunchItemPath)
+    If InStr(lunchStr, outBuildType & " ") Then
+        checkBuildType = True
+    Else
+        checkBuildType = False
+        MsgBox("Wrong build type!" & VbLf & "out=" & outBuildType & VbLf & "lunch_item=" & lunchStr)
+    End If
+End Function
+
 Function isT0Sdk()
     If InStr(mIp.Infos.Sdk, "_t0") > 0 Then
         isT0Sdk = True

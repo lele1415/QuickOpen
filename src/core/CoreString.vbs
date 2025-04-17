@@ -130,16 +130,6 @@ Function isCompressFilePath(path)
     End If
 End Function
 
-Function checkDriveSdkPath(path)
-    Dim newPath
-    newPath = relpaceBackSlashInPath(path)
-    If InStr(newPath, ":\") = 0 And InStr(newPath, "\\192.168") = 0 Then
-        checkDriveSdkPath = mIp.Infos.getPathWithDriveSdk(newPath)
-    Else
-        checkDriveSdkPath = newPath
-    End If
-End Function
-
 Function strExistInFile(filePath, str)
     Dim oText, path, sLine
     path = checkDriveSdkPath(filePath)

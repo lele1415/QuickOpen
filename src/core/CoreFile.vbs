@@ -197,6 +197,24 @@ Function readTextAndGetValue(keyStr, filePath)
     If Not flag Then readTextAndGetValue = ""
 End Function
 
+Function readLineOfTextFile(line, filePath)
+    Dim path : path = checkDriveSdkPath(filePath)
+    If Not isFileExists(path) Then Exit Function
+    
+    Dim oText, sReadLine, index
+    Set oText = oFso.OpenTextFile(path, FOR_READING)
+    index = 1
+
+    Do Until oText.AtEndOfStream
+        If index = line Then
+            sReadLine = Trim(oText.ReadLine)
+            Exit Do
+        End If
+        index = index + 1
+    Loop
+    readLineOfTextFile = sReadLine
+End Function
+
 Function getTabStr()
     Dim folderPath
     folderPath = getParentPath(getOpenPath())

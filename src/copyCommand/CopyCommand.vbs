@@ -47,6 +47,7 @@ Sub getMakeCommand(rmOut, rmBuildprop, ota)
 End Sub
 
 Function getSplitBuildCommand(opts)
+    If Not checkBuildType() Then getSplitBuildCommand = "" : Exit Function
     Dim buildsh, params, commandStr
     If is8781Vnd() Then
         buildsh = "./split_build_v2.sh"
