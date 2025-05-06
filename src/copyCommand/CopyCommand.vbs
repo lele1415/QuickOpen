@@ -57,6 +57,8 @@ Function getSplitBuildCommand(opts)
     If opts = "a" Then
         If is8781Vnd() Then
             params = " vext krn hal sys m p"
+        ElseIf isV0SysSdk() Then
+            params = " krn vnd sys m p"
         Else
             params = " vnd krn sys m p"
         End If
@@ -899,7 +901,11 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
 		cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
 	ElseIf whatArr(0) = "sp" Then
-	    filePath = "build/make/core/version_defaults.mk"
+        If InStr(mIp.Infos.Sdk, "\v_sys") Then
+            filePath = "build/make/core/version_util.mk"
+        Else
+            filePath = "build/make/core/version_defaults.mk"
+        End If
 		keyStr = "PLATFORM_SECURITY_PATCH"
 		startStr = " := "
 		searchStr = keyStr & startStr
@@ -1254,14 +1260,11 @@ Sub moveOutFoldersOut()
     If innerId = "" Then MsgBox("Empty inner id!") : Exit Sub
     buildType = getSysOutInfo("ro.build.type")
     If buildType = "userdebug" Then buildType = "debug"
-    idArr = Split(Split(innerId, "-")(0), ".")
-    taskNum = Replace(idArr(2), "-MMI", "")
-    if InStr(taskNum, "-") > 0 Then
-        taskNumArr = Split(taskNum, "-")
-        taskNum = taskNumArr(UBound(taskNumArr))
-        If Not isNumeric(taskNum) Then
-            taskNum = taskNumArr(UBound(taskNumArr) - 1)
-        End If
+    idArr = Split(Split(innerId, ".")(4), "-")
+    If isNumeric(idArr(UBound(idArr))) Then
+        taskNum = idArr(UBound(idArr))
+    Else
+        taskNum = idArr(UBound(idArr) - 1)
     End If
     If Not isNumeric(taskNum) Then MsgBox("Invalid taskNum! " & taskNum) : Exit Sub
     workName = getWorkInfoWithTaskNum(taskNum, "work")
