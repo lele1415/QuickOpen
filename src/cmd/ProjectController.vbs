@@ -197,7 +197,7 @@ Function getTmpTaskWithNum(taskNum)
     For i = mTaskList.Bound To 0 Step -1
         Set task = mTaskList.v(i)
         If task.Infos.TaskNum = taskNum Then
-            Set mTmpTask = mTask
+            Set mTmpTask = task
             result = True
             Exit For
         End If
