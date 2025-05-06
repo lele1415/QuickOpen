@@ -124,13 +124,13 @@ End Function
 
 Function getOriginPathFromOverlayPath(path)
     If InStr(path, "weibu/") = 1 Then
-	    If InStr(path, "/alps/") Then
-        	path = Split(path, "/alps/")(1)
-		Else
-		    path = Right(path, Len(path) - InStr(path, "/"))
-		    path = Right(path, Len(path) - InStr(path, "/"))
-		    path = Right(path, Len(path) - InStr(path, "/"))
-		End If
+        If InStr(path, "/alps/") Then
+            path = Split(path, "/alps/")(1)
+        Else
+            path = Right(path, Len(path) - InStr(path, "/"))
+            path = Right(path, Len(path) - InStr(path, "/"))
+            path = Right(path, Len(path) - InStr(path, "/"))
+        End If
     End If
     getOriginPathFromOverlayPath = path
 End Function
@@ -211,23 +211,23 @@ End Function
 Function replaceProjectInfoStr(path)
     If InStr(path, "[vnd]") > 0 Then
         If mBuild.Infos.is8781() Then
-		    path = Replace(path, "[vnd]", "vext")
+            path = Replace(path, "[vnd]", "vext")
         Else
-		    path = Replace(path, "[vnd]", "vnd")
+            path = Replace(path, "[vnd]", "vnd")
         End If
-	End If
+    End If
 
-	If InStr(path, "[product]") > 0 Then
-		path = Replace(path, "[product]", mBuild.Product)
-	End If
+    If InStr(path, "[product]") > 0 Then
+        path = Replace(path, "[product]", mBuild.Product)
+    End If
 
-	If InStr(path, "[project]") > 0 Then
-		path = Replace(path, "[project]", mBuild.Project)
-	End If
+    If InStr(path, "[project]") > 0 Then
+        path = Replace(path, "[project]", mBuild.Project)
+    End If
 
     If InStr(path, "[boot_logo]") > 0 Then
-		path = Replace(path, "[boot_logo]", mBuild.Infos.getBootLogo())
-	End If
+        path = Replace(path, "[boot_logo]", mBuild.Infos.getBootLogo())
+    End If
 
-	replaceProjectInfoStr = path
+    replaceProjectInfoStr = path
 End Function

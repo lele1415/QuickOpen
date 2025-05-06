@@ -133,7 +133,7 @@ Sub setOpenPath(path)
 End Sub
 
 Function getOpenButtonListPath(where)
-	getOpenButtonListPath = mOverlayPathDict.Item(where)
+    getOpenButtonListPath = mOverlayPathDict.Item(where)
 End Function
 
 Sub onInputListClick(divId, str)
@@ -155,36 +155,36 @@ Function changeListFocus(keyCode)
 End Function
 
 Sub onOpenButtonClick()
-	If mCmdInput.text <> "" Then
-	    Dim cmd : cmd = mCmdInput.text
-	    Call handleCmdInput()
-		If mCmdInput.text = "" Then Call saveHistoryCmd(cmd)
-		Exit Sub
-	End If
-	Call removeOpenButtonList()
-	Call makeOpenButton()
-	If mOpenButtonList.VaArray.Bound = -1 Then
-		Call runPath(getOpenPath())
-	Else
-	    Call mOpenButtonList.toggleButtonList()
-	End If
+    If mCmdInput.text <> "" Then
+        Dim cmd : cmd = mCmdInput.text
+        Call handleCmdInput()
+        If mCmdInput.text = "" Then Call saveHistoryCmd(cmd)
+        Exit Sub
+    End If
+    Call removeOpenButtonList()
+    Call makeOpenButton()
+    If mOpenButtonList.VaArray.Bound = -1 Then
+        Call runPath(getOpenPath())
+    Else
+        Call mOpenButtonList.toggleButtonList()
+    End If
 End Sub
 
 Sub removeOpenButtonList()
     Call mOverlayPathDict.RemoveAll()
-	Call mOpenButtonList.removeList()
+    Call mOpenButtonList.removeList()
 End Sub
 
 Sub makeOpenButton()
-	Dim inputPath
-	inputPath = getOpenPath()
-	If Trim(inputPath) = "" Or _
-	        InStr(inputPath, ":\") > 0 Or _
-	        InStr(inputPath, "\\") = 1 Or _
-	        InStr(inputPath, "weibu/") = 1 Or _
-	        InStr(inputPath, "out/") = 1 Then
-		Exit Sub
-	End If
+    Dim inputPath
+    inputPath = getOpenPath()
+    If Trim(inputPath) = "" Or _
+            InStr(inputPath, ":\") > 0 Or _
+            InStr(inputPath, "\\") = 1 Or _
+            InStr(inputPath, "weibu/") = 1 Or _
+            InStr(inputPath, "out/") = 1 Then
+        Exit Sub
+    End If
 
     Call findOverlayPath()
 
@@ -196,8 +196,8 @@ Sub makeOpenButton()
 End Sub
 
 Sub findOverlayPath()
-	Dim inputPath, isFile, projectName, newName, wholePath, configFilePath
-	inputPath = getOpenPath()
+    Dim inputPath, isFile, projectName, newName, wholePath, configFilePath
+    inputPath = getOpenPath()
     If isFileExists(inputPath) Then
         isFile = True
     ElseIf isFolderExists(inputPath) Then
@@ -206,40 +206,40 @@ Sub findOverlayPath()
         Exit Sub
     End If
 
-	projectName = mBuild.Project
-	wholePath = mBuild.Infos.getOverlayPath(inputPath)
-	If isFile Then configFilePath = mBuild.Infos.ProjectPath & "/config/" & getFileNameFromPath(inputPath)
+    projectName = mBuild.Project
+    wholePath = mBuild.Infos.getOverlayPath(inputPath)
+    If isFile Then configFilePath = mBuild.Infos.ProjectPath & "/config/" & getFileNameFromPath(inputPath)
 
     Do
-		If isFile And (Not isFileExists(wholePath)) Then
-			If isFileExists(configFilePath) Then
-				wholePath = configFilePath
-			End If
-		End If
+        If isFile And (Not isFileExists(wholePath)) Then
+            If isFileExists(configFilePath) Then
+                wholePath = configFilePath
+            End If
+        End If
 
-		If isFile Then
-		    If isFileExists(wholePath) Then
-				Call mOverlayPathDict.Add(projectName, wholePath)
-				Call mOpenButtonList.VaArray.append(projectName)
-			ElseIf isFileExists(configFilePath) Then
-			    Call mOverlayPathDict.Add(projectName, configFilePath)
-				Call mOpenButtonList.VaArray.append(projectName)
-			End If
-			    
-		ElseIf isFolderExists(wholePath) Then
-			Call mOverlayPathDict.Add(projectName, wholePath)
-			Call mOpenButtonList.VaArray.append(projectName)
-		End If
+        If isFile Then
+            If isFileExists(wholePath) Then
+                Call mOverlayPathDict.Add(projectName, wholePath)
+                Call mOpenButtonList.VaArray.append(projectName)
+            ElseIf isFileExists(configFilePath) Then
+                Call mOverlayPathDict.Add(projectName, configFilePath)
+                Call mOpenButtonList.VaArray.append(projectName)
+            End If
+                
+        ElseIf isFolderExists(wholePath) Then
+            Call mOverlayPathDict.Add(projectName, wholePath)
+            Call mOpenButtonList.VaArray.append(projectName)
+        End If
 
-		If InStr(projectName, "-") > 0 Then
-		    newName = Left(projectName, InStrRev(projectName, "-") - 1)
-			wholePath = Replace(wholePath, projectName, newName)
-			If isFile Then configFilePath = Replace(configFilePath, projectName, newName)
-			projectName = newName
-		Else
-		    Exit Do
-		End If
-	Loop
+        If InStr(projectName, "-") > 0 Then
+            newName = Left(projectName, InStrRev(projectName, "-") - 1)
+            wholePath = Replace(wholePath, projectName, newName)
+            If isFile Then configFilePath = Replace(configFilePath, projectName, newName)
+            projectName = newName
+        Else
+            Exit Do
+        End If
+    Loop
 End Sub
 
 Sub onOpenPathChange()
@@ -247,13 +247,13 @@ Sub onOpenPathChange()
 End Sub
 
 Sub replaceOpenPath()
-	Dim path : path = getOpenPath()
-	If InStr(path, ":\") > 0 Or InStr(path, "\\192.168") > 0 Then Exit Sub
+    Dim path : path = getOpenPath()
+    If InStr(path, ":\") > 0 Or InStr(path, "\\192.168") > 0 Then Exit Sub
 
     path = replaceProjectInfoStr(path)
-	Call setOpenPath(relpaceSlashInPath(path))
+    Call setOpenPath(relpaceSlashInPath(path))
 
-	'Call cutSdkPath()
+    'Call cutSdkPath()
 End Sub
 
 Const KEYCODE_ENTER = 13

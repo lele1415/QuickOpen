@@ -158,7 +158,7 @@ Sub loadLastTask()
     taskNum = getLastTaskNum()
     If isTaskNum(taskNum) Then
         mLastTaskNum = taskNum
-		Call loadTaskWithNum(taskNum)
+        Call loadTaskWithNum(taskNum)
     End If
 End Sub
 
@@ -201,14 +201,14 @@ End Sub
 Dim mTmpTask
 Function getTmpTaskWithNum(taskNum)
     If Not isTaskNum(taskNum) Then getTmpTaskWithNum = False : Exit Function
-	If taskNum = mTask.Infos.TaskNum Then
-	    Set mTmpTask = mTask
+    If taskNum = mTask.Infos.TaskNum Then
+        Set mTmpTask = mTask
         getTmpTaskWithNum = True
         Exit Function
     End If
 
-	Dim task, i, result
-	result = False
+    Dim task, i, result
+    result = False
     For i = mTaskList.Bound To 0 Step -1
         Set task = mTaskList.v(i)
         If task.Infos.TaskNum = taskNum Then
