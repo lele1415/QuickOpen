@@ -345,6 +345,9 @@ Function handleProjectCmd()
 	ElseIf mCmdInput.text = "upwi" Then
 	    Call updateWorkInfoTxt()
 		Exit Function
+	ElseIf mCmdInput.text = "uptl" Then
+	    Call updateTaskListTxt()
+		Exit Function
 	ElseIf InStr(mCmdInput.text, "show-") = 1 Then
 	    Call showWorkInfo(Replace(mCmdInput.text, "show-", ""))
 		Exit Function

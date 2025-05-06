@@ -220,6 +220,32 @@ Sub updateWorkInfoTxt()
     Set oTxt = Nothing
 End Sub
 
+Sub updateTaskListTxt()
+    initTxtFile(oWs.CurrentDirectory & "\res\tasklist.ini")
+    Dim oTxt, i, obj, customName, sp
+    Set oTxt = oFso.OpenTextFile(oWs.CurrentDirectory & "\res\tasklist.ini", FOR_APPENDING, False, True)
+	sp = " | "
+
+    For i = vaWorksInfo.Bound To 0 Step -1
+        Set obj = vaWorksInfo.V(i)
+		customName = Replace(obj.Firmware, "\\192.168.0.248\安卓固件文件\", "")
+		customName = Replace(customName, "\\192.168.0.248\安卓固件文件1\", "")
+		customName = Replace(customName, "\00" & obj.TaskNum, "")
+		customName = Replace(customName, "\0" & obj.TaskNum, "")
+		customName = Replace(customName, "\" & obj.TaskNum, "")
+		If InStr(obj.Sdk, "_t0") > 0  Then
+			oTxt.WriteLine(obj.TaskNum & sp & Split(obj.Work, " ")(0) & sp & customName & sp & obj.Sdk & sp & obj.Product & sp & obj.Project &_
+					sp & obj.SysSdk & sp & obj.SysTarget & sp & obj.SysProject)
+		Else
+		    oTxt.WriteLine(obj.TaskNum & sp & Split(obj.Work, " ")(0) & sp & customName & sp & obj.Sdk & sp & obj.Product & sp & obj.DriverProject &_
+					sp & obj.Sdk & sp & obj.Product & sp & obj.Project)
+		End if
+    Next
+
+    oTxt.Close
+    Set oTxt = Nothing
+End Sub
+
 Sub updateNewShortcutBtn()
 	Set obj = vaWorksInfo.V(vaWorksInfo.Bound)
 	Call addShortcutButton(obj.Work, obj.Sdk, obj.Product, obj.Project, obj.Firmware, obj.Requirements, obj.Zentao, ID_DIV_SHORTCUT)
