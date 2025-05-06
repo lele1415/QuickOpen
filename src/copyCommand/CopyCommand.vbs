@@ -240,9 +240,9 @@ End Function
 
 Sub getT0SysLunchCommand(buildType)
     If isV0SysSdk() THen
-        commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-next-" & buildType & " " & mIp.Infos.Project
+        commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-next-" & buildType & " " & mIp.Infos.SysProject
     Else
-        commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-" & buildType & " " & mIp.Infos.Project
+        commandFinal = "source build/envsetup.sh && lunch sys_" & mIp.Infos.SysTarget & "-" & buildType & " " & mIp.Infos.SysProject
     End If
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
