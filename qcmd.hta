@@ -1,0 +1,91 @@
+<!--
+Version: 5.0
+-->
+
+<Html>
+<Head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<Title>Quick Open v5.0</Title>
+
+<style type="text/css">
+
+<!-- 
+body { font-family: sans-serif; color:#f8f8f2;}
+
+.Menu_sdkPath { position:relative; width:400px; height:50px; z-index:1; margin-top:0px; display:none; }
+
+.Menu_project { position:relative; width:155px; height:50px; z-index:1; margin-top:0px; display:none; }
+
+.Menu_option { position:relative; width:400px; height:50px; z-index:1; margin-top:0px; display:none; }
+
+.Menu2 { position: absolute; left:0; top:0; width:100%; height:auto; overflow:hidden; z-index:1; } 
+
+.Menu2 ul{ margin:0; padding:0; } 
+
+.Menu2 ul li{ width:100%; height:25px; line-height:25px; text-indent:5px;  border-bottom:1px solid #ccc; cursor:pointer; 
+    change:expression( 
+        this.onmouseover=function(){ 
+            this.style.background="#66d9ef"; 
+        }, 
+        this.onmouseout=function(){ 
+            this.style.background=""; 
+        },
+        this.onfocus=function(){ 
+            this.style.background="#66d9ef"; 
+        },
+        this.onblur=function(){ 
+            this.style.background=""; 
+        }
+    ) 
+}
+
+.form_sdk_path { width:335px; height:auto; }
+.form_sdk_path div{ position:relative; top:0; left:0; margin-bottom:5px; }
+
+.form_product { width:155px; height:auto; }
+.form_product div{ position:relative; top:0; left:0; margin-bottom:5px; }
+
+.form_project { width:95px; height:auto; }
+.form_project div{ position:relative; top:0; left:0; margin-bottom:5px; }
+
+.input_text{border:1px solid #aaa;}
+.input_button{border:1px solid #aaa; background:none; color:#f8f8f2;font-size:14}
+
+.textarea_text{font-family: "微软雅黑"; font-size: 12px; word-break:break-all;}
+
+.cmd_text{border:1px solid #aaa; background:none; color:#f8f8f2;font-family: "微软雅黑"; font-size: 12px; word-break:break-all;}
+
+-->
+</style>
+
+</Head>
+
+<HTA:APPLICATION 
+    SysMenu="no"
+>
+
+<Body bgcolor="#272822">
+
+<input class="cmd_text" type="text" id="input_cmd" size="30">
+<div class="form_product" id="parent_file_button" style="display:none"></div>
+<div class="form_product" id="parent_find_project_button" style="display:none"></div>
+<div class="form_product" id="parent_open_button" style="display:none"></div>
+<div class="form_sdk_path" id="parent_open_path" style="display:none"></div>
+<textarea id="input_open_path" class="cmd_text" onchange="onOpenPathChange()" rows="4" cols="60"></textarea>
+
+<Script Language="JavaScript" src="src\cmd\CoreFun.js"></Script>
+<Script Language="JavaScript" src="src\cmd\InputList.js"></Script>
+
+<Script Language="VBScript" src="src\cmd\CoreWscript.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\CoreClass.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\CoreElement.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\CoreFile.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\CoreString.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\ProjectClass.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\ProjectController.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\ReadConfigPath.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\Main.vbs"></Script>
+<Script Language="VBScript" src="src\cmd\CmdManager.vbs"></Script>
+
+</Body>
+</Html>
