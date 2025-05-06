@@ -1,3 +1,63 @@
+2025-05-06
+    Replace Tab to Space
+    ProjectController: add function of saveLastTaskNum
+    ProjectController: fix bug in getTmpTaskWithNum
+    Add qcmd.hta and new src code
+    Update test.vbs
+    Add function to create tasklist.ini
+    Update V0 functions
+    Update project.ini
+    CopyCommand: fix getT0SysLunchCommand
+
+2025-04-17
+    Check build type of out and lunch item before make
+    Fix bug of V0 sdk functions
+
+2025-04-11
+    Auto find drive path when apply project
+    Fix for function of move out folders
+
+2025-04-08
+    Do not set elements in cmd mode
+    Add build id of V0 sdk
+
+2025-04-03
+    Split CoreFun to CoreElement, CoreFile, CoreProject, CoreString and CoreWscript
+    update last task number to last_task.ini
+    Add functions of findProjectPathWithTaskNum and getProjectPathWithTaskNum
+    Update DeviceInfoHW to v5.20.1
+
+2025-04-01
+    Modify function of lunch command, and others for V0 sdk
+
+2025-03-14
+    update for V0 sdk
+
+2025-03-12
+    modify until 2025-02-17
+
+2024-11-15
+    modify Firmware path and save with UTF-8
+    Add get display id and textview path cmds
+    Add split build cmds
+    Add lunch cmds of vnd
+    Add qmake cmds, modify other cmds
+    mvOut: use Work name as out folder name
+
+2024-10-21
+    Add cmd of install apk
+    Don't call cutSdkPath() when OpenPath changed
+    Add new cmd:lg-as, getrl, df
+    Fix bug of save new project infos
+
+2024-09-06
+    Fix bug of modify product names
+    Update gms commit info, Update FactoryTest commit info, Show gms prop with adb shell command
+    Add cmd text history
+    Add work infos from project path
+    update U0 file path
+    update project.ini
+
 2024-07-01
     CopyCommand: fix lunch command of Android 11
     CopyCommand: add diff info for modDisplayIdForOtaTest
