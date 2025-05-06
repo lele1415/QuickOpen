@@ -7,6 +7,7 @@ Dim mDrive : mDrive = DRIVE_WORK_1
 Dim mBuild : Set mBuild = New BaseBuild
 Dim mTask : Set mTask = New TaskBuild
 Dim mTaskList : Set mTaskList = New VariableArray
+Dim mLastTaskNum
 
 Sub updateCurrentTaskTitle()
     Dim buildType
@@ -61,6 +62,10 @@ Sub setCurrentTask(task)
     Set mTask = task
     Call setCurrentBuild(mTask.Sys)
     Call findDrive()
+    If mTask.Infos.TaskNum <> mLastTaskNum Then
+        Call saveLastTaskNum()
+        mLastTaskNum = mTask.Infos.TaskNum
+    End If
 End Sub
 
 Sub setVndBuild()
@@ -139,10 +144,20 @@ Function getLastTaskNum()
     getLastTaskNum = sReadLine
 End Function
 
+Sub saveLastTaskNum()
+    Call initTxtFile(PATH_LAST_TASK)
+    Dim oTxt
+    Set oTxt = oFso.OpenTextFile(PATH_LAST_TASK, FOR_APPENDING, False, True)
+    oTxt.WriteLine(mTask.Infos.TaskNum)
+    oTxt.Close
+    Set oTxt = Nothing
+End Sub
+
 Sub loadLastTask()
     Dim task, taskNum
     taskNum = getLastTaskNum()
     If isTaskNum(taskNum) Then
+        mLastTaskNum = taskNum
 		Call loadTaskWithNum(taskNum)
     End If
 End Sub
