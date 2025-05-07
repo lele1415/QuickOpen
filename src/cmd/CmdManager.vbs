@@ -169,12 +169,12 @@ Function handleProp()
     If mCmdInput.text = "sample" Then Call setOpenPath("persist.sys.sample.device.name") : Exit Function
     If mCmdInput.text = "locale" Then Call setOpenPath("ro.product.locale" & VbLf & "persist.sys.locale") : Exit Function
     If mCmdInput.text = "timezone" Then Call setOpenPath("persist.sys.timezone") : Exit Function
-    If mCmdInput.text = "vol" Then Call setOpenPath("ro.config.media_vol_default" & VbLf &_
-                                                                "ro.config.alarm_vol_default" & VbLf &_
-                                                                "ro.config.ring_vol_default" & VbLf &_
-                                                                "ro.config.system_vol_default" & VbLf &_
-                                                                "ro.config.notification_vol_default" & VbLf &_
-                                                                "ro.config.vc_call_vol_default") : Exit Function
+    If mCmdInput.text = "vol" Then Call setOpenPath("ro.config.media_vol_default=15" & VbLf &_
+                                                                "ro.config.alarm_vol_default=15" & VbLf &_
+                                                                "ro.config.ring_vol_default=15" & VbLf &_
+                                                                "ro.config.system_vol_default=15" & VbLf &_
+                                                                "ro.config.notification_vol_default=15" & VbLf &_
+                                                                "ro.config.vc_call_vol_default=7") : Exit Function
     If mCmdInput.text = "sku" Then Call setOpenPath("ro.boot.hardware.sku") : Exit Function
     If mCmdInput.text = "hardware" Then Call setOpenPath("ro.boot.hardware.revision") : Exit Function
     If mCmdInput.text = "date" Then Call setOpenPath("$(date +%Y%m%d)") : Exit Function
@@ -343,6 +343,10 @@ Function handleProjectCmd()
         Exit Function
     ElseIf mCmdInput.text = "save" Then
         Call handleForWorksInfo(Replace(getOpenPath(), VbLf, " | "))
+        Call updateTaskList()
+        Exit Function
+    ElseIf mCmdInput.text = "tl" Then
+        Call updateTaskList()
         Exit Function
     End If
     handleProjectCmd = False
@@ -443,6 +447,13 @@ Function getMultiMkdirStr(arr, what)
     Next
     getMultiMkdirStr = str
 End Function
+
+Sub cpFileAndSetValue(whatArr)
+    Dim cmdStr
+    cmdStr = getCmdStrForCpFileAndSetValue(whatArr)
+    If cmdStr = "" Then Exit Sub
+    Call copyStrAndPasteInXshell(cmdStr)
+End Sub
 
 Function getCmdStrForCpFileAndSetValue(whatArr)
     Dim filePath, folderPath, keyStr, startStr, searchStr, valueStr, cmdStr
@@ -599,7 +610,7 @@ End Function
 Sub mkdirLogo()
     Call setVndBuild()
     Dim lg_fd, lg_u, lg_k, boot_logo
-    lg_fd = mBuild.Infos.LogoPath
+    lg_fd = mBuild.Infos.LogoPath & "/"
     boot_logo = mBuild.Infos.BootLogo
     lg_u = lg_fd & boot_logo & "_uboot.bmp"
     lg_k = lg_fd & boot_logo & "_kernel.bmp"
@@ -913,7 +924,7 @@ Function getLunchCommandInSplitBuild(buildType, task)
         lunchStr = getLunchStrFromWSavedWork(buildType, task)
         If lunchStr = "" Then getLunchCommandInSplitBuild = "" : Exit Function
         commandStr = "sed -i 's/^.*$/" & lunchStr & "/' lunch_item"
-        If InStr(task.Product, "tb8781") Then commandStr = commandStr & "_v2"
+        If InStr(task.Vnd.Product, "tb8781") Then commandStr = commandStr & "_v2"
     Else
         lunchStr = getLunchStrFromWSavedWork(buildType, task)
         If lunchStr = "" Then getLunchCommandInSplitBuild = "" : Exit Function
@@ -930,8 +941,8 @@ Sub getLunchCommand(buildType, taskNum)
     If mTmpTask.Sys.Infos.Version > 12 Or mTmpTask.Sys.Infos.is8168() Then
         commandFinal = getLunchCommandInSplitBuild(buildType, mTmpTask)
     Else
-        comboName = "full_" & mBuild.Infos.Product & "-" & buildType
-        commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mBuild.Infos.Project
+        comboName = "full_" & mBuild.Product & "-" & buildType
+        commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mBuild.Project
     End If
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
@@ -984,6 +995,27 @@ Function getCustomModemSedStr()
     End If
 End Function
 
+Function checkBuildType()
+    If Not isFolderExists(mBuild.Infos.Out) Then checkBuildType = True : Exit Function
+    Dim outBuildType, lunchItemPath, lunchStr
+    Call setSysBuild()
+    outBuildType = mBuild.Infos.getOutProp("ro.build.type")
+    If mBuild.Infos.is8781() Then
+        lunchItemPath = "../lunch_item_v2"
+    ElseIf mBuild.Infos.isV0() Then
+        lunchItemPath = "lunch_item"
+    Else
+        lunchItemPath = "../lunch_item"
+    End If
+    lunchStr = readLineOfTextFile(1, lunchItemPath)
+    If InStr(lunchStr, outBuildType & " ") Then
+        checkBuildType = True
+    Else
+        checkBuildType = False
+        MsgBox("Wrong build type!" & VbLf & "out=" & outBuildType & VbLf & "lunch_item=" & lunchStr)
+    End If
+End Function
+
 Function getSplitBuildCommand(opts)
     If Not checkBuildType() Then getSplitBuildCommand = "" : Exit Function
     Dim buildsh, params, commandStr
@@ -1009,7 +1041,7 @@ Function getSplitBuildCommand(opts)
             End If
         End If
         If InStr(opts, "k") Then params = params & " krn"
-        If mBuild.Infos.is8781() And InStr(opts, "h") Then params = params & " hal"
+        If mBuild.Infos.is8781() And isInStr(opts, "h") Then params = params & " hal"
         If InStr(opts, "s") Then params = params & " sys"
         If InStr(opts, "m") Then params = params & " m"
         If InStr(opts, "p") Then params = params & " p"
@@ -1017,7 +1049,7 @@ Function getSplitBuildCommand(opts)
 
     commandStr = buildsh & params
 
-    if mTask.Vnd.Sdk <> mTask.Sys.Sdk And InStr(params, " p") And InStr(params, " vnd") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
+    if mTask.Vnd.Sdk <> mTask.Sys.Sdk And InStr(params, " p") > 0 And InStr(params, " vnd") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
         Call setVndBuild()
         commandStr = getCustomModemSedStr() & commandStr
     End If
@@ -1074,7 +1106,7 @@ Sub MkdirWeibuFolderPath()
     Dim overlayFilePath
     Dim overlayFolderPath
     Dim mkdirCmd, cpCmd
-    commandFinal = ""
+    Dim commandFinal
 
     folderPath = getParentPath(filePath)
     overlayFilePath = mBuild.Infos.getOverlayPath(filePath)
@@ -1097,7 +1129,7 @@ Sub MkdirWeibuFolderPath()
     commandFinal = mkdirCmd & cpCmd
 
     commandFinal = relpaceSlashInPath(commandFinal)
-    Call setOpenPath(mBuild.Infos.ProjectPath & "/" & filePath) 
+    Call setOpenPath(mBuild.Infos.getOverlayPath(filePath))
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
@@ -1696,7 +1728,7 @@ Sub getProjectInfosFromOpenPath()
             Split(Split(inputArray(0), "/weibu/")(1), "/")(0) & VbLf &_
             Split(Split(inputArray(0), "/weibu/")(1), "/")(1) & VbLf &_
             relpaceBackSlashInPath(Split(inputArray(1), "/weibu/")(0)) & VbLf &_
-            Split(Split(inputArray(0), "/weibu/")(1), "/")(0) & VbLf &_
-            Split(Split(inputArray(0), "/weibu/")(1), "/")(1)
+            Split(Split(inputArray(1), "/weibu/")(1), "/")(0) & VbLf &_
+            Split(Split(inputArray(1), "/weibu/")(1), "/")(1)
     Call setOpenPath(Infos)
 End Sub

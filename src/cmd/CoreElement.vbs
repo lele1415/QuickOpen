@@ -256,6 +256,13 @@ Sub replaceOpenPath()
     'Call cutSdkPath()
 End Sub
 
+Sub pasteAndOpenPath()
+    Call setElementValue(ID_INPUT_OPEN_PATH, "")
+    Call focusElement(ID_INPUT_OPEN_PATH)
+    oWs.SendKeys "^v"
+    oWs.SendKeys "{ENTER}"
+End Sub
+
 Const KEYCODE_ENTER = 13
 Const KEYCODE_SPACE = 32
 Const KEYCODE_TAB = 9

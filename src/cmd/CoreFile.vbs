@@ -243,12 +243,13 @@ Sub saveHistoryPath(path)
     Call vaPathHistory.append(path)
 End Sub
 
+Dim mCurrentHistoryPath
 Sub showHistoryPath(keyCode)
     If vaPathHistory.Bound = -1 Then Exit Sub
 
     Dim index
     index = vaPathHistory.getIndexIfExist(getOriginPathFromOverlayPath(getOpenPath()))
-    If index = -1 Then mCurrentPath = getOpenPath()
+    If index = -1 Then mCurrentHistoryPath = getOpenPath()
 
     If keyCode = KEYCODE_UP Then
         If index > 0 Then
@@ -260,7 +261,7 @@ Sub showHistoryPath(keyCode)
         If index > -1 And index < vaPathHistory.Bound Then
             Call setOpenPath(vaPathHistory.V(index + 1))
         ElseIf index = vaPathHistory.Bound Then
-            Call setOpenPath(mCurrentPath)
+            Call setOpenPath(mCurrentHistoryPath)
         End If
     End If
 End Sub
@@ -279,7 +280,7 @@ Sub showHistoryCmd(keyCode)
 
     Dim index
     index = vaCmdHistory.getIndexIfExist(getCmdText())
-    If index = -1 Then mCurrentPath = getCmdText()
+    If index = -1 Then mCurrentHistoryPath = getCmdText()
 
     If keyCode = KEYCODE_UP Then
         If index > 0 Then
@@ -291,7 +292,7 @@ Sub showHistoryCmd(keyCode)
         If index > -1 And index < vaCmdHistory.Bound Then
             Call setCmdText(vaCmdHistory.V(index + 1))
         ElseIf index = vaCmdHistory.Bound Then
-            Call setCmdText(mCurrentPath)
+            Call setCmdText(mCurrentHistoryPath)
         End If
     End If
 End Sub
@@ -299,11 +300,11 @@ End Sub
 Function getParentProject()
     Dim vaParents, project, index, folderPath
     Set vaParents = New VariableArray
-    project = mBuild.Infos.Project
+    project = mBuild.Project
     index = InStrRev(project, "-")
     Do While index > 0
         project = Left(project, index - 1)
-        folderPath = "weibu/" & mBuild.Infos.Product & "/" & project
+        folderPath = "weibu/" & mBuild.Product & "/" & project
         If isFolderExists(folderPath) Then
             vaParents.Append(folderPath)
         End If
@@ -313,6 +314,7 @@ Function getParentProject()
 End Function
 
 Function getMultiOverlayPath(filePath)
+    Dim configFile
     If mBuild.Infos.hasConfig() Then
         configFile = mBuild.Infos.ProjectPath & "/config/" & getFileNameFromPath(filePath)
         If isFileExists(configFile) Then
@@ -323,7 +325,7 @@ Function getMultiOverlayPath(filePath)
 
     Dim overlayPath
     overlayPath = filePath
-    If isFileExists(filePath) And InStr(mBuild.Infos.Project, "-") > 0 Then
+    If isFileExists(filePath) And InStr(mBuild.Project, "-") > 0 Then
         Dim vaParents, i
         Set vaParents = getParentProject()
         If vaParents.Bound > -1 Then

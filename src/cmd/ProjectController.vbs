@@ -35,7 +35,7 @@ Sub findDrive()
     sdkP = getParentPath(mBuild.Sdk)
     userOut = mTask.Infos.TaskName & "_user"
     debugOut = mTask.Infos.TaskName & "_debug"
-    If isFolderExists(mBuild.Infos.Out) And InStr(mBuild.Infos.getOutProp("ro.build.display.inner.id"), Replace(mTask.Vnd.Project, "_", ".")) Then
+    If isFolderExists(mBuild.Infos.Out) And isInStr(mBuild.Infos.getOutProp("ro.build.display.inner.id"), Replace(mTask.Vnd.Project, "_", ".")) Then
         Exit Sub
     Else
         If mDrive = DRIVE_WORK_1 Then
@@ -43,13 +43,26 @@ Sub findDrive()
         Else
             Call setCurrentDrive("x1")
         End If
-        If isFolderExists(mBuild.Infos.Out) And InStr(mBuild.Infos.getOutProp("ro.build.display.inner.id"), Replace(mTask.Vnd.Project, "_", ".")) Then Exit Sub
+        If isFolderExists(mBuild.Infos.Out) And isInStr(mBuild.Infos.getOutProp("ro.build.display.inner.id"), Replace(mTask.Vnd.Project, "_", ".")) Then Exit Sub
     End If
 
     If oFso.FolderExists(DRIVE_WORK_1 & sdkP & "\OUT\" & userOut) Or oFso.FolderExists(DRIVE_WORK_1 & sdkP & "\OUT\" & debugOut) Then
         Call setCurrentDrive("x1")
+        Exit Sub
     ElseIf oFso.FolderExists(DRIVE_WORK_2 & sdkP & "\OUT\" & userOut) Or oFso.FolderExists(DRIVE_WORK_2 & sdkP & "\OUT\" & debugOut) Then
         Call setCurrentDrive("x2")
+        Exit Sub
+    End If
+
+    If isFolderExists(mBuild.Infos.ProjectPath) Then
+        Exit Sub
+    Else
+        If mDrive = DRIVE_WORK_1 Then
+            Call setCurrentDrive("x2")
+        Else
+            Call setCurrentDrive("x1")
+        End If
+        If isFolderExists(mBuild.Infos.ProjectPath) Then Exit Sub
     End If
 End Sub
 
@@ -98,14 +111,14 @@ End Sub
 Sub handleForWorksInfo(sReadLine)
     Dim arr, taskInfos, vndBuild, sysBuild, taskBuild
     arr = Split(sReadLine, " | ")
-    If UBound(arr) < 8 Or Not isTaskNum(arr(0)) Then MsgBox("Invalid task infos!" & VbLf & sReadLine) : Exit Sub
+    If UBound(arr) < 8 Or Not isTaskNum(trimStr(arr(0))) Then MsgBox("Invalid task infos!" & VbLf & sReadLine) : Exit Sub
 
     'taskNum, taskName, customName
-    Set taskInfos = (New TaskInfos)(arr(0), arr(1), arr(2))
+    Set taskInfos = (New TaskInfos)(trimStr(arr(0)), trimStr(arr(1)), trimStr(arr(2)))
     'type, sdk, product, project
-    Set vndBuild = (New BaseBuild)("vnd", arr(3), arr(4), arr(5))
+    Set vndBuild = (New BaseBuild)("vnd", trimStr(arr(3)), trimStr(arr(4)), trimStr(arr(5)))
     'type, sdk, product, project
-    Set sysBuild = (New BaseBuild)("sys", arr(6), arr(7), arr(8))
+    Set sysBuild = (New BaseBuild)("sys", trimStr(arr(6)), trimStr(arr(7)), trimStr(arr(8)))
 
     Set taskBuild = (New TaskBuild)(taskInfos, vndBuild, sysBuild)
 
@@ -162,11 +175,6 @@ Sub loadLastTask()
     End If
 End Sub
 
-Sub addNewTask(task)
-    Call mTaskList.append(task)
-    Call updateTaskList()
-End Sub
-
 Sub removeTask(taskNum)
     Dim i, task, seq
     seq = -1
@@ -189,7 +197,7 @@ Sub updateTaskList()
     Set oTxt = oFso.OpenTextFile(PATH_TASK_LIST, FOR_APPENDING, False, True)
     sp = " | "
 
-    For i = mTaskList.Bound To 0 Step -1
+    For i = 0 To mTaskList.Bound
         Set task = mTaskList.v(i)
         oTxt.WriteLine(task.Infos.toString(sp) & sp & task.Vnd.toString(sp) & sp & task.Sys.toString(sp))
     Next

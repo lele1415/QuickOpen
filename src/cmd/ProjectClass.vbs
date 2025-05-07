@@ -3,15 +3,15 @@ Option Explicit
 Class BuildInfos
     Private mVos, mSdk, mProduct, mProject, mVersion, mPath
 
-    Public Function isV0() : isV0 = InStr(mSdk, "/v_sys") : End Function
-    Public Function isU0() : isU0 = InStr(mSdk, "/u_sys") : End Function
-    Public Function isT0() : isT0 = InStr(mSdk, "/sys") : End Function
-    Public Function isS0() : isS0 = InStr(mSdk, "/vnd") : End Function
-    Public Function isR0() : isR0 = InStr(mSdk, "_r/") : End Function
-    Public Function isSdkT0() : isSdkT0 = InStr(mSdk, "_t0") : End Function
-    Public Function isVnd() : isVnd = InStr(mVos, "vnd") : End Function
-    Public Function isSys() : isSys = InStr(mVos, "sys") : End Function
-    Public Function is8168() : is8168 = InStr(mSdk, "8168") : End Function
+    Public Function isV0() : isV0 = isInStr(mSdk, "/v_sys") : End Function
+    Public Function isU0() : isU0 = isInStr(mSdk, "/u_sys") : End Function
+    Public Function isT0() : isT0 = isInStr(mSdk, "/sys") : End Function
+    Public Function isS0() : isS0 = isInStr(mSdk, "/vnd") : End Function
+    Public Function isR0() : isR0 = isInStr(mSdk, "_r/") : End Function
+    Public Function isSdkT0() : isSdkT0 = isInStr(mSdk, "_t0") : End Function
+    Public Function isVnd() : isVnd = isInStr(mVos, "vnd") : End Function
+    Public Function isSys() : isSys = isInStr(mVos, "sys") : End Function
+    Public Function is8168() : is8168 = isInStr(mSdk, "8168") : End Function
     Public Function is8781()
         If isVnd() Then
             is8781 = isEq(mProduct, "tb8781p1_64")
@@ -52,7 +52,7 @@ Class BuildInfos
                 ProductFile = "device/mediateksample/" & mProduct & "/vnd_" & mProduct & ".mk"
             End If
         Else
-            ProductFile = "device/mediateksample/" & mProduct & "/sys_" & mProduct & ".mk"
+            ProductFile = "device/mediatek/system/" & mProduct & "/sys_" & mProduct & ".mk"
         End If
     End Property
 
@@ -65,7 +65,7 @@ Class BuildInfos
     End Property
 
     Public Property Get Out
-        If isV0() Or is8781() Then
+        If isSys() And (isV0() Or is8781()) Then
             Out = "out_sys"
         Else
             Out = "out"
@@ -103,7 +103,26 @@ Class BuildInfos
         End If
     End Property
 
-    Public Property Get BootLogo : BootLogo = readTextAndGetValue("BOOT_LOGO", ProjectConfigMk) : End Property
+    Public Property Get BootLogo
+        Dim logo, csciPath
+        logo = readTextAndGetValue("BOOT_LOGO", ProjectConfigMk)
+        csciPath = ProjectPath & "/config/csci.ini"
+        If isFileExists(csciPath) Then
+            Dim oText, sReadLine
+            Set oText = oFso.OpenTextFile(checkDriveSdkPath(csciPath), FOR_READING)
+            Do Until oText.AtEndOfStream
+                sReadLine = oText.ReadLine
+                If InStr(sReadLine, "ro.vendor.fake.orientation") > 0 And InStr(sReadLine, " 1 ") > 0 Then
+                    logo = logo & "nl"
+                    Exit Do
+                End If
+            Loop
+            oText.Close
+            Set oText = Nothing
+        End If
+        BootLogo = logo
+    End Property
+
     Public Property Get LogoPath
         If is8781() Then
             LogoPath = "vendor/mediatek/proprietary/external/BootLogo/logo/" & BootLogo
@@ -133,10 +152,10 @@ Class BuildInfos
     End Function
 
     Public Function getOverlayPath(path)
-        If hasAlps() Then
-            getOverlayPath = ProjectPath & "/alps/" & path
-        Else
+        If mVersion < 12 And Not is8168() Then
             getOverlayPath = ProjectPath & "/" & path
+        Else
+            getOverlayPath = ProjectPath & "/alps/" & path
         End if
     End Function
 
