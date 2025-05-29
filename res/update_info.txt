@@ -1,3 +1,9 @@
+2025-05-29
+    Add modSettingProviderDefault and setCommonTask functions, fix bugs
+
+2025-05-07
+    Fix running errors
+
 2025-05-06
     Replace Tab to Space
     ProjectController: add function of saveLastTaskNum
