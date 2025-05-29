@@ -12,6 +12,7 @@ Class BuildInfos
     Public Function isVnd() : isVnd = isInStr(mVos, "vnd") : End Function
     Public Function isSys() : isSys = isInStr(mVos, "sys") : End Function
     Public Function is8168() : is8168 = isInStr(mSdk, "8168") : End Function
+    Public Function is8791() : is8791 = isInStr(mProduct, "8791") : End Function
     Public Function is8781()
         If isVnd() Then
             is8781 = isEq(mProduct, "tb8781p1_64")
@@ -127,7 +128,7 @@ Class BuildInfos
         If is8781() Then
             LogoPath = "vendor/mediatek/proprietary/external/BootLogo/logo/" & BootLogo
         Else
-            tLogoPath = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/" & BootLogo
+            LogoPath = "vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/" & BootLogo
         End If
     End Property
 

@@ -76,7 +76,7 @@ End Sub
 
 Function HandleFolderPathCmd()
     HandleFolderPathCmd = True
-    If mCmdInput.text = "p" Then Call runPath(mBuild.Infos.ProjectPath) : Exit Function
+    If mCmdInput.text = "pp" Then Call runPath(mBuild.Infos.ProjectPath) : Exit Function
     If mCmdInput.text = "rom" Then Call runPath("../ROM") : Exit Function
     If mCmdInput.text = "out" Then Call runPath(mBuild.Infos.OutPath) : Exit Function
     If mCmdInput.text = "oa" Then Call runPath(mBuild.Infos.OutPath & "/obj/APPS") : Exit Function
@@ -192,11 +192,11 @@ Function handleGetInfo()
     If mCmdInput.text = "plf" Then Call setOpenPath(mBuild.Infos.getPlatform()) : Exit Function
     If mCmdInput.text = "gmsv" Then Call setOpenPath(readTextAndGetValue("GMS_PACKAGE_VERSION_ID", "vendor/partner_gms/products/gms_package_version.mk")) : Exit Function
     If mCmdInput.text = "spc" Then Call setOpenPath(readTextAndGetValue("PLATFORM_SECURITY_PATCH", "build/make/core/version_defaults.mk")) : Exit Function
-    If mCmdInput.text = "pbd" Then Call setOpenPath(readTextAndGetValue("PRODUCT_BRAND"), mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile)) : Exit Function
-    If mCmdInput.text = "pmd" Then Call setOpenPath(readTextAndGetValue("PRODUCT_MODEL"), mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile)) : Exit Function
-    If mCmdInput.text = "pdc" Then Call setOpenPath(readTextAndGetValue("PRODUCT_DEVICE"), mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile)) : Exit Function
-    If mCmdInput.text = "pnm" Then Call setOpenPath(readTextAndGetValue("PRODUCT_NAME"), mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile)) : Exit Function
-    If mCmdInput.text = "pmf" Then Call setOpenPath(readTextAndGetValue("PRODUCT_MANUFACTURER"), mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile)) : Exit Function
+    If mCmdInput.text = "pbd" Then Call setOpenPath(readTextAndGetValue("PRODUCT_BRAND", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
+    If mCmdInput.text = "pmd" Then Call setOpenPath(readTextAndGetValue("PRODUCT_MODEL", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
+    If mCmdInput.text = "pdc" Then Call setOpenPath(readTextAndGetValue("PRODUCT_DEVICE", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
+    If mCmdInput.text = "pnm" Then Call setOpenPath(readTextAndGetValue("PRODUCT_NAME", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
+    If mCmdInput.text = "pmf" Then Call setOpenPath(readTextAndGetValue("PRODUCT_MANUFACTURER", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
     handleGetInfo = False
 End Function
 
@@ -305,6 +305,7 @@ Function handleEditTextCmd()
     If InStr(mCmdInput.text, "tz=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
     If InStr(mCmdInput.text, "loc=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
     If InStr(mCmdInput.text, "ftd=") > 0 Then Call modSystemprop(Split(mCmdInput.text, "=")) : Exit Function
+    If InStr(mCmdInput.text, "spdf-") > 0 Then Call modSettingProviderDefault(Split(mCmdInput.text, "-")(1)) : Exit Function
     If InStr(mCmdInput.text, "=") > 0 Then Call cpFileAndSetValue(Split(mCmdInput.text, "=")) : Exit Function
     handleEditTextCmd = False
 End Function
@@ -323,6 +324,10 @@ Function handleProjectCmd()
     ElseIf mCmdInput.text = "v" Then
         Call setVndBuild()
         Exit Function
+    ElseIf mCmdInput.text = "v0" Then Call setCommonTask("v0") : Exit Function
+    ElseIf mCmdInput.text = "u0" Then Call setCommonTask("u0") : Exit Function
+    ElseIf mCmdInput.text = "t0" Then Call setCommonTask("t0") : Exit Function
+    ElseIf mCmdInput.text = "s0" Then Call setCommonTask("s0") : Exit Function
     ElseIf InStr(mCmdInput.text, "show-") = 1 Then
         Call showWorkInfo(Replace(mCmdInput.text, "show-", ""))
         Exit Function
@@ -1439,11 +1444,17 @@ Function getCurrentTaskOutFolders()
             End If
         Else
             If mTask.Sys.Infos.isV0() Then
-                getCurrentTaskOutFolders = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out")
+                If mTask.Vnd.Infos.is8791() Then
+                    getCurrentTaskOutFolders = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out")
+                Else
+                    getCurrentTaskOutFolders = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out", "v_sys/out_krn")
+                End If
             ElseIf mTask.Sys.Infos.isU0() Then
                 getCurrentTaskOutFolders = Array("merged", "u_sys/out", "vnd/out")
-            Else
+            ElseIf mTask.Sys.Infos.isT0() Then
                 getCurrentTaskOutFolders = Array("merged", "sys/out", "vnd/out")
+            Else
+                getCurrentTaskOutFolders = Array("vnd/out")
             End If
         End If
     ElseIf mBuild.Infos.is8168() Then
@@ -1493,8 +1504,7 @@ Function findOutFoldersForMvOut()
             ElseIf isFolderExists("../sys/out") Then
                 findOutFoldersForMvOut = Array("merged", "sys/out", "vnd/out")
             Else
-                MsgBox("No sys out!")
-                findOutFoldersForMvOut = Array("")
+                findOutFoldersForMvOut = Array("vnd/out")
             End If
         Else
             MsgBox("No vnd out!")
@@ -1582,7 +1592,7 @@ End Sub
 Sub writeSearchStrInWeiXin(who)
     window.clearTimeout(idTimer)
     Call oWs.sendkeys(who & "xiangmuqun")
-    idTimer = window.setTimeout("Call enterSearchInWeiXin(""" & who & """)", 500, "VBScript")
+    'idTimer = window.setTimeout("Call enterSearchInWeiXin(""" & who & """)", 500, "VBScript")
 End Sub
 
 Sub enterSearchInWeiXin(who)
@@ -1701,6 +1711,31 @@ Sub modSystemprop(whatArr)
     Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
+Sub modSettingProviderDefault(what)
+    Dim filePath, cmdStr
+    filePath = "vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml"
+    If Not isFileExists(mBuild.Infos.getOverlayPath(filePath)) Then
+        cmdStr = "mkdir -p " & mBuild.Infos.getOverlayPath(getParentPath(filePath)) & ";"
+        cmdStr = cmdStr & "cp " & filePath & " " & mBuild.Infos.getOverlayPath(getParentPath(filePath)) & ";"
+    End If
+
+    If what = "tz" Then
+        cmdStr = getSedCmd(cmdStr, "def_auto_time_zone", "true", "false", mBuild.Infos.getOverlayPath(filePath))
+    ElseIf what = "24" Then
+        cmdStr = getSedCmd(cmdStr, "def_time_12_24", ">12<", ">24<", mBuild.Infos.getOverlayPath(filePath))
+    ElseIf isNumeric(what) Then
+        cmdStr = getSedCmd(cmdStr, "def_screen_off_timeout", "60000", what & "000", mBuild.Infos.getOverlayPath(filePath))
+    ElseIf what = "rota" Then
+        cmdStr = getSedCmd(cmdStr, "def_accelerometer_rotation", "false", "true", mBuild.Infos.getOverlayPath(filePath))
+    ElseIf what = "bt" Then
+        cmdStr = getSedCmd(cmdStr, "def_bluetooth_on", "false", "true", mBuild.Infos.getOverlayPath(filePath))
+    ElseIf what = "wifi" Then
+        cmdStr = getSedCmd(cmdStr, "def_wifi_on", "false", "true", mBuild.Infos.getOverlayPath(filePath))
+    End If
+    cmdStr = getGitDiffCmd(cmdStr, filePath)
+    Call copyStrAndPasteInXshell(cmdStr)
+End Sub
+
 Sub showWorkInfo(taskNum)
     If isTaskNum(taskNum) Then
         Dim infos
@@ -1731,4 +1766,33 @@ Sub getProjectInfosFromOpenPath()
             Split(Split(inputArray(1), "/weibu/")(1), "/")(0) & VbLf &_
             Split(Split(inputArray(1), "/weibu/")(1), "/")(1)
     Call setOpenPath(Infos)
+End Sub
+
+Sub setCommonTask(sdk)
+    Dim taskInfos, vndBuild, sysBuild
+    If sdk = "v0" Then
+        Set taskInfos = (New TaskInfos)("0000", "COMMON_V0", "COMMON_V0")
+        Set vndBuild = (New BaseBuild)("vnd", "mtk_sp_t0/v_sys", "tb8786p1_64_k66", "COMMON")
+        Set sysBuild = (New BaseBuild)("sys", "mtk_sp_t0/v_sys", "mssi_64_cn", "COMMON")
+        Set mTask = (New TaskBuild)(taskInfos, vndBuild, sysBuild)
+        Call setCurrentBuild(mTask.Sys)
+    ElseIf sdk = "u0" Then
+        Set taskInfos = (New TaskInfos)("0000", "COMMON_U0", "COMMON_U0")
+        Set vndBuild = (New BaseBuild)("vnd", "mtk_sp_t0/vnd", "tb8781p1_64", "M100TB_CS_625_WIFI")
+        Set sysBuild = (New BaseBuild)("sys", "mtk_sp_t0/u_sys", "mssi_t_64_cn_armv82", "COMMON")
+        Set mTask = (New TaskBuild)(taskInfos, vndBuild, sysBuild)
+        Call setCurrentBuild(mTask.Sys)
+    ElseIf sdk = "t0" Then
+        Set taskInfos = (New TaskInfos)("0000", "COMMON_T0", "COMMON_T0")
+        Set vndBuild = (New BaseBuild)("vnd", "mtk_sp_t0/vnd", "tb8781p1_64", "M100TB_CS_625_WIFI")
+        Set sysBuild = (New BaseBuild)("sys", "mtk_sp_t0/sys", "mssi_t_64_cn_armv82", "COMMON")
+        Set mTask = (New TaskBuild)(taskInfos, vndBuild, sysBuild)
+        Call setCurrentBuild(mTask.Sys)
+    ElseIf sdk = "s0" Then
+        Set taskInfos = (New TaskInfos)("0000", "COMMON_S0", "COMMON_S0")
+        Set vndBuild = (New BaseBuild)("vnd", "mtk_sp_t0/vnd", "tb8781p1_64", "M100TB_CS_625_WIFI")
+        Set sysBuild = (New BaseBuild)("sys", "mtk_sp_t0/vnd", "tb8781p1_64", "M100TB_CS_625_WIFI")
+        Set mTask = (New TaskBuild)(taskInfos, vndBuild, sysBuild)
+        Call setCurrentBuild(mTask.Sys)
+    End If
 End Sub

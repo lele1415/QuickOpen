@@ -301,15 +301,14 @@ Function getParentProject()
     Dim vaParents, project, index, folderPath
     Set vaParents = New VariableArray
     project = mBuild.Project
-    index = InStrRev(project, "-")
-    Do While index > 0
-        project = Left(project, index - 1)
+    Do
         folderPath = "weibu/" & mBuild.Product & "/" & project
         If isFolderExists(folderPath) Then
             vaParents.Append(folderPath)
         End If
         index = InStrRev(project, "-")
-    Loop
+        If index > 0 Then project = Left(project, index - 1)
+    Loop While index > 0
     Set getParentProject = vaParents
 End Function
 
