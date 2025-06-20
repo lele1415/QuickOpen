@@ -1,4 +1,13 @@
+2025-06-20
+    Update tasklist.ini
+    CopyCommitInfo: remove Browser, add TextView
+    Add commands of move outfolders out by task number and force move outfolders in
+    Add checkBuildTask function
+    findDrive: reset origin drive path when not found
+    Update V0 functions
+
 2025-05-29
+    Add res files
     Add modSettingProviderDefault and setCommonTask functions, fix bugs
 
 2025-05-07
