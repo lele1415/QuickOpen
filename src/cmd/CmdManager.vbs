@@ -1230,12 +1230,12 @@ Sub CopyCommitInfo(what)
         commandFinal = "Audio [" & mBuild.Project & "] : 默认音量%"
     ElseIf what = "slp" Then
         commandFinal = "Settings [" & mBuild.Project & "] : 默认休眠时间"
-    ElseIf what = "hp" Then
-        commandFinal = "Browser [" & mBuild.Project & "] : 默认网址"
     ElseIf what = "bat" Then
         commandFinal = "Battery [" & mBuild.Project & "] : 电池检测容量mAh"
     ElseIf what = "ft" Then
         commandFinal = "FactoryTest [" & mBuild.Project & "] : "
+    ElseIf what = "tv" Then
+        commandFinal = "TextView [" & mBuild.Project & "] : "
     Else
         commandFinal = what & " [" & mBuild.Project & "] : "
     End If
