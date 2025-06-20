@@ -228,9 +228,12 @@ Function handleLinuxCmd()
     If mCmdInput.text = "cc" Then Call copyStrAndPasteInXshell("git checkout .;git clean -df") : Exit Function
     If InStr(mCmdInput.text, "qm-") = 1 Then Call CopyQmakeCmd(Replace(mCmdInput.text, "qm-", "")) : Exit Function
     If mCmdInput.text = "exp" Then Call copyStrAndPasteInXshell("export PATH=$HOME/Tools:$PATH") : Exit Function
-    If mCmdInput.text = "mo" Then Call moveOutFoldersOut() : Exit Function
-    If mCmdInput.text = "mui" Then Call moveOutFoldersIn("user") : Exit Function
-    If mCmdInput.text = "mdi" Then Call moveOutFoldersIn("debug") : Exit Function
+    If mCmdInput.text = "mo" Then Call moveOutFoldersOut("") : Exit Function
+    If InStr(mCmdInput.text, "mo-") = 1 Then Call moveOutFoldersOut(Replace(mCmdInput.text, "mo-", "")) : Exit Function
+    If mCmdInput.text = "mui" Then Call moveOutFoldersIn("user", False) : Exit Function
+    If mCmdInput.text = "mdi" Then Call moveOutFoldersIn("debug", False) : Exit Function
+    If mCmdInput.text = "mui-f" Then Call moveOutFoldersIn("user", True) : Exit Function
+    If mCmdInput.text = "mdi-f" Then Call moveOutFoldersIn("debug", True) : Exit Function
     If mCmdInput.text = "ps" Then Call copyStrAndPasteInXshell("git pull -r origin master && git push origin master") : Exit Function
     If mCmdInput.text = "ccps" Then Call copyStrAndPasteInXshell("git checkout .;git clean -df;git pull -r origin master && git push origin master") : Exit Function
     If mCmdInput.text = "update" Then Call copyStrAndPasteInXshell("git remote update origin --prune") : Exit Function
@@ -1434,7 +1437,7 @@ Function checkMvOut(outPath, folders)
     checkMvOut = cmdStr
 End Function
 
-Function checkMvIn(outPath, folders)
+Function checkMvIn(outPath, folders, force)
     Dim cmdStr, folder, outFolder, parentFolder
     For Each folder In folders
         outFolder = outPath & "/" & folder
@@ -1448,7 +1451,7 @@ Function checkMvIn(outPath, folders)
     For Each folder In folders
         Dim checkFd : checkFd = folder
         If mBuild.Infos.isSdkT0() Then checkFd = "../" & folder
-        If isFolderExists(checkFd) Then
+        If (Not force) And isFolderExists(checkFd) Then
             MsgBox(folder & " already exist!")
             checkMvIn = ""
             Exit Function
@@ -1556,24 +1559,30 @@ Function findOutFoldersForMvOut()
     End If
 End Function
 
-Sub moveOutFoldersOut()
-    Call setSysBuild()
-    Dim innerId
-    innerId = mBuild.Infos.getOutProp("ro.build.display.inner.id")
-    If innerId = "" Then MsgBox("Empty inner id!") : Exit Sub
-    If InStr(innerId, ".") = 0 Then MsgBox("Invalid inner id!" & VbLf & innerId) : Exit Sub
-    Dim idArr
-    idArr = Split(innerId, ".")
-    If UBound(idArr) < 2 Then MsgBox("Invalid inner id!" & VbLf & innerId) : Exit Sub
-    Dim numArr, i, taskNum
-    numArr = Split(idArr(2), "-")
-    For i = UBound(numArr) To 0 Step -1
-        If isTaskNum(numArr(i)) Then
-            taskNum = numArr(i)
-            Exit For
-        End If
-    Next
-    If taskNum = "" Then MsgBox("Empty taskNum! ") : Exit Sub
+Sub moveOutFoldersOut(taskNumInput)
+    Dim taskNum
+    If taskNumInput <> "" Then
+        taskNum = taskNumInput
+    Else
+        Call setSysBuild()
+        Dim innerId
+        innerId = mBuild.Infos.getOutProp("ro.build.display.inner.id")
+        If innerId = "" Then MsgBox("Empty inner id!") : Exit Sub
+        If InStr(innerId, ".") = 0 Then MsgBox("Invalid inner id!" & VbLf & innerId) : Exit Sub
+        Dim idArr
+        idArr = Split(innerId, ".")
+        If UBound(idArr) < 2 Then MsgBox("Invalid inner id!" & VbLf & innerId) : Exit Sub
+        Dim numArr, i
+        numArr = Split(idArr(2), "-")
+        For i = UBound(numArr) To 0 Step -1
+            If isTaskNum(numArr(i)) Then
+                taskNum = numArr(i)
+                Exit For
+            End If
+        Next
+        If taskNum = "" Then MsgBox("Empty taskNum! ") : Exit Sub
+    End If
+
     Dim buildType, outPath, outFolders, cmdStr
     If Not getTmpTaskWithNum(taskNum) Then Exit Sub
     buildType = mBuild.Infos.getOutProp("ro.build.type")
@@ -1590,11 +1599,11 @@ Sub moveOutFoldersOut()
     End If
 End Sub
 
-Sub moveOutFoldersIn(buildType)
+Sub moveOutFoldersIn(buildType, force)
     Dim outPath, outFolders, cmdStr
     outPath = "../OUT/" & mTask.Infos.TaskName & "_" & buildType
     outFolders = getCurrentTaskOutFolders()
-    cmdStr = checkMvIn(outPath, outFolders)
+    cmdStr = checkMvIn(outPath, outFolders, force)
     Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
