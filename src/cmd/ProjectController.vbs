@@ -44,6 +44,11 @@ Sub findDrive()
             Call setCurrentDrive("x1")
         End If
         If isFolderExists(mBuild.Infos.Out) And isInStr(mBuild.Infos.getOutProp("ro.build.display.inner.id"), Replace(mTask.Vnd.Project, "_", ".")) Then Exit Sub
+        If mDrive = DRIVE_WORK_1 Then
+            Call setCurrentDrive("x2")
+        Else
+            Call setCurrentDrive("x1")
+        End If
     End If
 
     If oFso.FolderExists(DRIVE_WORK_1 & sdkP & "\OUT\" & userOut) Or oFso.FolderExists(DRIVE_WORK_1 & sdkP & "\OUT\" & debugOut) Then
@@ -63,6 +68,11 @@ Sub findDrive()
             Call setCurrentDrive("x1")
         End If
         If isFolderExists(mBuild.Infos.ProjectPath) Then Exit Sub
+        If mDrive = DRIVE_WORK_1 Then
+            Call setCurrentDrive("x2")
+        Else
+            Call setCurrentDrive("x1")
+        End If
     End If
 End Sub
 
