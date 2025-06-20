@@ -1007,6 +1007,32 @@ Function getCustomModemSedStr()
     End If
 End Function
 
+Function checkBuildTask()
+    If Not isFolderExists(mBuild.Infos.Out) Then checkBuildTask = True : Exit Function
+    Dim outDisplayId, lunchItemPath, lunchStr, index
+    Call setSysBuild()
+    outDisplayId = mBuild.Infos.getOutProp("ro.build.display.inner.id")
+    If mBuild.Infos.is8781() Then
+        lunchItemPath = "../lunch_item_v2"
+    ElseIf mBuild.Infos.isV0() Then
+        lunchItemPath = "lunch_item"
+    Else
+        lunchItemPath = "../lunch_item"
+    End If
+    lunchStr = readLineOfTextFile(1, lunchItemPath)
+    If mBuild.Infos.is8781() Then
+        index = 3
+    Else
+        index = 1
+    End If
+    If InStr(outDisplayId, Replace(Split(lunchStr, " ")(index), "_", ".")) > 0 Then
+        checkBuildTask = True
+    Else
+        checkBuildTask = False
+        MsgBox("Diff lunch item and out!")
+    End If
+End Function
+
 Function checkBuildType()
     If Not isFolderExists(mBuild.Infos.Out) Then checkBuildType = True : Exit Function
     Dim outBuildType, lunchItemPath, lunchStr
@@ -1029,6 +1055,7 @@ Function checkBuildType()
 End Function
 
 Function getSplitBuildCommand(opts)
+    Call checkBuildTask()
     If Not checkBuildType() Then getSplitBuildCommand = "" : Exit Function
     Dim buildsh, params, commandStr
     If mBuild.Infos.is8781() Then
