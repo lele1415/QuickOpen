@@ -945,6 +945,9 @@ Sub getLunchCommand(buildType, taskNum)
     Dim commandFinal, comboName
     If mTmpTask.Sys.Infos.Version > 12 Or mTmpTask.Sys.Infos.is8168() Then
         commandFinal = getLunchCommandInSplitBuild(buildType, mTmpTask)
+        If mTmpTask.Vnd.Infos.isV0() Then
+            commandFinal = "cd ~" & relpaceSlashInPath(Split(mDrive, ":")(1)) & mTmpTask.Vnd.Sdk & " && " & commandFinal
+        End If
     Else
         comboName = "full_" & mBuild.Product & "-" & buildType
         commandFinal = "source build/envsetup.sh ; lunch " & comboName & " " & mBuild.Project
@@ -994,7 +997,11 @@ Function getCustomModemSedStr()
     customModem = readTextAndGetValue("CUSTOM_MODEM", mTask.Vnd.Infos.ProjectConfigMk)
     deviceModem = readTextAndGetValue("CUSTOM_MODEM", mTask.Vnd.Infos.OriginProjectConfigMk)
     if customModem <> "" And customModem <> deviceModem Then
-        getCustomModemSedStr = getSedCmd("", "CUSTOM_MODEM", "=.*$", "= " & customModem, "vnd/" & mTask.Vnd.Infos.OriginProjectConfigMk)
+        If mTask.Vnd.Infos.isV0() Then
+            getCustomModemSedStr = getSedCmd("", "CUSTOM_MODEM", "=.*$", "= " & customModem, mTask.Vnd.Infos.OriginProjectConfigMk)
+        Else
+            getCustomModemSedStr = getSedCmd("", "CUSTOM_MODEM", "=.*$", "= " & customModem, "vnd/" & mTask.Vnd.Infos.OriginProjectConfigMk)
+        End If
     Else
         getCustomModemSedStr = ""
     End If
@@ -1054,7 +1061,7 @@ Function getSplitBuildCommand(opts)
 
     commandStr = buildsh & params
 
-    if mTask.Vnd.Sdk <> mTask.Sys.Sdk And InStr(params, " p") > 0 And InStr(params, " vnd") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
+    if InStr(params, " p") > 0 And InStr(params, " vnd") = 0 And InStr(params, " vext") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
         Call setVndBuild()
         commandStr = getCustomModemSedStr() & commandStr
     End If
@@ -1208,7 +1215,7 @@ End Sub
 Sub CopyBuildOtaUpdate()
     Dim commandFinal
     If mTask.Sys.Infos.Version > 11 Then
-        commandFinal = "./" & mTask.Sys.Infos.Out & "/host/linux-x86/bin/ota_from_target_files -i target_files_.zip target_files.zip update__to_.zip"
+        commandFinal = "./" & mTask.Sys.Infos.Out & "/host/linux-x86/bin/ota_from_target_files -i target_files_.zip target_files.zip update_.zip"
     Else
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
     End If

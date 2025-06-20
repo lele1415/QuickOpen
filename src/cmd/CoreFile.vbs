@@ -324,7 +324,7 @@ Function getMultiOverlayPath(filePath)
 
     Dim overlayPath
     overlayPath = filePath
-    If isFileExists(filePath) And InStr(mBuild.Project, "-") > 0 Then
+    If isFileExists(filePath) Then
         Dim vaParents, i
         Set vaParents = getParentProject()
         If vaParents.Bound > -1 Then

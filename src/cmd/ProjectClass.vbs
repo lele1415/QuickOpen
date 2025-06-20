@@ -17,7 +17,7 @@ Class BuildInfos
         If isVnd() Then
             is8781 = isEq(mProduct, "tb8781p1_64")
         ElseIf isSys() Then
-            is8781 = isEq(mProduct, "mssi_t_64_cn_armv82")
+            is8781 = isCt(mProduct, "mssi_t_64_cn_armv82")
         Else
             is8781 = False
         End If

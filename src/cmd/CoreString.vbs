@@ -8,6 +8,14 @@ Function isEq(str1, str2)
     End If
 End Function
 
+Function isCt(str1, str2)
+    If InStr(str1, str2) > 0 Then
+        isCt = True
+    Else
+        isCt = False
+    End If
+End Function
+
 Function isInStr(str1, str2)
     If InStr(str1, str2) > 0 Then
         isInStr = True
