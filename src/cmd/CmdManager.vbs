@@ -1603,6 +1603,9 @@ Sub moveOutFoldersOut(taskNumInput)
     End If
     If outFolders(0) <> "" Then
         cmdStr = checkMvOut(outPath, outFolders)
+        If cmdStr <> "" And mTmpTask.Vnd.Infos.isV0() Then
+            cmdStr = "cd ~" & relpaceSlashInPath(Split(mDrive, ":")(1)) & getParentPath(mTmpTask.Vnd.Sdk) & " && " & cmdStr
+        End If
         Call copyStrAndPasteInXshell(cmdStr)
     End If
 End Sub
@@ -1612,6 +1615,9 @@ Sub moveOutFoldersIn(buildType, force)
     outPath = "../OUT/" & mTask.Infos.TaskName & "_" & buildType
     outFolders = getCurrentTaskOutFolders()
     cmdStr = checkMvIn(outPath, outFolders, force)
+    If cmdStr <> "" And mTask.Vnd.Infos.isV0() Then
+        cmdStr = "cd ~" & relpaceSlashInPath(Split(mDrive, ":")(1)) & getParentPath(mTask.Vnd.Sdk) & " && " & cmdStr
+    End If
     Call copyStrAndPasteInXshell(cmdStr)
 End Sub
 
