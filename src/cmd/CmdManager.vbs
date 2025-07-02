@@ -1140,38 +1140,46 @@ Sub getSplitTestOTABuildCommand(opts)
 End Sub
 
 Sub MkdirWeibuFolderPath()
-    If Not isFileExists(getOpenPath()) Then MsgBox("File not exist! " & getOpenPath()) : Exit Sub
-    Dim filePath : filePath = getOriginPathFromOverlayPath(getOpenPath())
-    If Not isFileExists(filePath) Then MsgBox("File not exist! " & filePath) : Exit Sub
-
-    Dim folderPath
-    Dim overlayFilePath
-    Dim overlayFolderPath
-    Dim mkdirCmd, cpCmd
     Dim commandFinal
+    If Not isFileExists(getOpenPath()) Then
+        If Not isFolderExists(getOpenPath()) Then
+            MsgBox("File or Folder not exist! " & getOpenPath())
+            Exit Sub
+        Else
+            commandFinal = "mkdir -p " & mBuild.Infos.getOverlayPath(getOriginPathFromOverlayPath(getOpenPath())) & ";"
+        End If
+    Else
+        Dim filePath : filePath = getOriginPathFromOverlayPath(getOpenPath())
+        'If Not isFileExists(filePath) Then MsgBox("File not exist! " & filePath) : Exit Sub
 
-    folderPath = getParentPath(filePath)
-    overlayFilePath = mBuild.Infos.getOverlayPath(filePath)
-    overlayFolderPath = mBuild.Infos.getOverlayPath(folderPath)
+        Dim folderPath
+        Dim overlayFilePath
+        Dim overlayFolderPath
+        Dim mkdirCmd, cpCmd
 
-    If isFileExists(overlayFilePath) Then MsgBox("File exist! " & overlayFilePath) : Exit Sub
-    If Not isFolderExists(overlayFolderPath) Then
-        mkdirCmd = "mkdir -p " & overlayFolderPath & ";"
+        folderPath = getParentPath(filePath)
+        overlayFilePath = mBuild.Infos.getOverlayPath(filePath)
+        overlayFolderPath = mBuild.Infos.getOverlayPath(folderPath)
+
+        If isFileExists(overlayFilePath) Then MsgBox("File exist! " & overlayFilePath) : Exit Sub
+        If Not isFolderExists(overlayFolderPath) Then
+            mkdirCmd = "mkdir -p " & overlayFolderPath & ";"
+        End If
+
+        Dim multiOverlayFile
+        multiOverlayFile = getMultiOverlayPath(filePath)
+        If multiOverlayFile <> filePath Then
+            filePath = multiOverlayFile
+        ElseIf getOpenPath() <> filePath Then
+            filePath = getOpenPath()
+        End If 
+
+        cpCmd = "cp " & filePath & " " & mBuild.Infos.getOverlayPath(folderPath)
+        commandFinal = mkdirCmd & cpCmd
     End If
 
-    Dim multiOverlayFile
-    multiOverlayFile = getMultiOverlayPath(filePath)
-    If multiOverlayFile <> filePath Then
-        filePath = multiOverlayFile
-    ElseIf getOpenPath() <> filePath Then
-        filePath = getOpenPath()
-    End If 
-
-    cpCmd = "cp " & filePath & " " & mBuild.Infos.getOverlayPath(folderPath)
-    commandFinal = mkdirCmd & cpCmd
-
     commandFinal = relpaceSlashInPath(commandFinal)
-    Call setOpenPath(mBuild.Infos.getOverlayPath(filePath))
+    Call setOpenPath(overlayFilePath)
     Call copyStrAndPasteInXshell(commandFinal)
 End Sub
 
