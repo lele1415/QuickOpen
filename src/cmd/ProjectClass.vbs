@@ -3,11 +3,14 @@ Option Explicit
 Class BuildInfos
     Private mVos, mSdk, mProduct, mProject, mVersion, mPath
 
+    Public Function isB0() : isB0 = isInStr(mSdk, "/b0") : End Function
     Public Function isV0() : isV0 = isInStr(mSdk, "/v_sys") : End Function
     Public Function isU0() : isU0 = isInStr(mSdk, "/u_sys") : End Function
     Public Function isT0() : isT0 = isInStr(mSdk, "/sys") : End Function
     Public Function isS0() : isS0 = isInStr(mSdk, "/vnd") : End Function
     Public Function isR0() : isR0 = isInStr(mSdk, "_r/") : End Function
+    Public Function atLeast(version) : atLeast = isGe(mVersion, version) : End Function
+    Public Function atMost(version) : atMost = isLe(mVersion, version) : End Function
     Public Function isSdkT0() : isSdkT0 = isInStr(mSdk, "_t0") : End Function
     Public Function isVnd() : isVnd = isInStr(mVos, "vnd") : End Function
     Public Function isSys() : isSys = isInStr(mVos, "sys") : End Function
@@ -34,6 +37,8 @@ Class BuildInfos
             mVersion = 14
         ElseIf isV0() Then
             mVersion = 15
+        ElseIf isB0() Then
+            mVersion = 16
         End If
     End Sub
 
@@ -66,7 +71,7 @@ Class BuildInfos
     End Property
 
     Public Property Get Out
-        If isSys() And (isV0() Or is8781()) Then
+        If isSys() And (atLeast(15) Or is8781()) Then
             Out = "out_sys"
         Else
             Out = "out"
@@ -75,7 +80,7 @@ Class BuildInfos
     Public Property Get OutPath : OutPath = Out & "/target/product/" & mProduct : End Property
 
     Public Property Get OutSystemExtPath
-        If mVersion > 13 Then
+        If atLeast(14) Then
             OutSystemExtPath = OutPath & "/system_ext/priv-app"
         Else
             OutSystemExtPath = OutPath & "/system/system_ext/priv-app"
@@ -85,7 +90,7 @@ Class BuildInfos
     Public Property Get  OutSystemBuildProp : OutSystemBuildProp = OutPath & "/system/build.prop" : End Property
     Public Property Get  OutVendorBuildProp : OutVendorBuildProp = OutPath & "/vendor/build.prop" : End Property
     Public Property Get  OutProductBuildProp
-        If mVersion > 11 Then
+        If atLeast(12) Then
             OutProductBuildProp = OutPath & "/product/etc/build.prop"
         Else
             OutProductBuildProp = OutPath & "/product/build.prop"
@@ -133,7 +138,7 @@ Class BuildInfos
     End Property
 
     Public Function getPowerProfilePath()
-        If mVersion > 13 Then
+        If atLeast(14) Then
             getPowerProfilePath = "device/mediatek/system/common/overlay/power/frameworks/base/core/res/res/xml/power_profile.xml"
         Else
             getPowerProfilePath = "vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml"
@@ -141,7 +146,7 @@ Class BuildInfos
     End Function
 
     Public Function getBluetoothfilePath()
-        If mVersion > 12 Then
+        If atLeast(13) Then
             getBluetoothfilePath = "vendor/mediatek/proprietary/packages/modules/Bluetooth/system/btif/src/btif_dm.cc"
         Else
             getBluetoothfilePath = "system/bt/btif/src/btif_dm.cc"
@@ -153,7 +158,7 @@ Class BuildInfos
     End Function
 
     Public Function getOverlayPath(path)
-        If mVersion < 12 And Not is8168() Then
+        If atMost(11) And Not is8168() Then
             getOverlayPath = ProjectPath & "/" & path
         Else
             getOverlayPath = ProjectPath & "/alps/" & path

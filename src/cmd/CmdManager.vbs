@@ -137,7 +137,7 @@ Function HandleFilePathCmd()
     If mCmdInput.text = "wfdrt" Then Call setPathFromCmdAndCopyKey("getPersistedDeviceName", "packages/modules/Wifi/service/java/com/android/server/wifi/p2p/WifiP2pServiceImpl.java") : Exit Function
     If mCmdInput.text = "bt" Then Call setPathFromCmdAndCopyKey("btif_default_local_name", mBuild.Infos.getBluetoothfilePath()) : Exit Function
     If mCmdInput.text = "bat" Then
-        If mBuild.Infos.Version < 13 Then
+        If mBuild.Infos.atMost(12) Then
             Call setVndBuild()
         Else
             Call setSysBuild()
@@ -346,6 +346,12 @@ Function handleProjectCmd()
     ElseIf mCmdInput.text = "svpi" Then
         Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/v_sys/")
         Exit Function
+    ElseIf mCmdInput.text = "bpi" Then
+        Call setOpenPath("mtk_sp_t0/v_sys/" & VbLf & "mtk_sp_t0/b0/")
+        Exit Function
+    ElseIf mCmdInput.text = "sbpi" Then
+        Call setOpenPath("mtk_sp_t0/vnd/" & VbLf & "mtk_sp_t0/b0/")
+        Exit Function
     ElseIf mCmdInput.text = "getpi" Then
         Call getProjectInfosFromOpenPath()
         Exit Function
@@ -474,7 +480,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
         cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
     ElseIf whatArr(0) = "sp" Then
-        If mBuild.Infos.isV0() Then
+        If mBuild.Infos.atLeast(15) Then
             filePath = "build/make/core/version_util.mk"
         Else
             filePath = "build/make/core/version_defaults.mk"
@@ -600,7 +606,7 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
         cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
     ElseIf whatArr(0) = "bat" Then
-        If mBuild.Infos.Version < 13 Then
+        If mBuild.Infos.atMost(12) Then
             Call setVndBuild()
         Else
             Call setSysBuild()
@@ -642,7 +648,7 @@ End Sub
 
 Sub mkdirWallpaper(go)
     Dim wp_gms, wp_go1, wp_go2, wp1, wp2, wp3
-    If mBuild.Infos.Version > 12 Then
+    If mBuild.Infos.atLeast(13) Then
         wp_gms = "vendor/partner_gms/overlay/AndroidGmsBetaOverlay/res/drawable-nodpi/default_wallpaper.png"
     Else
         wp_gms = "vendor/partner_gms/overlay/AndroidSGmsBetaOverlay/res/drawable-nodpi/default_wallpaper.png"
@@ -862,6 +868,16 @@ Sub getProjectPathWithTaskNum(taskNum, which)
     End If
 End Sub
 
+Function getVBLunchStr(task, buildType, androidVer)
+    If task.Vnd.Product <> "" And task.Vnd.Project <> "" And task.Sys.Product <> "" And task.Sys.Project <> "" Then
+        getVBLunchStr = "vnd_" & task.Vnd.Product & "-next-" & buildType & " " & task.Vnd.Project &_
+                " sys_" & task.Sys.Product & "-next-" & buildType & " " & task.Sys.Project &_
+                androidVer
+    Else
+        getVBLunchStr = ""
+    End If
+End Function
+
 Function getVVLunchStr(task, buildType)
     If task.Vnd.Product <> "" And task.Vnd.Project <> "" And task.Sys.Product <> "" And task.Sys.Project <> "" Then
         getVVLunchStr = "vnd_" & task.Vnd.Product & "-next-" & buildType & " " & task.Vnd.Project &_
@@ -895,7 +911,13 @@ End Function
 
 Function getLunchStrFromWSavedWork(buildType, task)
     Dim lunchStr
-    If task.Sys.Infos.isV0() Then
+    If task.Sys.Infos.isB0() Then
+        If Not task.Vnd.Infos.is8781() Then
+            lunchStr = getVBLunchStr(task, buildType, " B")
+        Else
+            lunchStr = get8781LunchStr(task, buildType, "-next-", " B")
+        End If
+    ElseIf task.Sys.Infos.isV0() Then
         If Not task.Vnd.Infos.is8781() Then
             lunchStr = getVVLunchStr(task, buildType)
         Else
@@ -946,9 +968,9 @@ End Function
 Sub getLunchCommand(buildType, taskNum)
     If Not getTmpTaskWithNum(taskNum) Then Exit Sub
     Dim commandFinal, comboName
-    If mTmpTask.Sys.Infos.Version > 12 Or mTmpTask.Sys.Infos.is8168() Then
+    If mTmpTask.Sys.Infos.atLeast(13) Or mTmpTask.Sys.Infos.is8168() Then
         commandFinal = getLunchCommandInSplitBuild(buildType, mTmpTask)
-        If mTmpTask.Vnd.Infos.isV0() Then
+        If mTmpTask.Vnd.Infos.isV0() And mTmpTask.Sys.Infos.isV0() Then
             commandFinal = "cd ~" & relpaceSlashInPath(Split(mDrive, ":")(1)) & mTmpTask.Vnd.Sdk & " && " & commandFinal
         End If
     Else
@@ -960,7 +982,7 @@ End Sub
 
 Sub getSysLunchCommand(buildType)
     Dim commandFinal
-    If mTask.Sys.Infos.isV0() THen
+    If mTask.Sys.Infos.atLeast(15) THen
         commandFinal = "source build/envsetup.sh && lunch sys_" & mTask.Sys.Product & "-next-" & buildType & " " & mTask.Sys.Project
     Else
         commandFinal = "source build/envsetup.sh && lunch sys_" & mTask.Sys.Product & "-" & buildType & " " & mTask.Sys.Project
@@ -1000,7 +1022,7 @@ Function getCustomModemSedStr()
     customModem = readTextAndGetValue("CUSTOM_MODEM", mTask.Vnd.Infos.ProjectConfigMk)
     deviceModem = readTextAndGetValue("CUSTOM_MODEM", mTask.Vnd.Infos.OriginProjectConfigMk)
     if customModem <> "" And customModem <> deviceModem Then
-        If mTask.Vnd.Infos.isV0() Then
+        If mTask.Vnd.Infos.isV0() And mTask.Sys.Infos.isV0() Then
             getCustomModemSedStr = getSedCmd("", "CUSTOM_MODEM", "=.*$", "= " & customModem, mTask.Vnd.Infos.OriginProjectConfigMk)
         Else
             getCustomModemSedStr = getSedCmd("", "CUSTOM_MODEM", "=.*$", "= " & customModem, "vnd/" & mTask.Vnd.Infos.OriginProjectConfigMk)
@@ -1094,6 +1116,7 @@ Function getSplitBuildCommand(opts)
     if InStr(params, " p") > 0 And InStr(params, " vnd") = 0 And InStr(params, " vext") = 0 And InStr(params, " krn") = 0 And InStr(params, " hal") = 0 Then
         Call setVndBuild()
         commandStr = getCustomModemSedStr() & commandStr
+        Call setSysBuild()
     End If
     getSplitBuildCommand = commandStr & ";"
 End Function
@@ -1122,7 +1145,7 @@ Sub getSplitTestOTABuildCommand(opts)
     Dim cmdStr
     cmdStr = getSplitBuildCommand(opts)
     
-    If mTask.Vnd.Infos.isV0() Then
+    If mTask.Vnd.Infos.isV0() And mTask.Sys.Infos.isV0() Then
         cmdStr = cmdStr & "mkdir -p ../OTA/" & mTask.Infos.TaskNum & ";"
         cmdStr = cmdStr & "mv merged/target_files.zip ../OTA/" & mTask.Infos.TaskNum & "/target_files_s.zip;"
         cmdStr = cmdStr & getOTATestSedStr(False) & ";"
@@ -1252,7 +1275,7 @@ End Sub
 
 Sub CopyBuildOtaUpdate()
     Dim commandFinal
-    If mTask.Sys.Infos.Version > 11 Then
+    If mTask.Sys.Infos.atLeast(12) Then
         commandFinal = "./" & mTask.Sys.Infos.Out & "/host/linux-x86/bin/ota_from_target_files -i target_files_.zip target_files.zip update_.zip"
     Else
         commandFinal = "./build/tools/releasetools/ota_from_target_files -i old.zip new.zip update.zip"
@@ -1297,7 +1320,7 @@ Sub CopyAdbPushCmd(which)
         finalStr = "adb push " & sourcePath & " " & targetPath
     End If
 
-    If mTask.Sys.Infos.Version > 13 Then
+    If mTask.Sys.Infos.atLeast(14) Then
         finalStr = Replace(finalStr, "\system\system_ext\", "\system_ext\")
         finalStr = Replace(finalStr, "/system/system_ext/", "/system_ext/")
     End If
@@ -1480,7 +1503,9 @@ Function getCurrentTaskOutFolders()
         If mBuild.Infos.is8168() Then
             getCurrentTaskOutFolders = Array("merged", "sys/out", "vnd/out")
         ElseIf mBuild.Infos.is8781() Then
-            If mTask.Sys.Infos.isV0() Then
+            If mTask.Sys.Infos.isB0() Then
+                getCurrentTaskOutFolders = Array("merged", "b0/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+            ElseIf mTask.Sys.Infos.isV0() Then
                 getCurrentTaskOutFolders = Array("merged", "v_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             ElseIf mTask.Sys.Infos.isU0() Then
                 getCurrentTaskOutFolders = Array("merged", "u_sys/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
@@ -1488,7 +1513,13 @@ Function getCurrentTaskOutFolders()
                 getCurrentTaskOutFolders = Array("merged", "sys/out", "vnd/out", "vnd/out_hal", "vnd/out_krn")
             End If
         Else
-            If mTask.Sys.Infos.isV0() Then
+            If mTask.Sys.Infos.isB0() Then
+                If mTask.Vnd.Infos.is8791() Then
+                    getCurrentTaskOutFolders = Array("merged", "b0/out_sys", "v_sys/out")
+                Else
+                    getCurrentTaskOutFolders = Array("merged", "b0/out_sys", "v_sys/out", "v_sys/out_krn")
+                End If
+            ElseIf mTask.Sys.Infos.isV0() Then
                 If mTask.Vnd.Infos.is8791() Then
                     getCurrentTaskOutFolders = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out")
                 Else
@@ -1511,8 +1542,15 @@ End Function
 
 Function findOutFoldersForMvOut()
     If mBuild.Infos.isSdkT0() Then
+        'v+b
+        If mTask.Sys.Infos.isB0() And isFolderExists("../merged") And isFolderExists("../b0/out_sys") And isFolderExists("../v_sys/out") Then
+            If isFolderExists("v_sys/out_krn") Then
+                findOutFoldersForMvOut = Array("merged", "b0/out_sys", "v_sys/out", "v_sys/out_krn")
+            Else
+                findOutFoldersForMvOut = Array("merged", "b0/out_sys", "v_sys/out")
+            End If
         'v+v
-        If mTask.Sys.Infos.isV0() And isFolderExists("../v_sys/merged") And isFolderExists("../v_sys/out_sys") And isFolderExists("../v_sys/out") Then
+        ElseIf mTask.Sys.Infos.isV0() And isFolderExists("../v_sys/merged") And isFolderExists("../v_sys/out_sys") And isFolderExists("../v_sys/out") Then
             If isFolderExists("../v_sys/out_krn") Then
                 findOutFoldersForMvOut = Array("v_sys/merged", "v_sys/out_sys", "v_sys/out", "v_sys/out_krn")
             Else
@@ -1520,8 +1558,16 @@ Function findOutFoldersForMvOut()
             End If
         '8781
         ElseIf isFolderExists("../vnd/out_hal") Then
+            '8781 s+b
+            If mTask.Sys.Infos.isB0() And isFolderExists("../b0/out_sys") Then
+                If isFolderExists("../b0/out") Then
+                    MsgBox("There are two sys out folders: out/ out_sys/")
+                    findOutFoldersForMvOut = Array("")
+                Else
+                    findOutFoldersForMvOut = Array("merged", "b0/out_sys", "vnd/out", "vnd/out_hal", "vnd/out_krn")
+                End If
             '8781 s+v
-            If mTask.Sys.Infos.isV0() And isFolderExists("../v_sys/out_sys") Then
+            ElseIf mTask.Sys.Infos.isV0() And isFolderExists("../v_sys/out_sys") Then
                 If isFolderExists("../v_sys/out") Then
                     MsgBox("There are two sys out folders: out/ out_sys/")
                     findOutFoldersForMvOut = Array("")
@@ -1603,7 +1649,7 @@ Sub moveOutFoldersOut(taskNumInput)
     End If
     If outFolders(0) <> "" Then
         cmdStr = checkMvOut(outPath, outFolders)
-        If cmdStr <> "" And mTmpTask.Vnd.Infos.isV0() Then
+        If cmdStr <> "" And mTmpTask.Vnd.Infos.isV0() And mTmpTask.Sys.Infos.isV0() Then
             cmdStr = "cd ~" & relpaceSlashInPath(Split(mDrive, ":")(1)) & getParentPath(mTmpTask.Vnd.Sdk) & " && " & cmdStr
         End If
         Call copyStrAndPasteInXshell(cmdStr)
@@ -1615,7 +1661,7 @@ Sub moveOutFoldersIn(buildType, force)
     outPath = "../OUT/" & mTask.Infos.TaskName & "_" & buildType
     outFolders = getCurrentTaskOutFolders()
     cmdStr = checkMvIn(outPath, outFolders, force)
-    If cmdStr <> "" And mTask.Vnd.Infos.isV0() Then
+    If cmdStr <> "" And mTask.Vnd.Infos.isV0() And mTask.Sys.Infos.isV0() Then
         cmdStr = "cd ~" & relpaceSlashInPath(Split(mDrive, ":")(1)) & getParentPath(mTask.Vnd.Sdk) & " && " & cmdStr
     End If
     Call copyStrAndPasteInXshell(cmdStr)

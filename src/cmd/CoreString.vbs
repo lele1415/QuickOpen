@@ -24,6 +24,38 @@ Function isInStr(str1, str2)
     End If
 End Function
 
+Function isGt(num1, num2)
+    If num1 > num2 Then
+        isGt = True
+    Else
+        isGt = False
+    End If
+End Function
+
+Function isGe(num1, num2)
+    If num1 >= num2 Then
+        isGe = True
+    Else
+        isGe = False
+    End If
+End Function
+
+Function isLt(num1, num2)
+    If num1 < num2 Then
+        isLt = True
+    Else
+        isLt = False
+    End If
+End Function
+
+Function isLe(num1, num2)
+    If num1 <= num2 Then
+        isLe = True
+    Else
+        isLe = False
+    End If
+End Function
+
 Function relpaceSlashInPath(path)
     relpaceSlashInPath = Replace(path, "\", "/")
 End Function
