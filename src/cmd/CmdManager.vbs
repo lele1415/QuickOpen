@@ -1083,9 +1083,18 @@ Function checkBuildType()
     End If
 End Function
 
+Sub checkWorkSpaceClean()
+    Dim value
+    value = readTextAndGetValue("MID_CSCI_SUPPORT", "device/mediatek/system/" & mTask.Sys.Product & "/SystemConfig.mk")
+    If value = "yes" Then
+        MsgBox("Work space is not clean!")
+    End If
+End Sub
+
 Function getSplitBuildCommand(opts)
     Call checkBuildTask()
     If Not checkBuildType() Then getSplitBuildCommand = "" : Exit Function
+    Call checkWorkSpaceClean()
     Dim buildsh, params, commandStr
     If mBuild.Infos.is8781() Then
         buildsh = "./split_build_v2.sh"
