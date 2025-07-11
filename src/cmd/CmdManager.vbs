@@ -9,18 +9,6 @@ Dim mSaveString : Set mSaveString = New SaveString
 Dim mLeftComparePath, mRightComparePath
 Dim idTimer
 
-Sub copyStrAndPasteInXshell(cmdStr)
-    If cmdStr = "" Then MsgBox("Empty!") : Exit Sub
-    Call CopyString(cmdStr)
-    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_XSHELL & """)", 500, "VBScript")
-End Sub
-
-Sub copyStrAndPasteInPowerShell(cmdStr)
-    If cmdStr = "" Then MsgBox("Empty!") : Exit Sub
-    Call CopyString(cmdStr)
-    idTimer = window.setTimeout("Call appactivateAndPaste(" & """" & TITLE_POWERSHELL & """)", 500, "VBScript")
-End Sub
-
 Sub setPathFromCmd(path)
     Call setOpenPath(path)
     Call onOpenPathChange()
@@ -32,20 +20,36 @@ Sub setPathFromCmdAndCopyKey(key, path)
     mSaveString.str = key
 End Sub
 
-Sub appactivateAndPaste(title)
+Sub copyStrAndPasteInXshell(cmdStr)
+    If cmdStr = "" Then MsgBox("Empty!") : Exit Sub
+    Call CopyString(cmdStr)
+    idTimer = window.setTimeout("Call waitToAppactivate(""" & TITLE_XSHELL & """)", 200, "VBScript")
+End Sub
+
+Sub copyStrAndPasteInPowerShell(cmdStr)
+    If cmdStr = "" Then MsgBox("Empty!") : Exit Sub
+    Call CopyString(cmdStr)
+    idTimer = window.setTimeout("Call waitToAppactivate(""" & TITLE_POWERSHELL & """)", 200, "VBScript")
+End Sub
+
+Sub waitToAppactivate(title)
     window.clearTimeout(idTimer)
     Call oWs.appactivate(title)
+    idTimer = window.setTimeout("Call pasteInShell()", 200, "VBScript")
+End Sub
+
+Sub pasteInShell()
+    window.clearTimeout(idTimer)
     Call oWs.sendkeys("+{INSERT}")
 End Sub
 
 Sub copyStrAndPasteInCodeEditor()
     mSaveString.copy()
-    idTimer = window.setTimeout("Call appactivateCodeEditor(" & """" & TITLE_SUBLIME & """)", 500, "VBScript")
+    Call oWs.appactivate(TITLE_SUBLIME)
+    Call waitToSearch()
 End Sub
 
-Sub appactivateCodeEditor(title)
-    window.clearTimeout(idTimer)
-    Call oWs.appactivate(title)
+Sub waitToSearch(title)
     idTimer = window.setTimeout("Call searchInCodeEditor()", 300, "VBScript")
 End Sub
 

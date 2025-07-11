@@ -57,7 +57,13 @@ Sub CopyString(str)
         Call CopyOpenPathAllText()
         Exit Sub
     End If
-    oWs.Run "MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(Window.Close)"
+    Dim result, count
+    result = -1
+    count = 0
+    Do Until result = 0 Or count > 5
+        result = oWs.Run("MsHta vbscript:ClipBoardData.setData(""Text"",""" & str & """)(close)",0,True)
+        count = count + 1
+    Loop
 End Sub
 
 Sub CopyOpenPathAllText()
