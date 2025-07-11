@@ -101,6 +101,7 @@ Function HandleFolderPathCmd()
     If mCmdInput.text = "lg" Then Call setVndBuild() : Call setPathFromCmd(mTask.Vnd.Infos.LogoPath) : Exit Function
     'If mCmdInput.text = "md" Then Call setPathFromCmd("vendor/weibu_sz/media") : Exit Function
     If mCmdInput.text = "tee" Then Call setVndBuild() : Call setPathFromCmd("vendor/mediatek/proprietary/trustzone/trustkernel/source/build/" & mBuild.Product) : Exit Function
+    If mCmdInput.text = "3rd" Then Call setPathFromCmd("vendor/weibu_sz/3rd") : Exit Function
     HandleFolderPathCmd = False
 End Function
 
@@ -133,6 +134,7 @@ Function HandleFilePathCmd()
     'If mCmdInput.text = "cc" Then Call setPathFromCmd("device/mediatek/vendor/common/custom.conf") : Exit Function
     If mCmdInput.text = "fwc" Then Call setPathFromCmd("frameworks/base/core/res/res/values/config.xml") : Exit Function
     If mCmdInput.text = "fws" Then Call setPathFromCmd("frameworks/base/core/res/res/values/strings.xml") : Exit Function
+    If mCmdInput.text = "suc" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SystemUI/res/values/config.xml") : Exit Function
     If mCmdInput.text = "tv" Then Call setPathFromCmd("frameworks/base/core/java/android/widget/TextView.java") : Exit Function
     If mCmdInput.text = "tz" Then Call runPath("frameworks/base/packages/SettingsLib/res/xml/timezones.xml") : Exit Function
     If mCmdInput.text = "tz2" Then Call runPath("system/timezone/output_data/android/tzlookup.xml") : Exit Function
@@ -153,6 +155,7 @@ Function HandleFilePathCmd()
     If mCmdInput.text = "-zs" Then Call setPathFromCmd(getOpenPath() & "/res/values-zh-rCN/strings.xml") : Exit Function
     If mCmdInput.text = "-js" Then Call setPathFromCmd(getOpenPath() & "/res/values-ja/strings.xml") : Exit Function
     If mCmdInput.text = "-rs" Then Call setPathFromCmd(getOpenPath() & "/res/values-ru/strings.xml") : Exit Function
+    If mCmdInput.text = "-g" Then Call setPathFromCmd("vendor/partner_gms/overlay/gms_overlay/" & getOpenPath()) : Exit Function
     If mCmdInput.text = "spdf" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/res/values/defaults.xml") : Exit Function
     If mCmdInput.text = "spdb" Then Call setPathFromCmd("vendor/mediatek/proprietary/packages/apps/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java") : Exit Function
     If mCmdInput.text = "lot" Then Call setPathFromCmd("vendor/partner_gms/apps/GmsSampleIntegration/res_dhs_full/xml/partner_default_layout.xml") : Exit Function
@@ -165,6 +168,12 @@ Function HandleFilePathCmd()
     If mCmdInput.text = "sp2" Then Call setPathFromCmd("vendor/mediatek/proprietary/buildinfo_vnd/device.mk") : Exit Function
     If mCmdInput.text = "bn1" Then Call setPathFromCmd("build/make/core/weibu_config.mk") : Exit Function
     If mCmdInput.text = "bn2" Then Call setPathFromCmd("device/mediatek/system/common/BoardConfig.mk") : Exit Function
+    If mCmdInput.text = "rmvb" Then Call setPathFromCmd("vendor/mediatek/proprietary/frameworks/base/data/etc/pms_sysapp_removable_system_list.txt") : Exit Function
+    If mCmdInput.text = "pwm" Then Call setPathFromCmd("frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java") : Exit Function
+    If mCmdInput.text = "vlg" Then Call runPath(getBuildLog("vlg")) : Exit Function
+    If mCmdInput.text = "klg" Then Call runPath(getBuildLog("klg")) : Exit Function
+    If mCmdInput.text = "hlg" Then Call runPath(getBuildLog("hlg")) : Exit Function
+    If mCmdInput.text = "slg" Then Call runPath(getBuildLog("slg")) : Exit Function
     HandleFilePathCmd = False
 End Function
 
@@ -1912,3 +1921,23 @@ Sub setCommonTask(sdk)
         Call setCurrentBuild(mTask.Sys)
     End If
 End Sub
+
+Function getBuildLog(what)
+    If what = "vlg" Then
+        Call setVndBuild()
+        If mTask.Vnd.Infos.is8781() Then
+            getBuildLog = "vext_build.log"
+        Else
+            getBuildLog = "vnd_build.log"
+        End If
+    ElseIf what = "klg" Then
+        Call setVndBuild()
+        getBuildLog = "krn_build.log"
+    ElseIf what = "hlg" Then
+        Call setVndBuild()
+        getBuildLog = "hal_build.log"
+    Else
+        Call setSysBuild()
+        getBuildLog = "sys_build.log"
+    End If
+End Function
