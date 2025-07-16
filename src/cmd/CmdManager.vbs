@@ -526,6 +526,19 @@ Function getCmdStrForCpFileAndSetValue(whatArr)
         searchStr = keyStr & startStr
         valueStr = whatArr(1)
         cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
+    
+    ElseIf whatArr(0) = "bo" Then
+        If Not InStr(whatArr(1), ":user/release-keys") > 0 Then
+            MsgBox("Invalid base_os!")
+            getCmdStrForCpFileAndSetValue = ""
+            Exit Function
+        End If
+        filePath = "build/make/tools/buildinfo.sh"
+        keyStr = "ro.build.version.base_os"
+        startStr = "="
+        searchStr = keyStr & startStr
+        valueStr = whatArr(1) & """&Chr(34)&"""
+        cmdStr = getCpAndSedCmdStr(filePath, searchStr, startStr, valueStr, "s")
 
     ElseIf whatArr(0) = "bn2" Then
         filePath = "device/mediatek/system/common/BoardConfig.mk"
@@ -1249,13 +1262,24 @@ Sub CopyCommitInfo(what)
     ElseIf what = "di" Then
         commandFinal = "DisplayId [" & mBuild.Project & "] : 版本号"
     ElseIf InStr(what, "bn=") = 1 Then
-        commandFinal = "BuildNumber [" & mBuild.Project & "] : 固定指纹信息（build number " & Replace(what, "bn=", "") & "）"
-    ElseIf InStr(what, "sp=") = 1 Then
-        If InStr(what, "-bn=") > 0 Then
-            commandFinal = "GMS [" & mBuild.Project & "] : 固定GMS信息（安全补丁日期 " & Replace(Split(what, "-bn=")(0), "sp=", "") & "、build number " & Split(what, "-bn=")(1) & "）"
-        Else
-            commandFinal = "GMS [" & mBuild.Project & "] : 固定安全补丁日期 " & Replace(what, "sp=", "")
-        End If
+        commandFinal = "BuildNumber [" & mBuild.Project & "] : 更新指纹信息（build number " & Replace(what, "bn=", "") & "）"
+    ElseIf what = "smr" Then
+        Dim i, minIndex, spValue, bnValue, boValue, commitStr
+        minIndex = 0
+        If vaCmdHistory.Bound >= 4 Then minIndex = vaCmdHistory.Bound - 4
+        For i = vaCmdHistory.Bound To minIndex Step -1
+            If spValue = "" And InStr(vaCmdHistory.V(i), "sp=") > 0 Then
+                spValue = Replace(vaCmdHistory.V(i), "sp=", "")
+            ElseIf bnValue = "" And InStr(vaCmdHistory.V(i), "bn=") > 0 Then
+                bnValue = Replace(vaCmdHistory.V(i), "bn=", "")
+            ElseIf boValue = "" And InStr(vaCmdHistory.V(i), "bo=") > 0 Then
+                boValue = Replace(vaCmdHistory.V(i), "bo=", "")
+            End If
+        Next
+        If spValue <> "" Then commitStr = commitStr & "安全补丁日期 " & spValue
+        If bnValue <> "" Then commitStr = commitStr & "、build number " & bnValue
+        If boValue <> "" Then commitStr = commitStr & "、base_os=" & boValue
+        commandFinal = "GMS [" & mBuild.Project & "] : SMR修改（" & commitStr & "）"
     ElseIf what = "bm" Then
         commandFinal = "MMI [" & mBuild.Project & "] : 品牌，型号"
     ElseIf what = "bwm" Then
