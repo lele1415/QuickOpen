@@ -340,6 +340,7 @@ Function handleProjectCmd()
     ElseIf mCmdInput.text = "v" Then
         Call setVndBuild()
         Exit Function
+    ElseIf mCmdInput.text = "b0" Then Call setCommonTask("b0") : Exit Function
     ElseIf mCmdInput.text = "v0" Then Call setCommonTask("v0") : Exit Function
     ElseIf mCmdInput.text = "u0" Then Call setCommonTask("u0") : Exit Function
     ElseIf mCmdInput.text = "t0" Then Call setCommonTask("t0") : Exit Function
@@ -1895,7 +1896,13 @@ End Sub
 
 Sub setCommonTask(sdk)
     Dim taskInfos, vndBuild, sysBuild
-    If sdk = "v0" Then
+    If sdk = "b0" Then
+        Set taskInfos = (New TaskInfos)("0000", "COMMON_B0", "COMMON_B0")
+        Set vndBuild = (New BaseBuild)("vnd", "mtk_sp_t0/v_sys", "tb8786p1_64_k66", "COMMON")
+        Set sysBuild = (New BaseBuild)("sys", "mtk_sp_t0/b0", "mssi_64_cn", "M621QCR100_CC_2102_WIFI-MMI")
+        Set mTask = (New TaskBuild)(taskInfos, vndBuild, sysBuild)
+        Call setCurrentBuild(mTask.Sys)
+    ElseIf sdk = "v0" Then
         Set taskInfos = (New TaskInfos)("0000", "COMMON_V0", "COMMON_V0")
         Set vndBuild = (New BaseBuild)("vnd", "mtk_sp_t0/v_sys", "tb8786p1_64_k66", "COMMON")
         Set sysBuild = (New BaseBuild)("sys", "mtk_sp_t0/v_sys", "mssi_64_cn", "COMMON")
