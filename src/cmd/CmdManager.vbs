@@ -1649,14 +1649,16 @@ Sub moveOutFoldersOut(taskNumInput)
         Dim idArr
         idArr = Split(innerId, ".")
         If UBound(idArr) < 2 Then MsgBox("Invalid inner id!" & VbLf & innerId) : Exit Sub
-        Dim numArr, i
-        numArr = Split(idArr(2), "-")
+        Dim numArr, i, maxNum
+        numArr = Split(Replace(Split(innerId, idArr(0))(1), "-", "."), ".")
+        maxNum = 0
         For i = UBound(numArr) To 0 Step -1
-            If isTaskNum(numArr(i)) Then
-                taskNum = numArr(i)
+            If isNumeric(numArr(i)) And isTaskNum(numArr(i)) And numArr(i) > maxNum Then
+                maxNum = numArr(i)
                 Exit For
             End If
         Next
+        If maxNum > 0 Then taskNum = maxNum
         If taskNum = "" Then MsgBox("Empty taskNum! ") : Exit Sub
     End If
 
