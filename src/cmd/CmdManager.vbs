@@ -207,8 +207,8 @@ Function handleGetInfo()
     If mCmdInput.text = "spc" Then Call setOpenPath(readTextAndGetValue("PLATFORM_SECURITY_PATCH", "build/make/core/version_defaults.mk")) : Exit Function
     If mCmdInput.text = "pbd" Then Call setOpenPath(readTextAndGetValue("PRODUCT_BRAND", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
     If mCmdInput.text = "pmd" Then Call setOpenPath(readTextAndGetValue("PRODUCT_MODEL", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
-    If mCmdInput.text = "pdc" Then Call setOpenPath(readTextAndGetValue("PRODUCT_DEVICE", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
-    If mCmdInput.text = "pnm" Then Call setOpenPath(readTextAndGetValue("PRODUCT_NAME", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
+    If mCmdInput.text = "pdc" Then Call setOpenPath(readTextAndGetValue("PRODUCT_SYSTEM_DEVICE", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
+    If mCmdInput.text = "pnm" Then Call setOpenPath(readTextAndGetValue("PRODUCT_SYSTEM_NAME", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
     If mCmdInput.text = "pmf" Then Call setOpenPath(readTextAndGetValue("PRODUCT_MANUFACTURER", mBuild.Infos.getOverlayPath(mBuild.Infos.ProductFile))) : Exit Function
     handleGetInfo = False
 End Function
