@@ -248,7 +248,7 @@ Sub showHistoryPath(keyCode)
     If vaPathHistory.Bound = -1 Then Exit Sub
 
     Dim index
-    index = vaPathHistory.getIndexIfExist(getOriginPathFromOverlayPath(getOpenPath()))
+    index = vaPathHistory.getIndexIfExist(getOpenPath())
     If index = -1 Then mCurrentHistoryPath = getOpenPath()
 
     If keyCode = KEYCODE_UP Then
