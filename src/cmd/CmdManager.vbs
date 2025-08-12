@@ -1064,6 +1064,7 @@ Function checkBuildTask()
     Dim outDisplayId, lunchItemPath, lunchStr, index
     Call setSysBuild()
     outDisplayId = mBuild.Infos.getOutProp("ro.build.display.inner.id")
+    If outDisplayId = "" Then checkBuildTask = True : Exit Function
     If mBuild.Infos.is8781() Then
         lunchItemPath = "../lunch_item_v2"
     ElseIf mBuild.Infos.isV0() Then
