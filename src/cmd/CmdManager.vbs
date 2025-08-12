@@ -1310,7 +1310,10 @@ Sub CopyCommitInfo(what)
     ElseIf what = "slp" Then
         commandFinal = "Settings [" & mBuild.Project & "] : 默认休眠时间"
     ElseIf what = "bat" Then
-        commandFinal = "Battery [" & mBuild.Project & "] : 电池检测容量mAh"
+        Dim lastCmd, capacity
+        If vaCmdHistory.Bound > -1 Then lastCmd = vaCmdHistory.V(vaCmdHistory.Bound)
+        If InStr(lastCmd, "bat=") = 1 Then capacity = Replace(lastCmd, "bat=", "")
+        commandFinal = "Battery [" & mBuild.Project & "] : 电池检测容量" & capacity & "mAh"
     ElseIf what = "ft" Then
         commandFinal = "FactoryTest [" & mBuild.Project & "] : "
     ElseIf what = "tv" Then
